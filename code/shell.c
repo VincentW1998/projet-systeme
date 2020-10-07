@@ -16,6 +16,7 @@ int main(int argc, char const *argv[]) {
       // implementation de la commande exit
       if(!strncmp(buff,"exit\n",strlen("exit\n")))
         break;
+      // implementation ls
       if(!strncmp(buff,"ls",strlen("ls")))
         ls(buff, current);
 
