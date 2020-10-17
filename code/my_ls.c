@@ -100,15 +100,12 @@ int ls(char *buff){
 
     if(strcmp(options[i-1],"-l"))break;
   }
-  printf("i = %d\n", i);
   if((i==1 && strncmp(options[0],"ls\n",strlen("ls\n")))|| (i>1 && strcmp(options[0],"ls"))){//check si le ls appels
-    printf("%s\n", "1");
     perror("error:  ");
     return -1;
   }
   if(i>1 && strcmp(options[i-1],"-l")){
     if(chdir(options[i-1])){
-      printf("%s\n", "2");
 
       chdir(currpath);
       perror("error:  ");
