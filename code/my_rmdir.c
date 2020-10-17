@@ -13,7 +13,6 @@ int my_rmdir(char * path) {
 
     if(stat(path, &st) == -1) {
         perror("stat");
-        exit(1);
     }
 
     if(S_ISDIR(st.st_mode)){
@@ -37,6 +36,9 @@ int my_rmdir(char * path) {
             chdir(pwd);
             free(pwd);
             return 0;
+        }
+        else {
+          perror("rmdir");
         }
     }
     return -1;
