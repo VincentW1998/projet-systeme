@@ -9,18 +9,6 @@
 #include "my_mkdir.h"
 #include "my_rmdir.h"
 
-int affichagePrompt() {
-  write(1, KBLU, strlen(KBLU));
-  write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
-  write(1, "> ", 2);
-  write(1, RESET, strlen(RESET));
-  return 0;
-}
-
-
-int main(int argc, char const *argv[]) {
-  char str [BUFSIZE];
-  char * buff;
 
 int main(int argc, char const *argv[]) {
   char str [BUFSIZE];
@@ -28,9 +16,12 @@ int main(int argc, char const *argv[]) {
   int n;
   char * token;
   while(1) { // boucle infinie
-    affichagePrompt();
-    if((n = read(0,str,BUFSIZE)) > 0) { // check si l'usr ecrit dans l'entrée
-      // implementation de la commande exit
+    write(1, KBLU, strlen(KBLU));
+    write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
+    write(1, "> ", 2);
+    write(1, RESET, strlen(RESET));
+    if((n = read(0,str,BUFSIZE) > 0)) { // check si l'usr ecrit dans l'entrée
+
       token = strtok(str,"\n");
       if(token!=NULL){
         strcpy(buff,token);
@@ -54,6 +45,7 @@ int main(int argc, char const *argv[]) {
         token = strtok(buff, " \n");
         token = strtok(NULL, " \n");
 
+
         my_rmdir(token);
       }
       if(!strncmp(buff, "cd", strlen("cd"))) {
@@ -66,7 +58,6 @@ int main(int argc, char const *argv[]) {
         write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
         write(1, "\n\n", 2);
       }
-
     }
     strcpy(buff,"");
   }
