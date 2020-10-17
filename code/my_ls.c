@@ -1,6 +1,7 @@
 #include "my_ls.h"
 #define blocksize 500
 char s [blocksize];
+
 int typeFic(struct stat st){
 
   int n;
@@ -84,7 +85,7 @@ int mtime(struct stat st){
 
 
 
-int ls(char buff[]){
+int ls(char *buff){
   DIR * current;
   struct dirent *directory;
   struct stat st;
@@ -96,17 +97,19 @@ int ls(char buff[]){
   while((token = strtok(NULL," \n"))!=NULL){//separe la ligne de commande recu en plusieurs morceau et les stock dans options
     strcpy(options[i],token);
     i++;
+
     if(strcmp(options[i-1],"-l"))break;
   }
-
+  printf("i = %d\n", i);
   if((i==1 && strncmp(options[0],"ls\n",strlen("ls\n")))|| (i>1 && strcmp(options[0],"ls"))){//check si le ls appels
+    printf("%s\n", "1");
     perror("error:  ");
     return -1;
   }
   if(i>1 && strcmp(options[i-1],"-l")){
-    printf("PATH = %s\n",options[i-1]);
-    if(options[i-1]==NULL)printf("PATH is Null\n");
     if(chdir(options[i-1])){
+      printf("%s\n", "2");
+
       chdir(currpath);
       perror("error:  ");
      return -1;
@@ -115,8 +118,8 @@ int ls(char buff[]){
   current = opendir(".");
   while((directory = readdir(current)) > 0){
     if(directory->d_name[0]!='.'){
-      if(i>0 && !strcmp(options[1],"-l")){
-        if(stat(directory->d_name,&st)) printf("%s\n","pb stat");
+      if(i>1 && !strcmp(options[1],"-l")){
+        if(stat(directory->d_name,&st)) perror("error:  ");
         typeFic(st);
         rights(st);
         Nbrlink(st);
