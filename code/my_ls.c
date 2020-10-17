@@ -96,11 +96,6 @@ int ls(char buff[]){
   }
   printf("%d\n", i);
   if(i!=0 && strcmp(options[i-1],"-l")){
-    // printf("%s\n", "bonsoir");
-    // closedir(current);
-    // current = opendir(options[i-1]);
-    // if(chdir(options[i-1])) printf("%s\n", "yes");
-    // printf("%s\n", options[i-1]);
     chdir(options[i-1]);
   }
   current = opendir(".");
@@ -125,14 +120,14 @@ int ls(char buff[]){
       }
     }
   }
-  // write(1,"\n",1);
-  rewinddir(current);
-
+  // // write(1,"\n",1);
+  // rewinddir(current);
+  // free(options);
+  while(i!=0){
+    free(options[i]);
+    i--;
+  }
   closedir(current);
-  // if(i!=0 && !strcmp(options[i-1],"-l")){
-  //   closedir(current);
-  // }
 
-  // if(i!=0) closedir(current);
   return 0;
 }
