@@ -1,6 +1,7 @@
 #include "my_ls.h"
 #define blocksize 500
 char s [blocksize];
+
 int typeFic(struct stat st){
 
   int n;
@@ -84,7 +85,8 @@ int mtime(struct stat st){
 
 
 
-int ls(char buff[]){
+int ls(char *buff){
+  // printf("BUFFER = %s\n",buff );
   DIR * current;
   struct dirent *directory;
   struct stat st;
@@ -96,15 +98,19 @@ int ls(char buff[]){
   while((token = strtok(NULL," \n"))!=NULL){//separe la ligne de commande recu en plusieurs morceau et les stock dans options
     strcpy(options[i],token);
     i++;
+    // printf("opt = %sS\n", options[i-1]);
     if(strcmp(options[i-1],"-l"))break;
   }
-
+  printf("i = %d\n", i);
   if((i==1 && strncmp(options[0],"ls\n",strlen("ls\n")))|| (i>1 && strcmp(options[0],"ls"))){//check si le ls appels
+    printf("%s\n", "1");
     perror("error:  ");
     return -1;
   }
   if(i>1 && strcmp(options[i-1],"-l")){
     if(chdir(options[i-1])){
+      printf("%s\n", "2");
+
       chdir(currpath);
       perror("error:  ");
      return -1;
