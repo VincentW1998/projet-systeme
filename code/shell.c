@@ -9,18 +9,30 @@
 #include "my_mkdir.h"
 #include "my_rmdir.h"
 
+int affichagePrompt() {
+  write(1, KBLU, strlen(KBLU));
+  write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
+  write(1, "> ", 2);
+  write(1, RESET, strlen(RESET));
+  return 0;
+}
+
+
 int main(int argc, char const *argv[]) {
-  char buff [BUFSIZE];
+  char str [BUFSIZE];
+  char * buff;
 
   int n;
   char * token;
   while(1) { // boucle infinie
-    write(1, KBLU, strlen(KBLU));
-    write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
-    write(1, "> ", 2);
-    write(1, RESET, strlen(RESET));
-    if((n = read(0,buff,BUFSIZE)) > 0) { // check si l'usr ecrit dans l'entrée
+    affichagePrompt();
+    if((n = read(0,str,BUFSIZE)) > 0) { // check si l'usr ecrit dans l'entrée
       // implementation de la commande exit
+      token = strtok(str,"\n");
+      if(token!=NULL){
+        strcpy(buff,token);
+        strcat(buff,"\n");
+      }
 
       if(!strncmp(buff,"exit\n",strlen("exit\n")))
         break;
@@ -52,6 +64,7 @@ int main(int argc, char const *argv[]) {
         write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
         write(1, "\n\n", 2);
       }
+
     }
   }
   return 0;

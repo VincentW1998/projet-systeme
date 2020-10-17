@@ -115,7 +115,7 @@ int ls(char buff[]){
   current = opendir(".");
   while((directory = readdir(current)) > 0){
     if(directory->d_name[0]!='.'){
-      if(i>0 && !strcmp(options[1],"-l")){
+      if(i>1 && !strcmp(options[1],"-l")){
         if(stat(directory->d_name,&st)) printf("%s\n","pb stat");
         typeFic(st);
         rights(st);

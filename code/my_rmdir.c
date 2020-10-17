@@ -32,7 +32,8 @@ int my_rmdir(char * path) {
           s = realloc(s, strlen(token1) + 1);
           strcpy(s, token1);
         }
-        
+        printf("s : %s\n", s);
+        printf("token : %s\n", token1);
         if((n = rmdir(s) > -1)) {
             free(s);
             chdir(pwd);
