@@ -46,45 +46,50 @@ int rights(struct stat st){
       if(st.st_mode & S_IWOTH) strcat(s,"w"); else strcat(s,"-");
       if(st.st_mode & S_IXOTH) strcat(s,"x  "); else strcat(s,"-  ");
 
-  if(write(1,droits,strlen(droits))<9)return -1;
+  // if(write(1,droits,strlen(droits))<9)return -1;
   return 0;
 }
 
 int Nbrlink(struct stat st){
   char l[blocksize];
   sprintf(l,"%hi  ",st.st_nlink);
-  if(write(1,l,strlen(l))==0)return -1;
+
+  strcat(s, l);
+  strcat(s,"  ");
+  // if(write(1,l,strlen(l))==0)return -1;
   return 0;
 }
 
 int usrAndGrp(struct stat st){
-  char s[blocksize];
+  // char s[blocksize];
   struct passwd * usr;
   usr = getpwuid(st.st_uid);
-  strcpy(s,usr->pw_name);
-
+  // strcpy(s,usr->pw_name);
+  strcat(s,usr->pw_name);
   struct group * grp;
   grp = getgrgid(st.st_gid);
   strcat(s,"  ");
   strcat(s,grp->gr_name);
   strcat(s,"  ");
-  if(write(1,s,strlen(s))==0)return -1;
+  // if(write(1,s,strlen(s))==0)return -1;
   return 0;
 }
 
 int psize(struct stat st){
-  char s[blocksize];
-  sprintf(s,"%lld",st.st_size);
+  char l[blocksize];
+  sprintf(l,"%lld",st.st_size);
+  strcat(s,l);
   strcat(s,"  ");
-  if(write(1,s,strlen(s))==0)return -1;
+  // if(write(1,s,strlen(s))==0)return -1;
   return 0;
 }
 
 int mtime(struct stat st){
-  char *s;
-  s = ctime(&st.st_mtime);
-  if(write(1,s,strlen(s)-1)==0)return -1 ;
-  write(1,"  ",2);
+  // char *s;
+  strncat(s,ctime(&st.st_mtime),strlen(ctime(&st.st_mtime))-1);
+  strcat(s,"  ");
+  // if(write(1,s,strlen(s)-1)==0)return -1 ;
+  // write(1,"  ",2);
   return 0;
 }
 
@@ -95,21 +100,25 @@ int ls(char buff[]){
   struct dirent *directory;
   struct stat st;
   char * currpath = getcwd(NULL,0);
-  char s[blocksize];
-  char options[2][blocksize];
-  int i=0;
+  // char s[blocksize];
+  char options[3][blocksize];
+  int i=1;
   char * token = strtok(buff," ");
+  strcpy(options[0],token);
+  if(strcmp(options[0],"ls"))return -1;
   while((token = strtok(NULL," \n"))!=NULL){
     strcpy(options[i],token);
     i++;
   }
-  if(i!=0 && strcmp(options[i-1],"-l")){
-    chdir(options[i-1]);
+  if(i>0 && strcmp(options[i-1],"-l")){
+    if(chdir(options[i-1])){
+     return -1;
+    }
   }
   current = opendir(".");
   while((directory = readdir(current)) > 0){
     if(directory->d_name[0]!='.'){
-      if(i!=0 && !strcmp(options[0],"-l")){
+      if(i>0 && !strcmp(options[1],"-l")){
         if(stat(directory->d_name,&st)) printf("%s\n","pb stat");
         if(typeFic(st))return -1;
         if(rights(st))return -1;
@@ -117,8 +126,11 @@ int ls(char buff[]){
         if(usrAndGrp(st))return -1;
         if(psize(st))return -1;
         if(mtime(st))return -1;
-        write(1,directory->d_name,strlen(directory->d_name));
-        write(1,"\n",1);
+        // write(1,directory->d_name,strlen(directory->d_name));
+        strcat(s,directory->d_name);
+        strcat(s,"\n");
+        write(1,s,strlen(s));
+        // write(1,"\n",1);
       }
       else{
         strcpy(s,directory->d_name);
