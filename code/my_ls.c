@@ -86,7 +86,6 @@ int mtime(struct stat st){
 
 
 int ls(char *buff){
-  // printf("BUFFER = %s\n",buff );
   DIR * current;
   struct dirent *directory;
   struct stat st;
@@ -98,7 +97,7 @@ int ls(char *buff){
   while((token = strtok(NULL," \n"))!=NULL){//separe la ligne de commande recu en plusieurs morceau et les stock dans options
     strcpy(options[i],token);
     i++;
-    // printf("opt = %sS\n", options[i-1]);
+
     if(strcmp(options[i-1],"-l"))break;
   }
   printf("i = %d\n", i);

@@ -21,15 +21,12 @@ int main(int argc, char const *argv[]) {
     write(1, "> ", 2);
     write(1, RESET, strlen(RESET));
     if((n = read(0,str,BUFSIZE) > 0)) { // check si l'usr ecrit dans l'entrée
-      // printf("N = %d\n",n );
-      // implementation de la commande exit
-      // getCMD(&buff);
+
       token = strtok(str,"\n");
       if(token!=NULL){
         strcpy(buff,token);
         strcat(buff,"\n");
       }
-      // printf("BUFFER = %s!\n", buff);
 
       if(!strncmp(buff,"exit\n",strlen("exit\n")))
         break;
