@@ -8,8 +8,8 @@
 
 int main(int argc, char const *argv[]) {
   char buff [BUFSIZE];
-  DIR * current;
-  current = opendir(".");
+  // DIR * current;
+  // current = opendir(".");
   int n, file;
   while(1){ // boucle infinie
     if((n = read(0,buff,BUFSIZE)) > 0){ // check si l'usr ecrit dans l'entrée
@@ -18,11 +18,11 @@ int main(int argc, char const *argv[]) {
         break;
       // implementation ls
       if(!strncmp(buff,"ls",strlen("ls")))
-        ls(buff, current);
+        ls(buff);
 
 
     }
   }
-  closedir(current);
+  // closedir(current);
   return 0;
 }
