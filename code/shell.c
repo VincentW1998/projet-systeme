@@ -51,7 +51,6 @@ int main(int argc, char const *argv[]) {
         token = strtok(buff, " \n");
         token = strtok(NULL, " \n");
 
-
         my_rmdir(token);
       }
       if(!strncmp(buff, "cd", strlen("cd"))) {
