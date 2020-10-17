@@ -9,7 +9,7 @@ int my_rmdir(char * path) {
     int n;
     struct stat st;
     char *pwd;
-    char *s;
+    char *s = NULL;
 
     if(stat(path, &st) == -1) {
         perror("stat");
