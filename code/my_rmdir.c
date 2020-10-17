@@ -20,17 +20,19 @@ int my_rmdir(char * path) {
         chdir(path); // change de directory
         char * token1 = strtok(path, "/"); // recupere le premier token
         char * token2;
+
         while((token2 = strtok(NULL,"/\n"))!=NULL){ // recupere tout les autres token
           s = malloc(strlen(token2) + 1);
           strcpy(s, token2);
         }
 
-        chdir("..");
+        chdir(".."); // retourne dans le dossier parent
+
         if(s == NULL) {
-          free(s);
-          s = malloc(strlen(token1) + 1);
+          s = realloc(s, strlen(token1) + 1);
           strcpy(s, token1);
         }
+        
         if((n = rmdir(s) > -1)) {
             free(s);
             chdir(pwd);
