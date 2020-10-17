@@ -104,8 +104,6 @@ int ls(char buff[]){
     return -1;
   }
   if(i>1 && strcmp(options[i-1],"-l")){
-    printf("PATH = %s\n",options[i-1]);
-    if(options[i-1]==NULL)printf("PATH is Null\n");
     if(chdir(options[i-1])){
       chdir(currpath);
       perror("error:  ");
@@ -115,7 +113,7 @@ int ls(char buff[]){
   current = opendir(".");
   while((directory = readdir(current)) > 0){
     if(directory->d_name[0]!='.'){
-      if(i>0 && !strcmp(options[1],"-l")){
+      if(i>1 && !strcmp(options[1],"-l")){
         if(stat(directory->d_name,&st)) printf("%s\n","pb stat");
         typeFic(st);
         rights(st);
