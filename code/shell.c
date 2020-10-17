@@ -14,6 +14,8 @@ int main(int argc, char const *argv[]) {
   int n, file, lu;
   char * token;
   while(1) { // boucle infinie
+    write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
+    write(1, "# ", 2);
     if((n = read(0,buff,BUFSIZE)) > 0) { // check si l'usr ecrit dans l'entrée
       // implementation de la commande exit
 
@@ -34,6 +36,15 @@ int main(int argc, char const *argv[]) {
         token = strtok(NULL, " \n");
 
         my_rmdir(token);
+      }
+      if(!strncmp(buff, "cd", strlen("cd"))) {
+        token = strtok(buff, " \n");
+        token = strtok(NULL, " \n");
+
+        chdir(token);
+      }
+      if(!strncmp(buff, "pwd", strlen("pwd"))) {
+        write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
       }
     }
   }
