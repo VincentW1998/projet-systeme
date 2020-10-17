@@ -1,4 +1,6 @@
 #define BUFSIZE 512
+#define KBLU  "\x1B[34m"
+#define KWHT  "\x1B[37m"
 #include <stdlib.h>
 #include "my_ls.h"
 #include <stdio.h>
@@ -14,8 +16,10 @@ int main(int argc, char const *argv[]) {
   int n, file, lu;
   char * token;
   while(1) { // boucle infinie
+    printf("%s\n", KBLU);
     write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
-    write(1, "# ", 2);
+    write(1, "> ", 2);
+    printf("%s\n", KWHT);
     if((n = read(0,buff,BUFSIZE)) > 0) { // check si l'usr ecrit dans l'entrée
       // implementation de la commande exit
 
@@ -45,6 +49,7 @@ int main(int argc, char const *argv[]) {
       }
       if(!strncmp(buff, "pwd", strlen("pwd"))) {
         write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
+        write(1, "\n\n", 2);
       }
     }
   }
