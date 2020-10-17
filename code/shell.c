@@ -16,10 +16,10 @@ int main(int argc, char const *argv[]) {
   int n, file, lu;
   char * token;
   while(1) { // boucle infinie
-    printf(KBLU "\n");
+    write(1, KBLU, strlen(KBLU));
     write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
     write(1, "> ", 2);
-    printf(RESET "\n");
+    write(1, RESET, strlen(RESET));
     if((n = read(0,buff,BUFSIZE)) > 0) { // check si l'usr ecrit dans l'entrée
       // implementation de la commande exit
 
