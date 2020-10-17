@@ -123,10 +123,10 @@ int ls(char buff[]){
   // // write(1,"\n",1);
   // rewinddir(current);
   // free(options);
-  while(i!=0){
-    free(options[i]);
-    i--;
-  }
+  // while(i!=0){
+  //   free(options[i]);
+  //   i--;
+  // }
   closedir(current);
 
   return 0;
