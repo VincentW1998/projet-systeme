@@ -22,6 +22,9 @@ int main(int argc, char const *argv[]) {
   char str [BUFSIZE];
   char * buff;
 
+int main(int argc, char const *argv[]) {
+  char str [BUFSIZE];
+  char * buff;
   int n;
   char * token;
   while(1) { // boucle infinie
@@ -65,6 +68,7 @@ int main(int argc, char const *argv[]) {
       }
 
     }
+    strcpy(buff,"");
   }
   return 0;
 }
