@@ -11,9 +11,8 @@
 
 int main(int argc, char const *argv[]) {
   char buff [BUFSIZE];
-  DIR * current;
-  current = opendir(".");
-  int n, file, lu;
+
+  int n;
   char * token;
   while(1) { // boucle infinie
     write(1, KBLU, strlen(KBLU));
@@ -27,7 +26,8 @@ int main(int argc, char const *argv[]) {
         break;
       // implementation ls
       if(!strncmp(buff,"ls",strlen("ls")))
-        ls(buff, current);
+        ls(buff);
+
       if(!strncmp(buff, "mkdir", strlen("mkdir"))) {
 
         token = strtok(buff, " \n");
@@ -38,6 +38,7 @@ int main(int argc, char const *argv[]) {
       if(!strncmp(buff, "rmdir", strlen("rmdir"))) {
         token = strtok(buff, " \n");
         token = strtok(NULL, " \n");
+
 
         my_rmdir(token);
       }
@@ -53,6 +54,5 @@ int main(int argc, char const *argv[]) {
       }
     }
   }
-  closedir(current);
   return 0;
 }
