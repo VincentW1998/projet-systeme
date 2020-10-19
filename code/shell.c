@@ -7,6 +7,9 @@ int main(int argc, char const *argv[]) {
   char * command[100];
   int nbOption = 0;
   int choix, choixBis;
+  char *pathFictif;
+  char *tarPath;
+  int longueurPath;
 
   while(1) { // boucle infinie
     affichagePrompt();
@@ -21,6 +24,13 @@ int main(int argc, char const *argv[]) {
 
       // separe buff en command, option, path
       nbOption = separateurCommand(token, buff, command);
+      char * tmp = findTar(token, nbOption, command);
+      if(tmp != NULL) {
+        tarPath = malloc(strlen(tmp) + 1);
+        strcpy(tarPath, tmp);
+        printf("tarPath : %s\n", tarPath);
+      }
+
       choix = commandPersonnalisee(command);
       if(choix == -1){
         execCommand(command);
@@ -32,7 +42,7 @@ int main(int argc, char const *argv[]) {
 
     }
 
-    strcpy(buff2,"");
+    // strcpy(buff2,"");
   }
   return 0;
 }

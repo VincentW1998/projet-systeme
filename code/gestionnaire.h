@@ -19,3 +19,7 @@ void *lectureLigne(char * token, char * str, char * buff);
 int separateurCommand(char * token, char * buff, char ** command);
 
 int commandPersonnalisee(char ** command);
+
+int estTar(char * token);
+
+void * findTar(char *token, int nbOption, char ** command);

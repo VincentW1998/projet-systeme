@@ -69,7 +69,7 @@ int commandPersonnalisee(char ** command) {
 
   for (size_t i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
-    numeroCommand = i;
+      numeroCommand = i;
   }
   switch (numeroCommand) {
     case -1 : return -1;
@@ -83,4 +83,46 @@ int commandPersonnalisee(char ** command) {
     break;
   }
   return 0;
+}
+
+int estTar(char * token) {
+  char * tok = strtok(token, ".");
+  char * name;
+  while((tok = strtok(NULL, ".\n")) != NULL) {
+    name = malloc(strlen(tok) + 1);
+    strcpy(name, tok);
+  }
+  if(!strcmp(name, "tar"))
+    return 0;
+  return -1;
+}
+
+
+void * findTar(char *token, int nbOption, char ** command) {
+  char * pathFictif;
+  char * token2;
+  for (size_t i = 1; i < nbOption; i++){
+    char * tmp = malloc(strlen(command[i]) + 1);
+    strcpy(tmp, command[i]);
+    token = strtok(tmp, "/\n");
+    char * tmp2 = malloc(strlen(token) + 1);
+    strcpy(tmp2, token);
+    if(!estTar(tmp2)){
+      // printf("token : %s\n", token);
+
+      return token;
+    }
+
+
+    while((token2 = strtok(NULL, "/\n")) != NULL) {
+      char * tmp = malloc(strlen(token2) + 1);
+      if(estTar(tmp)){
+        // printf("token2 : %s\n", token2);
+        return token2;
+
+      }
+    }
+
+  }
+  return NULL;
 }
