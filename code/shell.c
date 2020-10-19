@@ -22,15 +22,15 @@ int affichagePrompt() {
 
 int main(int argc, char const *argv[]) {
   char str [BUFSIZE];
-  char ** test;
   char * buff, * buff2, * token;
-  int n;
-  int nbrOption = 0;
-  int i = 1;
+  int n, i = 1;
   char * command[100];
+  int nbOption = 0;
+
 
   while(1) { // boucle infinie
     affichagePrompt();
+
     if((n = read(0,str,BUFSIZE) > 0)) { // check si l'usr ecrit dans l'entrée
 
       token = strtok(str,"\n");
@@ -45,13 +45,13 @@ int main(int argc, char const *argv[]) {
 
       token = strtok(buff, " \n");
       command[0] = malloc(strlen(token) + 1);
-      nbrOption++;
+      nbOption ++;
       strcpy(command[0], token);
       while((token = strtok(NULL, " \n")) != NULL) {
         command[i] = malloc(strlen(token) + 1);
         strcpy(command[i], token);
+        nbOption ++;
         i ++;
-        nbrOption++;
       }
 
      command[i] = NULL;
@@ -84,20 +84,22 @@ int main(int argc, char const *argv[]) {
       //
       //   my_rmdir(token);
       // }
-      if(!strncmp(buff2, "cd\n", strlen("cd\n"))) {
+      if(!strncmp(buff2, "cd", strlen("cd"))) {
         token = strtok(buff2, " \n");
         token = strtok(NULL, " \n");
 
         chdir(token);
       }
-      if(!strncmp(buff2, "pwd\n", strlen("pwd\n"))) {
+      if(!strncmp(buff2, "pwd", strlen("pwd"))) {
         write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
         write(1, "\n\n", 2);
       }
-      for (int j = 0; j < nbrOption; j++){
-        free(command[j]);
+      for (size_t j = 0; j < nbOption; j++) {
+        command[j] = NULL;
       }
+
     }
+
     strcpy(buff2,"");
   }
   return 0;
