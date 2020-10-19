@@ -25,6 +25,7 @@ int main(int argc, char const *argv[]) {
   char ** test;
   char * buff, * buff2, * token;
   int n;
+  int nbrOption = 0;
   int i = 1;
   char * command[100];
 
@@ -34,6 +35,7 @@ int main(int argc, char const *argv[]) {
 
       token = strtok(str,"\n");
       if(token!=NULL){
+        buff = malloc(strlen(token) + 1);
         strcpy(buff,token);
         strcat(buff,"\n");
       }
@@ -42,11 +44,14 @@ int main(int argc, char const *argv[]) {
       strcpy(buff2, buff);
 
       token = strtok(buff, " \n");
+      command[0] = malloc(strlen(token) + 1);
+      nbrOption++;
       strcpy(command[0], token);
       while((token = strtok(NULL, " \n")) != NULL) {
         command[i] = malloc(strlen(token) + 1);
         strcpy(command[i], token);
         i ++;
+        nbrOption++;
       }
 
      command[i] = NULL;
@@ -79,16 +84,19 @@ int main(int argc, char const *argv[]) {
       //
       //   my_rmdir(token);
       // }
-      // if(!strncmp(buff2, "cd\n", strlen("cd\n"))) {
-      //   token = strtok(buff2, " \n");
-      //   token = strtok(NULL, " \n");
-      //
-      //   chdir(token);
-      // }
-      // if(!strncmp(buff2, "pwd\n", strlen("pwd\n"))) {
-      //   write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
-      //   write(1, "\n\n", 2);
-      // }
+      if(!strncmp(buff2, "cd\n", strlen("cd\n"))) {
+        token = strtok(buff2, " \n");
+        token = strtok(NULL, " \n");
+
+        chdir(token);
+      }
+      if(!strncmp(buff2, "pwd\n", strlen("pwd\n"))) {
+        write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
+        write(1, "\n\n", 2);
+      }
+      for (int j = 0; j < nbrOption; j++){
+        free(command[j]);
+      }
     }
     strcpy(buff2,"");
   }
