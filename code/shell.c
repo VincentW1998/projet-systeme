@@ -19,17 +19,27 @@ int affichagePrompt() { // affichage du prompt
   return 0;
 }
 
+int afficheMessageErreur(char ** command) {
+  char * erreur = "tsh : command not found: ";
+  char * erreurBuf = malloc(strlen(erreur) + strlen(command[0]) + 2);
+  strcpy(erreurBuf, erreur);
+  strcat(erreurBuf, command[0]);
+  strcat(erreurBuf, "\n");
+  write(2, erreurBuf, strlen(erreurBuf));
+  return 0;
+}
 
 int execCommand(char ** command) {
   pid_t pid = fork();
+  int n;
   if(pid != 0) { // on attend que le processus fils se lance
     wait(NULL);
   }
   else { // puis on execute la commande souhaité
-    execvp(command[0], command);
-    return 0;
+    if((n = execvp(command[0], command)) == -1)
+      afficheMessageErreur(command);
   }
-  return -1;
+  return 0;
 }
 
 void *lectureLigne(char * token, char * str, char * buff){ //readLine
@@ -79,7 +89,7 @@ int commandPersonnalisee(char ** command) {
       break;
     default :
     write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
-    write(1, "\n\n", 2);
+    write(1, "\n", 2);
     break;
   }
   return 0;
@@ -93,7 +103,7 @@ int main(int argc, char const *argv[]) {
   int n, i = 1;
   char * command[100];
   int nbOption = 0;
-  int choix;
+  int choix, choixBis;
 
   while(1) { // boucle infinie
     affichagePrompt();
