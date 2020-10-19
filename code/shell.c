@@ -11,7 +11,6 @@
 // #include "my_mkdir.h"
 // #include "my_rmdir.h"
 
-
 int affichagePrompt() {
   write(1, KBLU, strlen(KBLU));
   write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
@@ -30,7 +29,7 @@ int main(int argc, char const *argv[]) {
 
   while(1) { // boucle infinie
     affichagePrompt();
-
+    nbOption = 0;
     if((n = read(0,str,BUFSIZE) > 0)) { // check si l'usr ecrit dans l'entrée
 
       token = strtok(str,"\n");
@@ -40,27 +39,30 @@ int main(int argc, char const *argv[]) {
         strcat(buff,"\n");
       }
 
+      // creation de buff2 car buff va etre 'ecraser' par strtok
       buff2 = malloc(strlen(buff) + 1);
       strcpy(buff2, buff);
 
+      // separe buff en command, option, path
       token = strtok(buff, " \n");
       command[0] = malloc(strlen(token) + 1);
-      nbOption ++;
       strcpy(command[0], token);
+      i = 1;
       while((token = strtok(NULL, " \n")) != NULL) {
         command[i] = malloc(strlen(token) + 1);
         strcpy(command[i], token);
-        nbOption ++;
         i ++;
       }
 
+    nbOption = i;
      command[i] = NULL;
      command[i+1] = NULL;
+
      pid_t pid = fork();
-     if(pid != 0) {
+     if(pid != 0) { // on attend que le processus fils se lance
        wait(NULL);
      }
-     else {
+     else { // puis on execute la commande souhaité
        execvp(command[0], command);
      }
 
