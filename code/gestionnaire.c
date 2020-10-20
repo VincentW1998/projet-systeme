@@ -32,8 +32,8 @@ int execCommand(char ** command) {
   return 0;
 }
 
-void *lectureLigne(char * token, char * str, char * buff){ //readLine
-  token = strtok(str,"\n");
+void *lectureLigne(char * str, char * buff){ //readLine
+  char * token = strtok(str,"\n");
   if(token!=NULL){
     buff = malloc(strlen(token) + 1);
     strcpy(buff,token);
@@ -42,8 +42,8 @@ void *lectureLigne(char * token, char * str, char * buff){ //readLine
   return buff;
 }
 
-int separateurCommand(char * token, char * buff, char ** command){ // separe la ligne en tableau de char
-  token = strtok(buff, " \n");
+int separateurCommand(char * buff, char ** command){ // separe la ligne en tableau de char
+  char * token = strtok(buff, " \n");
   command[0] = malloc(strlen(token) + 1);
   strcpy(command[0], token);
   int i = 1;
@@ -72,7 +72,7 @@ int commandPersonnalisee(char ** command) {
       numeroCommand = i;
   }
   switch (numeroCommand) {
-    case -1 : return -1;
+    case -1 : return -2;
     case 0 : exit(0);
     case 1 :
       chdir(command[1]);
@@ -83,6 +83,38 @@ int commandPersonnalisee(char ** command) {
     break;
   }
   return 0;
+}
+
+int commandTar(char ** command) {
+  int nbCommand = 8;
+  char *cmdTar[nbCommand];
+  int numeroCommand = -1;
+  cmdTar[0] = "pwd";
+  cmdTar[1] = "cd";
+  cmdTar[2] = "ls";
+  cmdTar[3] = "mkdir";
+  cmdTar[4] = "rmdir";
+  cmdTar[5] = "mv";
+  cmdTar[6] = "cat";
+  cmdTar[7] = "cp";
+
+  for (size_t i = 0; i < nbCommand; i++) {
+    if(!strcmp(cmdTar[i], command[0]))
+      numeroCommand = i;
+  }
+  switch (numeroCommand) {
+    case -1 : return -1;
+    case 0 :
+      printf("Here\n");
+      write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
+      write(1, "/", 1);
+      write(1, TARPATH, strlen(TARPATH));
+      write(1, "\n", 2);
+      // break;
+      return 0;
+  }
+  return -1;
+
 }
 
 int estTar(char * token) {
@@ -98,21 +130,18 @@ int estTar(char * token) {
 }
 
 
-void * findTar(char *token, int nbOption, char ** command) {
+void * findTar(int nbOption, char ** command) {
   char * pathFictif;
   char * token2;
   for (size_t i = 1; i < nbOption; i++){
     char * tmp = malloc(strlen(command[i]) + 1);
     strcpy(tmp, command[i]);
-    token = strtok(tmp, "/\n");
+    char *token = strtok(tmp, "/\n");
     char * tmp2 = malloc(strlen(token) + 1);
     strcpy(tmp2, token);
     if(!estTar(tmp2)){
-      // printf("token : %s\n", token);
-
       return token;
     }
-
 
     while((token2 = strtok(NULL, "/\n")) != NULL) {
       char * tmp = malloc(strlen(token2) + 1);
@@ -122,7 +151,6 @@ void * findTar(char *token, int nbOption, char ** command) {
 
       }
     }
-
   }
   return NULL;
 }

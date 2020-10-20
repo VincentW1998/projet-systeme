@@ -7,6 +7,8 @@
 #include <string.h>
 #include <dirent.h>
 #include <sys/wait.h>
+char * TARPATH;
+int CHOIX;
 
 int affichagePrompt();
 
@@ -14,12 +16,14 @@ int afficheMessageErreur(char ** command);
 
 int execCommand(char ** command);
 
-void *lectureLigne(char * token, char * str, char * buff);
+void *lectureLigne(char * str, char * buff);
 
-int separateurCommand(char * token, char * buff, char ** command);
+int separateurCommand(char * buff, char ** command);
 
 int commandPersonnalisee(char ** command);
 
+int commandTar(char ** command);
+
 int estTar(char * token);
 
-void * findTar(char *token, int nbOption, char ** command);
+void * findTar(int nbOption, char ** command);
