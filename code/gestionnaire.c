@@ -105,7 +105,6 @@ int commandTar(char ** command) {
   switch (numeroCommand) {
     case -1 : return -1;
     case 0 :
-      printf("Here\n");
       write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
       write(1, "/", 1);
       write(1, TARPATH, strlen(TARPATH));

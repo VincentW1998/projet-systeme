@@ -30,7 +30,7 @@ int main(int argc, char const *argv[]) {
         strcpy(TARPATH, tmp);
       }
 
-      printf("TARPATH : %s\n", TARPATH);
+      printf("printf : TARPATH : %s\n", TARPATH);
       if(TARPATH != NULL)
         CHOIX = commandTar(command);
 
