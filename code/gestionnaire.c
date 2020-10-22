@@ -105,6 +105,7 @@ int commandTar(char ** command) {
   switch (numeroCommand) {
     case -1 : return -1;
     case 0 :
+      printf("Here\n");
       write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
       write(1, "/", 1);
       write(1, TARPATH, strlen(TARPATH));
@@ -117,6 +118,8 @@ int commandTar(char ** command) {
 }
 
 int estTar(char * token) {
+  // char * tmp = malloc(strlen(token)+1);
+  // strcpy(tmp,token);
   char * tok = strtok(token, ".");
   char * name;
   while((tok = strtok(NULL, ".\n")) != NULL) {
@@ -128,9 +131,43 @@ int estTar(char * token) {
   return -1;
 }
 
+// int exist(char * token){
+//   char * pwd = getcwd(NULL, 0);
+//   if(chdir(token)){
+//     //jsp si besoin de chdir en cas d echec
+//     peror("pathError:");
+//     return -1;
+//   }
+//   chdir(pwd);
+//   return 0;
+// }
+
+int existTar(char * token){
+  DIR * dir = opendir(".");
+  struct dirent * cur;
+  while((cur = readdir(dir)) > 0){
+    if(!strcmp(cur->d_name,token)) return 0;
+  }
+  closedir(dir);
+  write(2,"no such file or directory:\n",strlen("no such file or directory:\n"));
+  perror("error: ");
+  return -1;
+}
+
+int moveTo(char * path, char * tarball){
+  char * pwd = getcwd(NULL, 0);
+  if(chdir(path)){
+    perror("pathError:");
+    return -1;
+  }
+  if(!existTar(tarball))
+    return 0;
+  return -1;
+}
+
 
 void * findTar(int nbOption, char ** command) {
-  char * pathFictif;
+  char * basicPath;
   char * token2;
   for (size_t i = 1; i < nbOption; i++){
     char * tmp = malloc(strlen(command[i]) + 1);
@@ -138,18 +175,31 @@ void * findTar(int nbOption, char ** command) {
     char *token = strtok(tmp, "/\n");
     char * tmp2 = malloc(strlen(token) + 1);
     strcpy(tmp2, token);
-    if(!estTar(tmp2)){
+    if(!estTar(tmp2) && !existTar(token)){
       return token;
     }
 
-    while((token2 = strtok(NULL, "/\n")) != NULL) {
-      char * tmp = malloc(strlen(token2) + 1);
-      if(estTar(tmp)){
-        // printf("token2 : %s\n", token2);
-        return token2;
+    basicPath = malloc(strlen(token)+1);
+    strcpy(basicPath, token);
 
+    strcat(basicPath,"/");
+    printf("%s\n",token);
+    while((token2 = strtok(NULL, "/\n")) != NULL) {
+      // char * tmp = malloc(strlen(token2) + 1);
+      printf("2\n");
+      if(estTar(token2)){
+        // printf("token2 : %s\n", token2);
+          if(!moveTo(basicPath,token2)){// bouge sur token 2
+
+            return command[1];
+          }
+          printf("1\n");
       }
+      strcat(basicPath,token2);
+      strcat(basicPath,"/");
     }
+
   }
+  printf("%s\n", "move");
   return NULL;
 }
