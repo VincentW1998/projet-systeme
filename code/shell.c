@@ -15,7 +15,7 @@ int main(int argc, char const *argv[]) {
     affichagePrompt();
     nbOption = 0;
     if((n = read(0,str,BUFSIZE) > 0)) { // check si l'usr ecrit dans l'entrée
-
+      CHOIX = -1;
       buff = lectureLigne(str, buff);
 
       // creation de buff2 car buff va etre 'ecraser' par strtok

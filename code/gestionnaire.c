@@ -203,12 +203,21 @@ void * findTar(char * path){
 //      return -1;
 //   }//relative path
 //   token = strtok_r(tmp,"/\n",&tmp);
-//   char * fullpath = malloc(sizeof(char)+1);
+//   char * fullpath = malloc(sizeof(char)+1); // concatenation de TARPATH(sans le tar) et la destination
 //   memcpy(fullpath, tmp);
 //   strcat(fullpath, path);
 //   //on entre dans le tarball
 //   if((file = open(token,O_RDONLY)) == -1){perror("error"); return -1;}
-//
+//   struct posix_header * p;
+//   while((n = read(file,p,BLOCKSIZE))>0){
+//     if(!strcmp(p->name, fullpath)){
+//       memcpy(TARPATH,fullpath,strlen(fullpath));
+//       return 0;
+//     }
+//   }
+//   free(fullpath);
+//   free(tmp);
+//   return -1;
 // }
 //
 // int absolutePath(char * path){
