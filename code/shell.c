@@ -17,12 +17,10 @@ int main(int argc, char const *argv[]) {
       CHOIX = -1;
       buff = lectureLigne(str, buff);
 
-      // creation de buff2 car buff va etre 'ecraser' par strtok
-      buff2 = malloc(strlen(buff) + 1);
-      strcpy(buff2, buff);
 
       // separe buff en command, option, path
       nbOption = separateurCommand(buff, command);
+      
       char * tmp = findTar(nbOption, command);
 
       if(tmp != NULL) {
@@ -46,7 +44,7 @@ int main(int argc, char const *argv[]) {
 
     }
 
-    // strcpy(buff2,"");
+
   }
   return 0;
 }
