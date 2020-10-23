@@ -21,6 +21,9 @@ int afficheMessageErreur(char ** command) {
 
 int execCommand(char ** command) {
   pid_t pid = fork();
+  if(pid == -1){
+    perror("fork");
+  }
   int n;
   if(pid != 0) { // on attend que le processus fils se lance
     wait(NULL);
@@ -33,6 +36,32 @@ int execCommand(char ** command) {
 }
 
 int execCommandPipe(char ** command, char ** commandPipe) {
+  int fd[2];
+  if(pipe(fd) < -1){
+    perror("pipe");
+  }
+  int n;
+  pid_t pid1;
+
+  pid1 = fork();
+  switch (pid1) {
+    case -1 :
+      perror("fork");
+      break;
+    case 0 : // fils, commandPipe[0], lecteur, fd[0]
+      close(fd[1]);
+      dup2(fd[0], 0);
+      close(fd[0]);
+      if((n = execvp(commandPipe[0], commandPipe)) == -1)
+        afficheMessageErreur(commandPipe);
+      break;
+    default : // pere, command[0], ecrivain, fd[1]
+      close(fd[0]);
+      dup2(fd[1], 1);
+      close(fd[1]);
+      if((n = execvp(command[0], command)) == -1)
+        afficheMessageErreur(command);
+  }
   return 0;
 }
 
