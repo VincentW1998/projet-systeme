@@ -5,10 +5,12 @@ int main(int argc, char const *argv[]) {
   char * buff, * buff2, * token;
   int n, i = 1;
   char * command[100];
+  char * commandPipe[100];
   int nbOption = 0;
   char *pathFictif;
   // char *tarPath;
   int longueurPath;
+  int pipe;
 
   while(1) { // boucle infinie
     affichagePrompt();
@@ -18,9 +20,14 @@ int main(int argc, char const *argv[]) {
       buff = lectureLigne(str, buff);
 
 
-      // separe buff en command, option, path
+      // separe buff en command, option, path dans une variable command[]
       nbOption = separateurCommand(buff, command);
-      
+
+      //verifions si dans le path il y a un pipe |
+
+      pipe = findPipe(nbOption, command, commandPipe); // 0 if has not pipe else 1
+
+
       char * tmp = findTar(nbOption, command);
 
       if(tmp != NULL) {
@@ -35,6 +42,9 @@ int main(int argc, char const *argv[]) {
       if(CHOIX != 0)
         CHOIX = commandPersonnalisee(command);
       if(CHOIX == -2){
+        if (pipe) {
+          execCommandPipe(command, commandPipe);
+        }
         execCommand(command);
       }
 

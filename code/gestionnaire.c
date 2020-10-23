@@ -32,6 +32,10 @@ int execCommand(char ** command) {
   return 0;
 }
 
+int execCommandPipe(char ** command, char ** commandPipe) {
+  return 0;
+}
+
 void *lectureLigne(char * str, char * buff){ //readLine
   char * token = strtok(str,"\n");
   if(token!=NULL){
@@ -57,6 +61,27 @@ int separateurCommand(char * buff, char ** command){ // separe la ligne en table
   command[i] = NULL;
   command[i+1] = NULL;
   return nbOption;
+}
+
+int findPipe(int nbOption, char ** command, char ** commandPipe) {
+  int pipe = 0;
+  int i, j = 0;
+
+  for(i = 0; i < nbOption; i ++) {
+    if(!strcmp(command[i], "|")){
+      pipe = 1;
+      break;
+    }
+  }
+  if (pipe) {
+    for(i = i + 1; i < nbOption; i ++) {
+      commandPipe[j] = malloc(strlen(command[i]) + 1);
+      strcpy(commandPipe[j], command[i]);
+      j++;
+    }
+  }
+
+  return pipe; // 0 if has no pipe, and 1 if has pipe
 }
 
 int commandPersonnalisee(char ** command) {
