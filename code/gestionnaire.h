@@ -24,6 +24,11 @@ int commandPersonnalisee(char ** command);
 
 int commandTar(char ** command);
 
+int hasTar(int nbOption, char ** command);
+
 int estTar(char * token);
 
-void * findTar(int nbOption, char ** command);
+void * cd(char * path);
+// void * cd (int nbOption, char ** command);
+
+// void * findTar(int nbOption, char ** command);

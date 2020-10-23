@@ -9,12 +9,13 @@ int main(int argc, char const *argv[]) {
   char *pathFictif;
   // char *tarPath;
   int longueurPath;
+  TARPATH = NULL;
 
   while(1) { // boucle infinie
     affichagePrompt();
     nbOption = 0;
     if((n = read(0,str,BUFSIZE) > 0)) { // check si l'usr ecrit dans l'entrée
-      CHOIX = -1;
+
       buff = lectureLigne(str, buff);
 
       // creation de buff2 car buff va etre 'ecraser' par strtok
@@ -23,14 +24,25 @@ int main(int argc, char const *argv[]) {
 
       // separe buff en command, option, path
       nbOption = separateurCommand(buff, command);
-      char * tmp = findTar(nbOption, command);
+      char * tmp;
+      if(!hasTar(nbOption, command)){
 
-      if(tmp != NULL) {
-        TARPATH = malloc(strlen(tmp) + 1);
-        strcpy(TARPATH, tmp);
+        if(TARPATH==NULL){
+          printf("%s!\n",command[nbOption-1] );
+           tmp= cd(command[nbOption-1]);
+          printf("%s\n","ici" );
+          // char * tmp = cd(nbOption, command);
+          if(tmp != NULL) {
+            TARPATH = malloc(strlen(tmp) + 1);
+            strcpy(TARPATH, tmp);
+          }
+        }
+        else{
+          // navigateTar(nbOption,command);
+          printf("hell\n");
+        }
       }
-
-      printf("printf : TARPATH : %s\n", TARPATH);
+      printf("TARPATH : %s\n", TARPATH);
       if(TARPATH != NULL)
         CHOIX = commandTar(command);
 
