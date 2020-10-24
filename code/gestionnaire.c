@@ -21,16 +21,18 @@ int afficheMessageErreur(char ** command) {
 
 int execCommand(char ** command) {
   pid_t pid = fork();
-  if(pid == -1){
-    perror("fork");
-  }
-  int n;
-  if(pid != 0) { // on attend que le processus fils se lance
-    wait(NULL);
-  }
-  else { // puis on execute la commande souhaité
-    if((n = execvp(command[0], command)) == -1)
-      afficheMessageErreur(command);
+  int n, w;
+  switch (pid) {
+    case -1:
+      perror("fork");
+      break;
+
+    case 0:
+      if((n = execvp(command[0], command)) == -1)
+          afficheMessageErreur(command);
+      break;
+    default :
+      wait(&w);
   }
   return 0;
 }
@@ -40,27 +42,42 @@ int execCommandPipe(char ** command, char ** commandPipe) {
   if(pipe(fd) < -1){
     perror("pipe");
   }
-  int n;
-  pid_t pid1;
+  int n, w;
+  pid_t pid1, pid2;
 
   pid1 = fork();
+
   switch (pid1) {
     case -1 :
       perror("fork");
       break;
     case 0 : // fils, commandPipe[0], lecteur, fd[0]
+
       close(fd[1]);
       dup2(fd[0], 0);
       close(fd[0]);
       if((n = execvp(commandPipe[0], commandPipe)) == -1)
         afficheMessageErreur(commandPipe);
       break;
-    default : // pere, command[0], ecrivain, fd[1]
-      close(fd[0]);
-      dup2(fd[1], 1);
-      close(fd[1]);
-      if((n = execvp(command[0], command)) == -1)
-        afficheMessageErreur(command);
+
+    default :
+
+      pid2 = fork();
+      switch (pid2) {
+
+        case -1 :
+          perror("fork");
+          break;
+        case 0 : // fils, command, ecrivain, fd[1]
+          close(fd[0]);
+          dup2(fd[1], 1);
+          close(fd[1]);
+
+          if((n = execvp(command[0], command)) == -1)
+            afficheMessageErreur(command);
+          break;
+      }
+      wait(&w);
   }
   return 0;
 }
@@ -109,6 +126,7 @@ int findPipe(int nbOption, char ** command, char ** commandPipe) {
       j++;
       command[i - 1] = NULL;
     }
+    command[i - 1] =NULL;
   }
 
   return pipe; // 0 if has no pipe, and 1 if has pipe

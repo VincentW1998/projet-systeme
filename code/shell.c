@@ -8,7 +8,6 @@ int main(int argc, char const *argv[]) {
   char * commandPipe[100];
   int nbOption = 0;
   char *pathFictif;
-  // char *tarPath;
   int longueurPath;
   int pipe;
 
@@ -24,30 +23,30 @@ int main(int argc, char const *argv[]) {
       nbOption = separateurCommand(buff, command);
 
       //verifions si dans le path il y a un pipe |
-
       pipe = findPipe(nbOption, command, commandPipe); // 0 if has not pipe else 1
 
-
-      // char * tmp = findTar(nbOption, command);
-      //
-      // if(tmp != NULL) {
-      //   TARPATH = malloc(strlen(tmp) + 1);
-      //   strcpy(TARPATH, tmp);
-      // }
-
-      printf("printf : TARPATH : %s\n", TARPATH);
+      // si la variable tarpath est initialisé alors on utilise une commande
+      // pour les tarball
       if(TARPATH != NULL)
         CHOIX = commandTar(command);
 
+      // si aucune commande tar à ete effectué, testons si on peut executer
+      // une commande personalisée (cd, (pwd), exit)
       if(CHOIX != 0)
         CHOIX = commandPersonnalisee(command);
+
+      // si aucune commande personalisée à ete effectué
       if(CHOIX == -2){
+        // execute une command pour les pipe
         if (pipe) {
           execCommandPipe(command, commandPipe);
         }
-        execCommand(command);
+        // sans les pipe
+        else
+          execCommand(command);
       }
 
+      // on remet à null le tableau qui prenait les differentes commandes
       for (size_t j = 0; j < nbOption; j++) {
         command[j] = NULL;
       }
