@@ -18,7 +18,7 @@
 **/
 
 int ecrire (char *destination, int nb_blocs, struct posix_header entete,int fichier){
-  off_t sk = lseek(fichier,SEEK_CUR,SEEK_CUR)-1;
+  off_t sk = lseek(fichier,0,SEEK_CUR)-1;
   strcpy(entete.name,destination);
   set_checksum(&entete);
   write(fichier,&entete,512);
