@@ -215,7 +215,7 @@ int navigateTar(char * path){
 
   // printf("3\n");
   //
-  // strcat(fullpath, path);
+  strcat(fullpath, path);
   // printf("%s\n", fullpath);
   // printf("4\n");
 
@@ -233,6 +233,7 @@ int navigateTar(char * path){
       // memcpy(TARPATH,fullpath,strlen(fullpath));
       // printf("%s\n",TARPATH );
       if(TARPATH[strlen(TARPATH-1)]!='/') strcat(TARPATH, "/");
+      
       strcat(TARPATH,path);
       // printf("endRes :%s\n", TARPATH);
       return 0;
