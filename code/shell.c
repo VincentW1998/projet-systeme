@@ -28,12 +28,12 @@ int main(int argc, char const *argv[]) {
       pipe = findPipe(nbOption, command, commandPipe); // 0 if has not pipe else 1
 
 
-      char * tmp = findTar(nbOption, command);
-
-      if(tmp != NULL) {
-        TARPATH = malloc(strlen(tmp) + 1);
-        strcpy(TARPATH, tmp);
-      }
+      // char * tmp = findTar(nbOption, command);
+      //
+      // if(tmp != NULL) {
+      //   TARPATH = malloc(strlen(tmp) + 1);
+      //   strcpy(TARPATH, tmp);
+      // }
 
       printf("printf : TARPATH : %s\n", TARPATH);
       if(TARPATH != NULL)

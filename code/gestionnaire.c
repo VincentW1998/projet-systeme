@@ -107,6 +107,7 @@ int findPipe(int nbOption, char ** command, char ** commandPipe) {
       commandPipe[j] = malloc(strlen(command[i]) + 1);
       strcpy(commandPipe[j], command[i]);
       j++;
+      command[i - 1] = NULL;
     }
   }
 
