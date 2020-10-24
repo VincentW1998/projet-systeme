@@ -62,7 +62,7 @@ int base_cp (int fichier, char *source, char *destination,  char *actuel){
     return ecrire(chemin,nb,entete,fichier);
   }
   
-  lseek(fichier,SEEK_CUR,nb*512);
+  lseek(fichier,nb*512,SEEK_CUR);
   return base_cp(fichier, actuel,source, destination);
 }
 
