@@ -28,6 +28,6 @@ int estTar(char * token);
 
 void * findTar(int nbOption, char ** command);
 
-int findPipe(int nbOption, char ** command, char ** commandPipe);
+void findPipeAndExec(int nbOption, char ** command, char ** commandPipe);
 
 int execCommandPipe(char ** command, char ** commandPipe);
