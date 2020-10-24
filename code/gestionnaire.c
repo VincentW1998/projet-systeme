@@ -205,7 +205,7 @@ int navigateTar(char * path){
      // if(absolutePath(path)) return 0;
      return 0;
   }//relative path
-  printf("2\n");
+  // printf("2\n");
 
   token = strtok_r(tmp,"/\n",&tmp);
   char * fullpath = malloc(sizeof(char)+1); // concatenation de TARPATH(sans le tar) et la destination
@@ -213,23 +213,23 @@ int navigateTar(char * path){
   if(tmp!=NULL)
     memcpy(fullpath, tmp, strlen(tmp));
 
-  printf("3\n");
-
-  strcat(fullpath, path);
-  printf("%s\n", fullpath);
-  printf("4\n");
+  // printf("3\n");
+  //
+  // strcat(fullpath, path);
+  // printf("%s\n", fullpath);
+  // printf("4\n");
 
   //on entre dans le tarball
   if((file = open(token,O_RDONLY)) == -1){perror("error"); return -1;}
-  printf("5\n");
+  // printf("5\n");
   // if(fullpath[strlen(fullpath-1)])
   struct posix_header * p = malloc(sizeof(struct posix_header));
   while((n = read(file,p,BLOCKSIZE))>0){
-    printf("6\n");
-    printf("%s\n", fullpath);
+    // printf("6\n");
+    // printf("%s\n", fullpath);
 
     if(!strcmp(p->name, fullpath)){
-      printf("7\n");
+      // printf("7\n");
       // memcpy(TARPATH,fullpath,strlen(fullpath));
       // printf("%s\n",TARPATH );
       if(TARPATH[strlen(TARPATH-1)]!='/') strcat(TARPATH, "/");
@@ -239,12 +239,18 @@ int navigateTar(char * path){
     }
     lseek(file,ceil(atoi(p->size)/512.)*BLOCKSIZE,SEEK_CUR);
   }
-  printf("8\n");
+  // printf("8\n");
 
   free(fullpath);
   free(tmp);
   return -1;
 }
+
+// int hasDotDot(char * path){
+//   char * tmp = malloc(strlen(path)+1);
+//   strcpy(tmp,path);
+//
+// }
 
 
 int cdPerso(char * path){
