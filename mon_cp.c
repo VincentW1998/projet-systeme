@@ -55,7 +55,7 @@ int base_cp (int fichier, char *source, char *destination,  char *actuel){
   char *c = entete.size;
   int b;
   int sc = sscanf(c,"%o",&b);
-  int nb = (sc+512-1)/512;
+  int nb = (b+512-1)/512;
   
   if(strcmp(entete.name,source)==0){
     // Vérifie que le chemin existe bien. Si oui, on tente de copier.
