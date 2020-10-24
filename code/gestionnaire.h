@@ -33,7 +33,13 @@ int commandTar(char ** command);
 
 int cdPerso(char * path);
 
-int navigateTar(char * path);
+// int navigateTar(char * path);
+
+int navigate(char * path);
+
+int dotdot(char * path);
+
+int checkPath(char * path, char * token);
 
 int hasTar(char * command);
 

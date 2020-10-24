@@ -18,32 +18,9 @@ int main(int argc, char const *argv[]) {
       CHOIX = -1;
 
       buff = lectureLigne(str, buff);
-
-      // creation de buff2 car buff va etre 'ecraser' par strtok
-      // buff2 = malloc(strlen(buff) + 1);
-      // strcpy(buff2, buff);
-
       // separe buff en command, option, path
-
       nbOption = separateurCommand(buff, command);
-      // char tmp;
-      // if(!hasTar(nbOption, command)){
-      //   printf("1\n");
-      //   if(TARPATH==NULL){
-      //     // printf("%s!\n",command[nbOption-1] );
-      //      tmp = cd(command[nbOption-1]);
-      //
-      //     // char * tmp = cd(nbOption, command);
-      //     if(tmp != NULL) {
-      //       TARPATH = malloc(strlen(tmp) + 1);
-      //       strcpy(TARPATH, tmp);
-      //     }
-      //   }
-      //   else{
-      //     // navigateTar(nbOption,command);
-      //
-      //   }
-      // }
+
       if(TARPATH != NULL)
         CHOIX = commandTar(command);
 
@@ -60,7 +37,6 @@ int main(int argc, char const *argv[]) {
 
     }
 
-    // strcpy(buff2,"");
   }
   return 0;
 }
