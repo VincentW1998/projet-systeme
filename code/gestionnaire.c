@@ -61,7 +61,6 @@ int execCommandPipe(char ** command, char ** commandPipe) {
       if((n = execvp(commandPipe[0], commandPipe)) == -1)
         afficheMessageErreur(commandPipe);
       break;
-
     default :
       pid2 = fork();
 
@@ -137,10 +136,11 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
     }
     command[i - 1] =NULL;
     execCommandPipe(command, commandPipe); // command avec pipe
+
   }
   else if((CHOIX = commandPersonnalisee(command)) == -1) //command perso sans pipe
     execCommand(command); // command sans le pipe
-  return pipe; // 0 if has no pipe, and 1 if has pipe
+  return; // 0 if has no pipe, and 1 if has pipe
 }
 
 int commandPersonnalisee(char ** command) {
@@ -188,7 +188,6 @@ int commandTar(char ** command) {
       write(1, "/", 1);
       write(1, TARPATH, strlen(TARPATH));
       write(1, "\n", 2);
-      // break;
       return 0;
   }
   return -1;
