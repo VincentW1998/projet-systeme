@@ -221,9 +221,9 @@ int navigate(char * path){
       fullpath[i] = malloc(strlen(token)+1);
       memcpy(fullpath[i],token,strlen(token));
       strcat(fullpath[i],"/");
-
+      i++;
     }
-    i++;
+
   }
   printf("nav\n");
   if(i == 0)return 0;
@@ -266,7 +266,7 @@ int dotdot(char * path){
   printf("dotdot\n");
   char * token;
   char * tmp2 = malloc(sizeof(char)+1);
-  if(!strlen(TARPATH)){   //tarpath null
+  if(TARPATH == NULL){   //tarpath null
     if(findTar(path) == NULL){
     return chdir(path);
     }
@@ -286,8 +286,13 @@ int dotdot(char * path){
   memcpy(tmp,TARPATH,strlen(TARPATH));
   while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
     if(tmp == NULL){// Pas SUR
-      // printf("%s\n", tmp2);
-      memcpy(TARPATH,tmp2,strlen(tmp2));
+      // printf("%s\n", tmp);
+      printf("%lu\n", strlen(tmp2));
+      if(strlen(tmp2) != 0)memcpy(TARPATH,tmp2,strlen(tmp2));
+
+      else TARPATH = NULL;
+      printf("%s\n", "yo");
+      printf("%s\n", TARPATH);
       return 0;
     }
     strcat(tmp2,token);
