@@ -1,4 +1,5 @@
 #include "gestionnaire.h"
+#include "tar.h"
 
 int affichagePrompt() { // affichage du prompt
   write(1, KBLU, strlen(KBLU));
@@ -75,7 +76,8 @@ int commandPersonnalisee(char ** command) {
     case -1 : return -2;
     case 0 : exit(0);
     case 1 :
-      chdir(command[1]);
+      // chdir(command[1]);
+      cdPerso(command[1]);
       break;
     default :
     write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
@@ -112,6 +114,8 @@ int commandTar(char ** command) {
       write(1, "\n", 2);
       // break;
       return 0;
+    case 1 :
+      return navigateTar(command[1]);
   }
   return -1;
 
@@ -156,20 +160,18 @@ int moveTo(char * path, char * tarball){
     perror("pathError:");
     return -1;
   }
-
-  printf("%s\n", getcwd(NULL,0));
   if(!existTar(tarball))
     return 0;
   chdir(pwd);
   return -1;
 }
 
-int hasTar(int nbOption, char ** command){
+int hasTar(char * path){
   char * token;
   int i = 0;
   // for (size_t i = 1; i < nbOption; i++){
-    char * tmp = malloc(strlen(command[nbOption-1])+1);
-    memcpy(tmp,command[nbOption-1],strlen(command[nbOption-1]));
+    char * tmp = malloc(strlen(path)+1);
+    memcpy(tmp,path,strlen(path));
 
     while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
       if(!estTar(token)){
@@ -190,39 +192,84 @@ void * findTar(char * path){
   return NULL;
 }
 
-// int navigateTar(char * path)
-//   char * tarFile = findTar(path);
-//   char * token;
-//   int file,n;
-//   char * tmp = malloc(strlen(TARBALL)+1);
-//   memcpy(tmp,TARBALL,stlen(TARBALL));
-//    // ne prend pas en compte les cas imbriques donc si il y a  un tar dans le path
-//    // il s'agit d'un path absolu
-//   if(tarFile != NULL){
-//      if(absolutePath(path)) return 0;
-//      return -1;
-//   }//relative path
-//   token = strtok_r(tmp,"/\n",&tmp);
-//   char * fullpath = malloc(sizeof(char)+1); // concatenation de TARPATH(sans le tar) et la destination
-//   memcpy(fullpath, tmp);
-//   strcat(fullpath, path);
-//   //on entre dans le tarball
-//   if((file = open(token,O_RDONLY)) == -1){perror("error"); return -1;}
-//   struct posix_header * p;
-//   while((n = read(file,p,BLOCKSIZE))>0){
-//     if(!strcmp(p->name, fullpath)){
-//       memcpy(TARPATH,fullpath,strlen(fullpath));
-//       return 0;
-//     }
-//   }
-//   free(fullpath);
-//   free(tmp);
-//   return -1;
-// }
-//
-// int absolutePath(char * path){
-//
-// }
+int navigateTar(char * path){
+  char * tarFile = findTar(path);
+  char * token;
+  int file,n;
+  printf("1\n");
+  char * tmp = malloc(strlen(TARPATH)+1);
+  memcpy(tmp,TARPATH,strlen(TARPATH));
+   // ne prend pas en compte les cas imbriques donc si il y a  un tar dans le path
+   // il s'agit d'un path absolu
+  if(tarFile != NULL){
+     // if(absolutePath(path)) return 0;
+     return 0;
+  }//relative path
+  printf("2\n");
+
+  token = strtok_r(tmp,"/\n",&tmp);
+  char * fullpath = malloc(sizeof(char)+1); // concatenation de TARPATH(sans le tar) et la destination
+  // memcpy(fullpath, tmp, strlen(fullpath));
+  if(tmp!=NULL)
+    memcpy(fullpath, tmp, strlen(tmp));
+
+  printf("3\n");
+
+  strcat(fullpath, path);
+  printf("%s\n", fullpath);
+  printf("4\n");
+
+  //on entre dans le tarball
+  if((file = open(token,O_RDONLY)) == -1){perror("error"); return -1;}
+  printf("5\n");
+  // if(fullpath[strlen(fullpath-1)])
+  struct posix_header * p = malloc(sizeof(struct posix_header));
+  while((n = read(file,p,BLOCKSIZE))>0){
+    printf("6\n");
+    printf("%s\n", fullpath);
+
+    if(!strcmp(p->name, fullpath)){
+      printf("7\n");
+      // memcpy(TARPATH,fullpath,strlen(fullpath));
+      // printf("%s\n",TARPATH );
+      if(TARPATH[strlen(TARPATH-1)]!='/') strcat(TARPATH, "/");
+      strcat(TARPATH,path);
+      // printf("endRes :%s\n", TARPATH);
+      return 0;
+    }
+    lseek(file,ceil(atoi(p->size)/512.)*BLOCKSIZE,SEEK_CUR);
+  }
+  printf("8\n");
+
+  free(fullpath);
+  free(tmp);
+  return -1;
+}
+
+
+int cdPerso(char * path){
+  if(!hasTar(path)){
+    if(TARPATH==NULL){
+      // printf("%s!\n",command[nbOption-1] );
+       char * tmp = cd(path);
+
+      // char * tmp = cd(nbOption, command);
+      if(tmp != NULL) {
+        TARPATH = malloc(strlen(tmp) + 1);
+        strcpy(TARPATH, tmp);
+        return 0;
+      }
+      return -1;
+    }
+    else{
+      // navigateTar(nbOption,command);
+      return 0;
+    }
+  }
+  chdir(path);
+  return 0;
+}
+
 
 void * cd (char * path) {
   char * basicPath = malloc(sizeof(char)+1);
