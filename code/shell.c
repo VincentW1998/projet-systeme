@@ -5,48 +5,38 @@ int main(int argc, char const *argv[]) {
   char * buff, * buff2, * token;
   int n, i = 1;
   char * command[100];
+  char * commandPipe[100];
   int nbOption = 0;
   char *pathFictif;
-  // char *tarPath;
   int longueurPath;
+  int pipe;
 
   while(1) { // boucle infinie
     affichagePrompt();
     nbOption = 0;
     if((n = read(0,str,BUFSIZE) > 0)) { // check si l'usr ecrit dans l'entrée
-      CHOIX = -1;
-      buff = lectureLigne(str, buff);
+      buff = lectureLigne(str, buff); // readline
 
-      // creation de buff2 car buff va etre 'ecraser' par strtok
-      buff2 = malloc(strlen(buff) + 1);
-      strcpy(buff2, buff);
-
-      // separe buff en command, option, path
+      // separe buff en command, option, path dans une variable command[]
       nbOption = separateurCommand(buff, command);
-      char * tmp = findTar(nbOption, command);
 
-      if(tmp != NULL) {
-        TARPATH = malloc(strlen(tmp) + 1);
-        strcpy(TARPATH, tmp);
-      }
+      //verifions si dans le path il y a un pipe |
+      // et en fonction s'il y a un pipe ou pas
+      // execute execCommandPipe, commandPersonnalisee ou execCommand
+      findPipeAndExec(nbOption, command, commandPipe);
 
-      printf("printf : TARPATH : %s\n", TARPATH);
+      // si la variable tarpath est initialisé alors on utilise une commande
+      // pour les tarball
       if(TARPATH != NULL)
         CHOIX = commandTar(command);
 
-      if(CHOIX != 0)
-        CHOIX = commandPersonnalisee(command);
-      if(CHOIX == -2){
-        execCommand(command);
-      }
 
+      // on remet à null le tableau qui prenait les differentes commandes
       for (size_t j = 0; j < nbOption; j++) {
         command[j] = NULL;
       }
 
     }
-
-    // strcpy(buff2,"");
   }
   return 0;
 }

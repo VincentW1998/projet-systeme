@@ -19,20 +19,72 @@ int afficheMessageErreur(char ** command) {
   return 0;
 }
 
+//Utilisation de execvp pour les commandes externes du shell
 int execCommand(char ** command) {
   pid_t pid = fork();
-  int n;
-  if(pid != 0) { // on attend que le processus fils se lance
-    wait(NULL);
-  }
-  else { // puis on execute la commande souhaité
-    if((n = execvp(command[0], command)) == -1)
-      afficheMessageErreur(command);
+  int n, w;
+  switch (pid) {
+    case -1:
+      perror("fork");
+      break;
+
+    case 0:
+      if((n = execvp(command[0], command)) == -1)
+          afficheMessageErreur(command);
+      break;
+    default :
+      wait(&w);
   }
   return 0;
 }
 
-void *lectureLigne(char * str, char * buff){ //readLine
+// pour les commandes externes du shell avec un pipi
+int execCommandPipe(char ** command, char ** commandPipe) {
+  int fd[2];
+  if(pipe(fd) < -1){
+    perror("pipe");
+  }
+  int n, w;
+  pid_t pid1, pid2;
+
+  pid1 = fork();
+
+  switch (pid1) {
+    case -1 :
+      perror("fork");
+      break;
+
+    case 0 : // fils, commandPipe[0], lecteur, fd[0]
+      close(fd[1]);
+      dup2(fd[0], 0);
+      close(fd[0]);
+      if((n = execvp(commandPipe[0], commandPipe)) == -1)
+        afficheMessageErreur(commandPipe);
+      break;
+
+    default :
+      pid2 = fork();
+
+      switch (pid2) {
+        case -1 :
+          perror("fork");
+          break;
+
+        case 0 : // fils, command, ecrivain, fd[1]
+          close(fd[0]);
+          dup2(fd[1], 1);
+          close(fd[1]);
+          if((n = execvp(command[0], command)) == -1)
+            afficheMessageErreur(command);
+          break;
+      }
+      wait(&w); //attend le processus fils
+  }
+  return 0;
+}
+
+//fonction qui se comporte comme readLine
+void *lectureLigne(char * str, char * buff){
   char * token = strtok(str,"\n");
   if(token!=NULL){
     buff = malloc(strlen(token) + 1);
@@ -42,7 +94,8 @@ void *lectureLigne(char * str, char * buff){ //readLine
   return buff;
 }
 
-int separateurCommand(char * buff, char ** command){ // separe la ligne en tableau de char
+// separe la ligne en tableau de char
+int separateurCommand(char * buff, char ** command){
   char * token = strtok(buff, " \n");
   command[0] = malloc(strlen(token) + 1);
   strcpy(command[0], token);
@@ -59,28 +112,54 @@ int separateurCommand(char * buff, char ** command){ // separe la ligne en table
   return nbOption;
 }
 
+// si la ligne de commande contient un pipe
+// on remplit command[] avec  tout les char avant le pipe |
+// on remplit commandPipe[] avec tout les char apres le pipe |
+// et on execute execCommandPipe
+// si la ligne ne contient pas de pipe alors on execute tout simplement
+// execcommand
+void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
+  int pipe = 0;
+  int i, j = 0;
+
+  for(i = 0; i < nbOption; i ++) {
+    if(!strcmp(command[i], "|")){
+      pipe = 1;
+      break;
+    }
+  }
+  if (pipe) {
+    for(i = i + 1; i < nbOption; i ++) {
+      commandPipe[j] = malloc(strlen(command[i]) + 1);
+      strcpy(commandPipe[j], command[i]);
+      j++;
+      command[i - 1] = NULL;
+    }
+    command[i - 1] =NULL;
+    execCommandPipe(command, commandPipe); // command avec pipe
+  }
+  else if((CHOIX = commandPersonnalisee(command)) == -1) //command perso sans pipe
+    execCommand(command); // command sans le pipe
+  return pipe; // 0 if has no pipe, and 1 if has pipe
+}
+
 int commandPersonnalisee(char ** command) {
-  int nbCommand = 3;
+  int nbCommand = 2;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
   commandPerso[0] = "exit";
   commandPerso[1] = "cd";
-  commandPerso[2] = "pwd";
 
   for (size_t i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
       numeroCommand = i;
   }
   switch (numeroCommand) {
-    case -1 : return -2;
-    case 0 : exit(0);
-    case 1 :
+    case -1 : return -1;
+    case 0 : exit(0); // exit
+    case 1 : // cd
       chdir(command[1]);
       break;
-    default :
-    write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
-    write(1, "\n", 2);
-    break;
   }
   return 0;
 }
