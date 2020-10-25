@@ -26,6 +26,8 @@ int ecrire (char *destination, int nb_blocs, struct posix_header entete,int fich
   for(int i = 0; i < nb_blocs ; i++){
     lseek(fichier,sk,(i*512));
     // ssize_t taille = read(fichier,tampon,512);
+    read(fichier,tampon,512);
+
     write(fichier,tampon,512);
   }
   free(destination);
@@ -55,6 +57,8 @@ int base_cp (int fichier, char *source, char *destination,  char *actuel){
   char *c = entete.size;
   int b;
   // int sc = sscanf(c,"%o",&b);
+  sscanf(c,"%o",&b);
+
   int nb = (b+512-1)/512;
 
   if(strcmp(entete.name,source)==0){
@@ -69,6 +73,11 @@ int base_cp (int fichier, char *source, char *destination,  char *actuel){
 /** Pour effectuer des tests **/
 int main (int argc, char **argv){
   int fichier = open(argv[1],O_RDWR | O_APPEND);
+
+  if(argc < 4) {
+    perror("usage : ./%s fichier.tar fichierSource fichierTarget");
+    exit(1);
+  }
   //Lecture et écriture du fichier.
   if(fichier < 0) {
     perror("Erreur à l'ouverture du fichier.");

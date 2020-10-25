@@ -37,6 +37,8 @@ int base_rm (int fichier, char *adresse, char *actuel){
   char *c = entete.size;
   int b;
   // int sc = sscanf(c,"%o",&b);
+  sscanf(c,"%o",&b);
+
   int nb = (b+512-1)/512;
   printf("Valeur de b : %d\n", b);
   if(strcmp(entete.name,adresse)==0){
@@ -54,7 +56,10 @@ int rm_r(int fichier, char *adresse, char *actuel);
 
 int main(int argc, char **argv){
   int fichier = open (argv[1],O_RDWR);
-  if(argc = 2);
+  if(argc <3) {
+    perror("usage : ./%s fichier.tar fichierTarget");
+    exit(1);
+  }
   if(fichier <0){
     perror("Erreur à l'ouverture du fichier.");
     return 1;
