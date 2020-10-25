@@ -293,7 +293,6 @@ void * findTar(char * path){
 // fonction pere = commandTar
 int navigate(char * path){// ..
   char * fullpath[100];
-  char * tarFile = findTar(path);
   char * token;
   char * tmp = malloc(strlen(path)+1);
   memcpy(tmp,path,strlen(path));
@@ -347,7 +346,7 @@ int navigate(char * path){// ..
     return checkPath(tmp2, token); // token toujours le fichier.tar
   }
   return checkPath(fullpath[0], token);
-  
+
 }
 
 int checkPath(char * path, char * token){
