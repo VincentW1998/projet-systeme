@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -g
-
+LDLIBS=-lm
 all : shell
 
 shell : shell.o gestionnaire.o
