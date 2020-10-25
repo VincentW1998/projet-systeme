@@ -1,5 +1,5 @@
 #include "gestionnaire.h"
-#include "tarball.h"
+#include "tar.h"
 
 int affichagePrompt() { // affichage du prompt
   write(1, KBLU, strlen(KBLU));
