@@ -147,8 +147,13 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
     execCommandPipe(command, commandPipe); // command avec pipe
 
   }
-  else if((CHOIX = commandPersonnalisee(command)) == -1) //command perso sans pipe
-    execCommand(command); // command sans le pipe
+  else {
+    if(TARPATH != NULL)
+      commandTar(command);
+    else if(commandPersonnalisee(command) == -1) //command perso sans pipe
+       execCommand(command); // command sans le pipe
+  }
+
   return; // 0 if has no pipe, and 1 if has pipe
 }
 
@@ -164,10 +169,9 @@ int commandPersonnalisee(char ** command) {
       numeroCommand = i;
   }
   switch (numeroCommand) {
-    case -1 : return -2;
+    case -1 : return -1;
     case 0 : exit(0);
     case 1 :
-      // chdir(command[1]);
       cdPerso(command[1]);
       break;
   }
@@ -175,7 +179,7 @@ int commandPersonnalisee(char ** command) {
 }
 
 int commandTar(char ** command) {
-  int nbCommand = 8;
+  int nbCommand = 9;
   char *cmdTar[nbCommand];
   int numeroCommand = -1;
   cmdTar[0] = "pwd";
@@ -186,6 +190,7 @@ int commandTar(char ** command) {
   cmdTar[5] = "mv";
   cmdTar[6] = "cat";
   cmdTar[7] = "cp";
+  cmdTar[8] = "exit";
 
   for (size_t i = 0; i < nbCommand; i++) {
     if(!strcmp(cmdTar[i], command[0]))
@@ -203,6 +208,8 @@ int commandTar(char ** command) {
     case 1 :
       // return navigateTar(command[1]);
       return navigate(command[1]);
+    case 8 :
+      exit(0);
   }
   return -1;
 
@@ -340,13 +347,7 @@ int navigate(char * path){// ..
     return checkPath(tmp2, token); // token toujours le fichier.tar
   }
   return checkPath(fullpath[0], token);
-  // memcpy(tmp2,tarp,strlen(tarp));
-  // strcat(tmp2, "/");
-  // printf("tmp2 copie de tarp :%s\n", tmp2);
-  // strcat(tmp2,fullpath[0]);
-  // printf("tmp2 strcat fullpath :%s\n", tmp2);
-  // return checkPath(tmp2, token);
-
+  
 }
 
 int checkPath(char * path, char * token){

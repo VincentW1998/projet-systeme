@@ -7,9 +7,6 @@ int main(int argc, char const *argv[]) {
   char * command[100];
   char * commandPipe[100];
   int nbOption = 0;
-  char *pathFictif;
-  // char *tarPath;
-  int longueurPath;
   TARPATH = NULL;
 
   while(1) { // boucle infinie
@@ -21,16 +18,7 @@ int main(int argc, char const *argv[]) {
       // separe buff en command, option, path dans une variable command[]
       nbOption = separateurCommand(buff, command);
 
-      //verifions si dans le path il y a un pipe |
-      // et en fonction s'il y a un pipe ou pas
-      // execute execCommandPipe, commandPersonnalisee ou execCommand
       findPipeAndExec(nbOption, command, commandPipe);
-
-      // si la variable tarpath est initialisé alors on utilise une commande
-      // pour les tarball
-      if(TARPATH != NULL)
-        CHOIX = commandTar(command);
-
 
       // on remet à null le tableau qui prenait les differentes commandes
       for (size_t j = 0; j < nbOption; j++) {

@@ -15,7 +15,6 @@
 
 
 char * TARPATH;
-int CHOIX;
 
 int affichagePrompt();
 
@@ -41,12 +40,16 @@ int dotdot(char * path);
 
 int checkPath(char * path, char * token);
 
-int hasTar(char * command);
+int hasTar(char * pathError);
 
 int estTar(char * token);
 
-void * findTar(int nbOption, char ** command);
+void * findTar(char * path);
+
+int cdPerso(char * path);
 
 void findPipeAndExec(int nbOption, char ** command, char ** commandPipe);
 
 int execCommandPipe(char ** command, char ** commandPipe);
+
+void * cd (char * path);
