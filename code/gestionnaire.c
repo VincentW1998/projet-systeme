@@ -199,7 +199,7 @@ int commandTar(char ** command) {
   switch (numeroCommand) {
     case -1 : return -1;
     case 0 :
-      printf("Here\n");
+      // printf("Here\n");
       write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
       write(1, "/", 1);
       write(1, TARPATH, strlen(TARPATH));
@@ -309,7 +309,7 @@ int navigate(char * path){// ..
       }
     }
     else { // si c'est pas ..
-      printf("token pour fullpath : %s\n", token);
+      // printf("token pour fullpath : %s\n", token);
       fullpath[i] = malloc(strlen(token)+1);
       memcpy(fullpath[i],token,strlen(token));
       strcat(fullpath[i],"/");
@@ -322,14 +322,14 @@ int navigate(char * path){// ..
   //transformation du tableau de string("java") en chaine de caractere
   for(int x = 1;x<i;x++){
     strcat(fullpath[0],fullpath[x]);
-    printf("fullpath[0] : %s\n", fullpath[0]);
+    // printf("fullpath[0] : %s\n", fullpath[0]);
   }
 
   char * tmp2 = malloc(sizeof(char)+1);
   char * tarp = malloc(strlen(TARPATH)+1);
   memcpy(tarp,TARPATH,strlen(TARPATH));// tarp = TARPATH copie
   token = strtok_r(tarp,"/",&tarp);
-  printf("tarp :%s\n", tarp);
+  // printf("tarp :%s\n", tarp);
 
   // if(!strcmp(token, tarp)){
   //   printf("fullpath %s:\n", fullpath[0]);
@@ -338,12 +338,12 @@ int navigate(char * path){// ..
   // }
 
   if(tarp[0] != '\0'){
-    printf("ici\n");
+    // printf("ici\n");
     memcpy(tmp2,tarp,strlen(tarp));
     strcat(tmp2, "/");
-    printf("tmp2 copie de tarp :%s\n", tmp2);
+    // printf("tmp2 copie de tarp :%s\n", tmp2);
     strcat(tmp2,fullpath[0]);
-    printf("tmp2 strcat fullpath :%s\n", tmp2);
+    // printf("tmp2 strcat fullpath :%s\n", tmp2);
     return checkPath(tmp2, token); // token toujours le fichier.tar
   }
   return checkPath(fullpath[0], token);
@@ -358,7 +358,7 @@ int checkPath(char * path, char * token){
 
   while((n = read(file,p,BLOCKSIZE))>0){
     if(((p-> typeflag == '5') && (!strncmp(path, p -> name, strlen(path)))) ){
-      printf("checkpath while\n");
+      // printf("checkpath while\n");
       // if(TARPATH[strlen(TARPATH-1)]!='/') strcat(TARPATH, "/");
       if(token[strlen(token) -1] != '/'){
         strcat(token, "/");
@@ -409,19 +409,19 @@ int dotdot(char * path){//..
   // ici TARPATH != NULL
   char * tmp = malloc(strlen(TARPATH)+1);
   memcpy(tmp,TARPATH,strlen(TARPATH));
-  printf("Avant le while\n");
+  // printf("Avant le while\n");
   while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
-    printf("Dans le while\n");
-    printf("tmp : %s\n", tmp);
+    // printf("Dans le while\n");
+    // printf("tmp : %s\n", tmp);
     if(tmp[0] == '\0'){// Pas SUR
 
 
       if(strlen(tmp2) != 0){
-        printf("tmp2 :%s\n", tmp2);
+        // printf("tmp2 :%s\n", tmp2);
         TARPATH = NULL;
         TARPATH = malloc(strlen(tmp2));
         strncpy(TARPATH,tmp2, strlen(tmp2) - 1);
-        printf("tarpath apres copy tmp2 : %s\n", TARPATH);
+        // printf("tarpath apres copy tmp2 : %s\n", TARPATH);
       }
       else TARPATH = NULL;
 
@@ -440,7 +440,7 @@ int cdPerso(char * path){
 
   if(!hasTar(path)){ // si dans le path il y un tar
     if(TARPATH==NULL){
-        printf("cdPerso path :%s\n", path);
+        // printf("cdPerso path :%s\n", path);
        char * tmp = cd(path);
       if(tmp != NULL) {// en gros si path est du genre fichier.tar
         TARPATH = malloc(strlen(tmp) + 1);
