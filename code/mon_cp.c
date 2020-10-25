@@ -10,11 +10,11 @@
 #include <unistd.h>
 #include "tar.h" // Programme fourni dans le TP1 du cours de Système
 
-/** 
+/**
     Fonctionne uniquement dans les archives tar pour le moment.
     Ce programme copie correctement les fichiers (dans les tarballs) et les données associées.
-    Cependant, il les écrit trop loin à la fin du fichier (à cause O_APPEND), 
-    ce qui fait que tar -xvf ne detecte pas le fichier quand l'on désarchive. 
+    Cependant, il les écrit trop loin à la fin du fichier (à cause O_APPEND),
+    ce qui fait que tar -xvf ne detecte pas le fichier quand l'on désarchive.
 **/
 
 int ecrire (char *destination, int nb_blocs, struct posix_header entete,int fichier){
@@ -25,7 +25,7 @@ int ecrire (char *destination, int nb_blocs, struct posix_header entete,int fich
   char tampon [512];
   for(int i = 0; i < nb_blocs ; i++){
     lseek(fichier,sk,(i*512));
-    ssize_t taille = read(fichier,tampon,512); 
+    // ssize_t taille = read(fichier,tampon,512);
     write(fichier,tampon,512);
   }
   free(destination);
@@ -33,8 +33,8 @@ int ecrire (char *destination, int nb_blocs, struct posix_header entete,int fich
 }
 
 /**
-   Prend en entrée un identifiant de fichier, une source pour le fichier que l'on 
-   souhaite copier et une destination, et enfin la position actuelle. 
+   Prend en entrée un identifiant de fichier, une source pour le fichier que l'on
+   souhaite copier et une destination, et enfin la position actuelle.
 **/
 
 int base_cp (int fichier, char *source, char *destination,  char *actuel){
@@ -43,7 +43,7 @@ int base_cp (int fichier, char *source, char *destination,  char *actuel){
   strcat(chemin,destination);
   // Ne prend pas encore en compte les chemins avec ".." et "."
   // Eventuellement faire une fonction qui les transformeraient en un chemin "propre".
-  
+
   struct posix_header entete;
   ssize_t lect = read (fichier, &entete , 512);
   if(lect <= 0){//lecture impossible
@@ -51,17 +51,17 @@ int base_cp (int fichier, char *source, char *destination,  char *actuel){
     perror("Échec de la lecture.");
     return -1;
   }
-  
+
   char *c = entete.size;
   int b;
-  int sc = sscanf(c,"%o",&b);
+  // int sc = sscanf(c,"%o",&b);
   int nb = (b+512-1)/512;
-  
+
   if(strcmp(entete.name,source)==0){
     // Vérifie que le chemin existe bien. Si oui, on tente de copier.
     return ecrire(chemin,nb,entete,fichier);
   }
-  
+
   lseek(fichier,nb*512,SEEK_CUR);
   return base_cp(fichier, actuel,source, destination);
 }

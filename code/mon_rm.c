@@ -23,19 +23,20 @@ int suppression(int fichier,int nb){
   for (int i = 0; i < nb+1; i ++){
     write(fichier,tab,512);//On supprime par bloc de 512.
   }
+  return 0;
 }
 
 int base_rm (int fichier, char *adresse, char *actuel){
   struct posix_header entete;
   ssize_t lect = read (fichier, &entete, 512);
-  
+
   if(lect <= 0){
     perror("Echec de la lecture.");
     return -1;
   }
   char *c = entete.size;
   int b;
-  int sc = sscanf(c,"%o",&b);
+  // int sc = sscanf(c,"%o",&b);
   int nb = (b+512-1)/512;
   printf("Valeur de b : %d\n", b);
   if(strcmp(entete.name,adresse)==0){
