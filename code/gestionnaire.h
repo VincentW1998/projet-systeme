@@ -45,7 +45,8 @@ int hasTar(char * command);
 
 int estTar(char * token);
 
-void * cd(char * path);
-// void * cd (int nbOption, char ** command);
+void * findTar(int nbOption, char ** command);
 
-// void * findTar(int nbOption, char ** command);
+void findPipeAndExec(int nbOption, char ** command, char ** commandPipe);
+
+int execCommandPipe(char ** command, char ** commandPipe);
