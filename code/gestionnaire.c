@@ -366,7 +366,6 @@ int cdPerso(char * path){
       return -1;
     }
     else{
-
       return 0;
     }
   }
