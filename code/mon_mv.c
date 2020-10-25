@@ -46,8 +46,8 @@ int mv(int fichier, char *source, char *cible){
 
 /** Pour effectuer des tests **/
 int main (int argc, char **argv){
-  if(argc < 3) {
-    perror("usage : ./%s fichier.tar fichierTarget");
+  if(argc < 4) {
+    perror("usage : ./%s fichier.tar fichierSource fichierTarget");
     exit(1);
   }
   int fichier = open(argv[1],O_RDWR);
