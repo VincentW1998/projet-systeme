@@ -59,9 +59,10 @@ int execCommandPipe(char ** command, char ** commandPipe) {
       dup2(fd[0], 0);
       close(fd[0]);
       if((n = execvp(commandPipe[0], commandPipe)) == -1)
-        afficheMessageErreur(commandPipe);
+        exit(1);
+        // perror("execvp");
+        // afficheMessageErreur(commandPipe);
       break;
-
     default :
       pid2 = fork();
 
@@ -75,7 +76,9 @@ int execCommandPipe(char ** command, char ** commandPipe) {
           dup2(fd[1], 1);
           close(fd[1]);
           if((n = execvp(command[0], command)) == -1)
-            afficheMessageErreur(command);
+            exit(1);
+            // perror("execvp");
+            // afficheMessageErreur(command);
           break;
       }
       wait(&w); //attend le processus fils
@@ -137,10 +140,11 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
     }
     command[i - 1] =NULL;
     execCommandPipe(command, commandPipe); // command avec pipe
+
   }
   else if((CHOIX = commandPersonnalisee(command)) == -1) //command perso sans pipe
     execCommand(command); // command sans le pipe
-  return pipe; // 0 if has no pipe, and 1 if has pipe
+  return; // 0 if has no pipe, and 1 if has pipe
 }
 
 int commandPersonnalisee(char ** command) {
@@ -188,7 +192,6 @@ int commandTar(char ** command) {
       write(1, "/", 1);
       write(1, TARPATH, strlen(TARPATH));
       write(1, "\n", 2);
-      // break;
       return 0;
   }
   return -1;
@@ -209,7 +212,6 @@ int estTar(char * token) {
 
 
 void * findTar(int nbOption, char ** command) {
-  char * pathFictif;
   char * token2;
   for (size_t i = 1; i < nbOption; i++){
     char * tmp = malloc(strlen(command[i]) + 1);

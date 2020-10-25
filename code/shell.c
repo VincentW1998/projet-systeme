@@ -2,14 +2,11 @@
 
 int main(int argc, char const *argv[]) {
   char str [BUFSIZE];
-  char * buff, * buff2, * token;
-  int n, i = 1;
+  char * buff;
+  int n;
   char * command[100];
   char * commandPipe[100];
   int nbOption = 0;
-  char *pathFictif;
-  int longueurPath;
-  int pipe;
 
   while(1) { // boucle infinie
     affichagePrompt();
