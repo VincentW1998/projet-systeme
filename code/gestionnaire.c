@@ -267,6 +267,7 @@ int dotdot(char * path){
   char * token;
   char * tmp2 = malloc(sizeof(char)+1);
   if(TARPATH == NULL){   //tarpath null
+    printf("%s\n", "tarpath null");
     if(findTar(path) == NULL){
     return chdir(path);
     }
@@ -287,9 +288,12 @@ int dotdot(char * path){
   while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
     if(tmp == NULL){// Pas SUR
       // printf("%s\n", tmp);
-      printf("%lu\n", strlen(tmp2));
-      if(strlen(tmp2) != 0)memcpy(TARPATH,tmp2,strlen(tmp2));
-
+      printf("%s\n", tmp2);
+      if(strlen(tmp2) != 0){
+        // memcpy(TARPATH,tmp2,strlen(tmp2));
+        strcpy(TARPATH,tmp2);
+        printf("%s\n", TARPATH);
+      }
       else TARPATH = NULL;
       printf("%s\n", "yo");
       printf("%s\n", TARPATH);
