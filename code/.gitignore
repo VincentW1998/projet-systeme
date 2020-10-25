@@ -1,2 +1,7 @@
 *.out
 a.out.dSYM/
+*.o
+shell
+mon_cp
+mon_rm
+mon_mv

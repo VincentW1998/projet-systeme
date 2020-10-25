@@ -17,7 +17,7 @@ int main(int argc, char const *argv[]) {
 
       // separe buff en command, option, path dans une variable command[]
       nbOption = separateurCommand(buff, command);
-
+      
       findPipeAndExec(nbOption, command, commandPipe);
 
       // on remet à null le tableau qui prenait les differentes commandes

@@ -1,5 +1,5 @@
 #include "gestionnaire.h"
-#include "tarball.h"
+#include "tar.h"
 
 int affichagePrompt() { // affichage du prompt
   write(1, KBLU, strlen(KBLU));
@@ -226,11 +226,11 @@ int estTar(char * token) { // verifie si un token est un .tar
     strcpy(name, tok);
   }
   if(name != NULL && !strcmp(name, "tar")){
-    free(temp);
+    // free(temp);
     return 0;
   }
 
-  free(temp);
+  // free(temp);
   return -1;
 }
 
@@ -272,12 +272,12 @@ int hasTar(char * path){
 
     while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
       if(!estTar(token)){
-        free((tmp));
+        // free((tmp));
         return 0;
       }
       i++;
     }
-    free(tmp);
+    // free(tmp);
   return -1;
 }
 
@@ -293,7 +293,6 @@ void * findTar(char * path){
 // fonction pere = commandTar
 int navigate(char * path){// ..
   char * fullpath[100];
-  char * tarFile = findTar(path);
   char * token;
   char * tmp = malloc(strlen(path)+1);
   memcpy(tmp,path,strlen(path));
@@ -329,7 +328,6 @@ int navigate(char * path){// ..
   char * tmp2 = malloc(sizeof(char)+1);
   char * tarp = malloc(strlen(TARPATH)+1);
   memcpy(tarp,TARPATH,strlen(TARPATH));// tarp = TARPATH copie
-
   token = strtok_r(tarp,"/",&tarp);
   printf("tarp :%s\n", tarp);
 
@@ -338,7 +336,9 @@ int navigate(char * path){// ..
   //
   //   return checkPath(fullpath[0], token);
   // }
-  if(tarp != NULL){
+
+  if(tarp[0] != '\0'){
+    printf("ici\n");
     memcpy(tmp2,tarp,strlen(tarp));
     strcat(tmp2, "/");
     printf("tmp2 copie de tarp :%s\n", tmp2);
@@ -347,7 +347,7 @@ int navigate(char * path){// ..
     return checkPath(tmp2, token); // token toujours le fichier.tar
   }
   return checkPath(fullpath[0], token);
-  
+
 }
 
 int checkPath(char * path, char * token){
@@ -357,11 +357,12 @@ int checkPath(char * path, char * token){
   struct posix_header * p = malloc(sizeof(struct posix_header));
 
   while((n = read(file,p,BLOCKSIZE))>0){
-    if((p->name[strlen(p->name) -1]=='/' && !strncmp(p->name, path, strlen(p->name)-1)) || !strcmp(p->name, path)){
-
+    if(((p-> typeflag == '5') && (!strncmp(path, p -> name, strlen(path)))) ){
+      printf("checkpath while\n");
       // if(TARPATH[strlen(TARPATH-1)]!='/') strcat(TARPATH, "/");
-      if(token[strlen(token) -1] != '/')
+      if(token[strlen(token) -1] != '/'){
         strcat(token, "/");
+      }
       TARPATH = NULL;
       if(path[strlen(path)-1]=='/') {
         // strncat(TARPATH,path,strlen(path)-1);
@@ -411,8 +412,8 @@ int dotdot(char * path){//..
   printf("Avant le while\n");
   while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
     printf("Dans le while\n");
-
-    if(tmp == NULL){// Pas SUR
+    printf("tmp : %s\n", tmp);
+    if(tmp[0] == '\0'){// Pas SUR
 
 
       if(strlen(tmp2) != 0){
@@ -477,7 +478,7 @@ void * cd (char * path) { //ex: path = leTest.tar
     strcat(basicPath,token);
     strcat(basicPath,"/");
   }
-  free(tmp);
-  free(basicPath);
+  // free(tmp);
+  // free(basicPath);
   return NULL;
 }
