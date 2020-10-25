@@ -1,4 +1,5 @@
 #define BUFSIZE 512
+// #include "tar.h"
 #define KBLU  "\x1B[34m"
 #define RESET "\x1B[0m"
 #include <stdlib.h>
@@ -7,6 +8,12 @@
 #include <string.h>
 #include <dirent.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <math.h>
+
+
 char * TARPATH;
 int CHOIX;
 
@@ -23,6 +30,18 @@ int separateurCommand(char * buff, char ** command);
 int commandPersonnalisee(char ** command);
 
 int commandTar(char ** command);
+
+int cdPerso(char * path);
+
+// int navigateTar(char * path);
+
+int navigate(char * path);
+
+int dotdot(char * path);
+
+int checkPath(char * path, char * token);
+
+int hasTar(char * command);
 
 int estTar(char * token);
 

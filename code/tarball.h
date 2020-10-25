@@ -1,5 +1,12 @@
+/* tar Header Block, from POSIX 1003.1-1990.  */
+#include <stdio.h>
+#include <string.h>
 #define BLOCKSIZE 512
 #define BLOCKBITS 9
+
+/* POSIX header.  */
+
+/* Note that sizeof(struct posix_header) == BLOCKSIZE */
 
 struct posix_header
 {                              /* byte offset */
@@ -20,7 +27,7 @@ struct posix_header
   char devminor[8];             /* 337 */
   char prefix[155];             /* 345 */
   char junk[12];                /* 500 */
-};
+};                              /* Total: 512 */
 
 #define TMAGIC   "ustar"        /* ustar and a null */
 #define TMAGLEN  6

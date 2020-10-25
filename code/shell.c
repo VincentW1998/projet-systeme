@@ -7,6 +7,10 @@ int main(int argc, char const *argv[]) {
   char * command[100];
   char * commandPipe[100];
   int nbOption = 0;
+  char *pathFictif;
+  // char *tarPath;
+  int longueurPath;
+  TARPATH = NULL;
 
   while(1) { // boucle infinie
     affichagePrompt();
