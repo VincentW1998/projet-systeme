@@ -4,6 +4,7 @@ RUN apt-get install -y vim
 RUN apt-get install -y libc-dev
 RUN apt-get install -y gcc
 RUN apt-get install -y make
+RUN apt-get install -y gdb
 RUN mkdir /home/projet
 COPY code/Makefile /home/projet/Makefile
 COPY code/shell.c /home/projet/shell.c
