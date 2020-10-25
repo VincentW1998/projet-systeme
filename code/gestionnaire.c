@@ -59,7 +59,9 @@ int execCommandPipe(char ** command, char ** commandPipe) {
       dup2(fd[0], 0);
       close(fd[0]);
       if((n = execvp(commandPipe[0], commandPipe)) == -1)
-        afficheMessageErreur(commandPipe);
+        exit(1);
+        // perror("execvp");
+        // afficheMessageErreur(commandPipe);
       break;
     default :
       pid2 = fork();
@@ -74,7 +76,9 @@ int execCommandPipe(char ** command, char ** commandPipe) {
           dup2(fd[1], 1);
           close(fd[1]);
           if((n = execvp(command[0], command)) == -1)
-            afficheMessageErreur(command);
+            exit(1);
+            // perror("execvp");
+            // afficheMessageErreur(command);
           break;
       }
       wait(&w); //attend le processus fils
