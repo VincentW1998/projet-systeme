@@ -60,4 +60,3 @@ int main(int argc, char **argv){
   }
   return base_rm(fichier, argv[2],"");
 }
-
