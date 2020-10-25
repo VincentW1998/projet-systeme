@@ -3,9 +3,9 @@
 **Projet de système L3**
 
 
-**CHAU JULIEN** : 
-*    numéro étudiant : 22018403
-*    alias : @chau
+**BERSAUTER JULIEN** : 
+*    numéro étudiant : 71400788
+*    alias : @bersaute
 
 **NGO FELIX** :
 
