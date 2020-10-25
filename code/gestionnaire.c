@@ -208,7 +208,6 @@ int estTar(char * token) {
 
 
 void * findTar(int nbOption, char ** command) {
-  char * pathFictif;
   char * token2;
   for (size_t i = 1; i < nbOption; i++){
     char * tmp = malloc(strlen(command[i]) + 1);
