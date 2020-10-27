@@ -149,15 +149,15 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
   }
   else {
     if(TARPATH != NULL)
-      commandTar(command);
-    else if(commandPersonnalisee(command) == -1) //command perso sans pipe
+      commandTar(nbOption, command);
+    else if(commandPersonnalisee(nbOption, command) == -1) //command perso sans pipe
        execCommand(command); // command sans le pipe
   }
 
   return; // 0 if has no pipe, and 1 if has pipe
 }
 
-int commandPersonnalisee(char ** command) {
+int commandPersonnalisee(int nbOption, char ** command) {
   int nbCommand = 2;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
@@ -172,13 +172,13 @@ int commandPersonnalisee(char ** command) {
     case -1 : return -1;
     case 0 : exit(0);
     case 1 :
-      cdPerso(command[1]);
+      cdPerso(nbOption, command[1]);
       break;
   }
   return 0;
 }
 
-int commandTar(char ** command) {
+int commandTar(int nbOption, char ** command) {
   int nbCommand = 9;
   char *cmdTar[nbCommand];
   int numeroCommand = -1;
@@ -207,7 +207,7 @@ int commandTar(char ** command) {
       return 0;
     case 1 :
       // return navigateTar(command[1]);
-      return navigate(command[1]);
+      return navigate(nbOption, command[1]);
     case 8 :
       exit(0);
   }
@@ -291,7 +291,12 @@ void * findTar(char * path){
 }
 
 // fonction pere = commandTar
-int navigate(char * path){// ..
+int navigate(int nbOption, char * path){// ..
+  if(nbOption == 1){
+    TARPATH = NULL;
+    chdir(getenv("HOME"));
+    return 0;
+  }
   char * fullpath[100];
   char * token;
   char * tmp = malloc(strlen(path)+1);
@@ -436,8 +441,11 @@ int dotdot(char * path){//..
 }
 
 // fonction qui appelle cdPerso = commandPersonnalisee
-int cdPerso(char * path){
-
+int cdPerso(int nbOption, char * path){
+  if(nbOption == 1){
+    chdir(getenv("HOME"));
+    return 0;
+  }
   if(!hasTar(path)){ // si dans le path il y un tar
     if(TARPATH==NULL){
         // printf("cdPerso path :%s\n", path);
