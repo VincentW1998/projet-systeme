@@ -49,33 +49,25 @@ int navigate(char * path){// ..
     // printf("fullpath[0] : %s\n", fullpath[0]);
   }
 
-  char * tmp2 = malloc(sizeof(char)+1);
   char * tarp = malloc(strlen(TARPATH)+1);
-  memcpy(tarp,TARPATH,strlen(TARPATH));// tarp = TARPATH copie
-  token = strtok_r(tarp,"/",&tarp);
-  char * bla = malloc(sizeof(char)+1);
-  strcpy(bla,token);
-  // printf("token avant condition :%s\n", token);
-
-  // if(!strcmp(token, tarp)){
-  //   printf("fullpath %s:\n", fullpath[0]);
-  //
-  //   return checkPath(fullpath[0], token);
-  // }
+  //memcpy(tarp,TARPATH,strlen(TARPATH));// tarp = TARPATH copie
+  strcpy(tarp, TARPATH);
+  token = strtok_r(tarp,"/", &tarp);
+//docker 
+  printf("tarp avant condition :%s!", tarp);
   if(tarp != NULL){
     // printf("token debut condition:%s\n", token);
     printf("TARP != NULL l-65\n");
+    char * tmp2 = malloc(strlen(tarp) + strlen(fullpath[0]) + 2);
     strcpy(tmp2,tarp);
 
     strcat(tmp2, "/");
-    printf("token test1:%s\n", token);
-    printf("tmp 2:%s\n", tmp2);
+    //printf("token test1:%s\n", token);
     // printf("tmp2 copie de tarp :%s\n", tmp2);
-    strcat(tmp2,fullpath[0]); // vide le token ici jsp pourquoi
-    printf("TARPATH : %s!\n", TARPATH);
+    strncat(tmp2,fullpath[0],strlen(fullpath[0])); // vide le token ici jsp pourquoi
     printf("token :%s!\n", token);
     printf("tmp2 strcat fullpath :%s!\n", tmp2);
-    printf("bla:%s!\n",bla);
+    //printf("bla:%s!\n",bla);
     return checkPath(tmp2, token); // token toujours le fichier.tar
   }
   return checkPath(fullpath[0], token);
