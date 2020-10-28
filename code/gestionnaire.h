@@ -22,34 +22,38 @@ int afficheMessageErreur(char ** command);
 
 int execCommand(char ** command);
 
+int execCommandPipe(char ** command, char ** commandPipe);
+
 void *lectureLigne(char * str, char * buff);
 
 int separateurCommand(char * buff, char ** command);
 
-int commandPersonnalisee(char ** command);
+void findPipeAndExec(int nbOption, char ** command, char ** commandPipe);
+
+int commandPersonnalisee(int nbOption, char ** command);
 
 int commandTar(char ** command);
 
-int cdPerso(char * path);
+int estTar(char * token);
 
-// int navigateTar(char * path);
+int existTar(char * token);
 
-int navigate(char * path);
+// int cdPerso(char * path);
 
-int dotdot(char * path);
+// int navigate(char * path);
 
-int checkPath(char * path, char * token);
+// int dotdot(char * path);
+
+// int checkPath(char * path, char * token);
 
 int hasTar(char * pathError);
 
-int estTar(char * token);
-
 void * findTar(char * path);
 
-int cdPerso(char * path);
+// int cdPerso(char * path);
 
-void findPipeAndExec(int nbOption, char ** command, char ** commandPipe);
 
-int execCommandPipe(char ** command, char ** commandPipe);
 
-void * cd (char * path);
+
+
+// void * cd (char * path);
