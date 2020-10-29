@@ -16,7 +16,7 @@ int moveTo(char * path, char * tarball){
 }
 
 int cdNoOptions(){
-  if(TARPATH != NULL)
+  if(TARPATH != NULL) // docker
     TARPATH = NULL;
   chdir(getenv("HOME"));
   return 0;
