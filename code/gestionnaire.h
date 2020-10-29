@@ -32,7 +32,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe);
 
 int commandPersonnalisee(int nbOption, char ** command);
 
-int commandTar(char ** command);
+int commandTar(int nbOption, char ** command);
 
 int estTar(char * token);
 

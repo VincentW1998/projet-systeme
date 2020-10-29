@@ -5,7 +5,7 @@ all : shell mon_cp mon_rm mon_mv
 
 shell : shell.o gestionnaire.o my_cd.o
 
-shell.o : shell.c gestionnaire.h 
+shell.o : shell.c gestionnaire.h
 
 gestionnaire.o : gestionnaire.c gestionnaire.h
 
@@ -21,4 +21,4 @@ clean :
 	rm -rf *.o
 
 cleanall : clean
-	rm -rf shell mon_cp mon_rm mon_mv
+	rm -rf shell mon_cp mon_rm mon_mv *.dSYM/

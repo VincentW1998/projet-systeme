@@ -14,6 +14,14 @@ int moveTo(char * path, char * tarball){
   chdir(pwd);
   return -1;
 }
+
+int cdNoOptions(){
+  if(TARPATH != NULL)
+    TARPATH = NULL;
+  chdir(getenv("HOME"));
+  return 0;
+}
+
 // fonction pere = commandTar
 int navigate(char * path){// ..
   char * fullpath[100];
@@ -53,7 +61,7 @@ int navigate(char * path){// ..
   //memcpy(tarp,TARPATH,strlen(TARPATH));// tarp = TARPATH copie
   strcpy(tarp, TARPATH);
   token = strtok_r(tarp,"/", &tarp);
-//docker 
+//docker
   printf("tarp avant condition :%s!", tarp);
   if(tarp != NULL){
     // printf("token debut condition:%s\n", token);
@@ -167,11 +175,6 @@ int dotdot(char * path){//..
 
 // fonction qui appelle cdPerso = commandPersonnalisee
 int cdPerso(int nbOption, char * path){
-  if(nbOption == 1){
-    chdir(getenv("HOME"));
-    // chdir("HOME");
-    return 0;
-  }
   if(!hasTar(path)){ // si dans le path il y un tar
     if(TARPATH==NULL){
         // printf("cdPerso path :%s\n", path);

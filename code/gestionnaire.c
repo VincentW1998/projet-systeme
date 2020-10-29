@@ -149,7 +149,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
   }
   else {
     if(TARPATH != NULL)
-      commandTar(command);
+      commandTar(nbOption, command);
     else if(commandPersonnalisee(nbOption, command) == -1) //command perso sans pipe
        execCommand(command); // command sans le pipe
   }
@@ -172,13 +172,15 @@ int commandPersonnalisee(int nbOption , char ** command) {
     case -1 : return -1;
     case 0 : exit(0);
     case 1 :
-        cdPerso(nbOption, command[1]);
-    break;
+      if(nbOption == 1)
+        return cdNoOptions();
+      return cdPerso(nbOption, command[1]);
+    // break;
   }
   return 0;
 }
 
-int commandTar(char ** command) {
+int commandTar(int nbOption, char ** command) {
   int nbCommand = 9;
   char *cmdTar[nbCommand];
   int numeroCommand = -1;
@@ -206,7 +208,8 @@ int commandTar(char ** command) {
       write(1, "\n", 2);
       return 0;
     case 1 :
-      // return navigateTar(command[1]);
+      if(nbOption == 1)
+        return cdNoOptions();
       return navigate(command[1]);
     case 8 :
       exit(0);
