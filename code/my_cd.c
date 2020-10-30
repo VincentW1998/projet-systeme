@@ -17,6 +17,7 @@ int moveTo(char * path, char * tarball){
 
 int cdNoOptions(){
   if(TARPATH != NULL) // docker
+  //if(TARPATH[0]=='\0')
     TARPATH = NULL;
   chdir(getenv("HOME"));
   return 0;
@@ -60,6 +61,7 @@ int navigate(char * path){// ..
   token = strtok_r(tarp,"/", &tarp);
 //docker
   if(tarp != NULL){
+    //if(tarp[0]!='\0'){
     char * tmp2 = malloc(strlen(tarp) + strlen(fullpath[0]) + 2);
     strcpy(tmp2,tarp);
     strcat(tmp2, "/");
@@ -141,7 +143,7 @@ int dotdot(char * path){//..
     // printf("Dans le while\n");
     // printf("tmp : %s\n", tmp);
     if(tmp == NULL){// Pas SUR
-
+    //if(tmp[0]=='\0'){//docker
 
       if(strlen(tmp2) != 0){
         // printf("tmp2 :%s\n", tmp2);
