@@ -38,22 +38,6 @@ int estTar(char * token);
 
 int existTar(char * token);
 
-// int cdPerso(char * path);
-
-// int navigate(char * path);
-
-// int dotdot(char * path);
-
-// int checkPath(char * path, char * token);
-
 int hasTar(char * pathError);
 
 void * findTar(char * path);
-
-// int cdPerso(char * path);
-
-
-
-
-
-// void * cd (char * path);

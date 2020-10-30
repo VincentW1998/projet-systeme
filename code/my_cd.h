@@ -11,4 +11,5 @@ int dotdot(char * path);
 
 int cdPerso(int nbOption, char * path);
 
-void * cd (char * path);
+// void * cd (char * path);
+int cd (char * path);

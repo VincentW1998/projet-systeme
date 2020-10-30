@@ -21,4 +21,4 @@ clean :
 	rm -rf *.o
 
 cleanall : clean
-	rm -rf shell mon_cp mon_rm mon_mv *.dSYM/
+	rm -rf shell mon_cp mon_rm mon_mv *.dSYM/ *.gch
