@@ -2,7 +2,6 @@
 #include "gestionnaire.h"
 #include "tar.h"
 int moveTo(char * path, char * tarball){
-
   char * pwd = getcwd(NULL, 0);
 
   if(chdir(path)){
@@ -25,6 +24,7 @@ int cdNoOptions(){
 
 // fonction pere = commandTar
 int navigate(char * path){// ..
+  if(path[0] == '/') return cd(path); // si le path est absolu
   char * fullpath[100]; // liste qui va separer le path
   char * token;
   char * tmp = malloc(strlen(path)+1);
@@ -35,26 +35,25 @@ int navigate(char * path){// ..
     if(!strcmp(token,"..")){
       if(i == 0) dotdot(tmp); //si le path nous mene hors du tarball
       else{
-        free(fullpath[i-1]); // on recule d'un cran dans le path
+        printf("f%s!\n",fullpath[i]);
+        fullpath[i-1] = NULL;// on recule d'un cran dans le path
         i--;
       }
     }
     else { // si c'est pas ..
       fullpath[i] = malloc(strlen(token)+1);
       memcpy(fullpath[i],token,strlen(token));
-      strcat(fullpath[i],"/");
       i++;
     }
-
   }
   if(i == 0)return 0;//si le fullpath est null on sort
 
   //transformation du tableau de string("java") en chaine de caractere
   for(int x = 1;x<i;x++){
+    strcat(fullpath[0],"/");
     strcat(fullpath[0],fullpath[x]);
-    // printf("fullpath[0] : %s\n", fullpath[0]);
   }
-
+  printf("FULLPATH:%s!\n",fullpath[0]);
   char * tarp = malloc(strlen(TARPATH)+1);
   //memcpy(tarp,TARPATH,strlen(TARPATH));// tarp = TARPATH copie
   strcpy(tarp, TARPATH);
@@ -116,11 +115,13 @@ int checkPath(char * path, char * token){
 
 // fonction pere : navigate
 int dotdot(char * path){//..
+  printf("dotot\n");
   char * token;
   char * tmp2 = malloc(sizeof(char)+1);
   if(TARPATH == NULL){   //tarpath null
 
     if(findTar(path) == NULL){ // il y a pas de tar
+      printf("pas de tar\n");
     return chdir(path);
     }
     else { //il y un tar
@@ -165,31 +166,16 @@ int dotdot(char * path){//..
 }
 
 // fonction qui appelle cdPerso = commandPersonnalisee
-int cdPerso(int nbOption, char * path){
-  if(!hasTar(path)){ // si dans le path il y un tar
-    if(TARPATH==NULL){
-        // printf("cdPerso path :%s\n", path);
-      //  char * tmp = cd(path);
-      // if(tmp != NULL) {// en gros si path est du genre fichier.tar
-      //   TARPATH = malloc(strlen(tmp) + 1);
-      //   strcpy(TARPATH, tmp);
-      //   return 0;
-      // }
-      // return -1;
-      return cd(path);
-    }
-    else{
-      return 0;
-    }
-  }
+int cdPerso(char * path){
+  if(!hasTar(path)) return cd(path); // si dans le path il y un tar
   chdir(path);
   return 0;
 }
+
 int cd(char * path){
   char * basicPath = malloc(sizeof(char)+1);
-  // char * tmp = malloc(strlen(path)+1);
   char * token;
-  // strncpy(tmp,path,strlen(path));
+  if(path[0]=='/') strcpy(basicPath,"/");
   while((token = strtok_r(path,"/\n",&path))!=NULL){
     if(!estTar(token)){
       if(basicPath[0] != '\0' && moveTo(basicPath, token)) return -1;
@@ -202,44 +188,10 @@ int cd(char * path){
     strncat(basicPath, token,strlen(token));
     strncat(basicPath,"/",1);
   }
+  printf("le reste du path:%s!\n",path );
   if(navigate(path)){
     TARPATH = NULL;
     return -1;
   }
   return 0;
-
-  // char * tmp2 = malloc(strlen(tmp)+1);
-  // strncpy(tmp2,tmp,strlen(tmp));
-  // if(checkPath(tmp2, token)) return -1;
-
-  // printf("TARPATH:%s!\n",TARPATH );
-  // printf("tmp:%s!\n", tmp);
-  // TARPATH = realloc(TARPATH, strlen(token) + strlen(tmp) + 1);
-  // strncat(TARPATH, tmp, strlen(tmp));
-  // return 0;
 }
-
-// void * cd (char * path) { //ex: path = leTest.tar
-//   char * basicPath = malloc(sizeof(char)+1);
-//   char * token;
-//   char * tmp = malloc(strlen(path)+1);
-//   memcpy(tmp,path,strlen(path));
-//   while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
-//     if(!estTar(token)){
-//       if(strlen(basicPath) == 0){
-//         if(!existTar(token))
-//           return token;
-//       }
-//       else {
-//         if(!moveTo(basicPath,token)){
-//           return token;
-//         }
-//       }
-//     }
-//     strcat(basicPath,token);
-//     strcat(basicPath,"/");
-//   }
-//   // free(tmp);
-//   // free(basicPath);
-//   return NULL;
-// }

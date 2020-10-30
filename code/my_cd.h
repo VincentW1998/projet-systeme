@@ -9,7 +9,6 @@ int checkPath(char * path, char * token);
 
 int dotdot(char * path);
 
-int cdPerso(int nbOption, char * path);
+int cdPerso(char * path);
 
-// void * cd (char * path);
 int cd (char * path);

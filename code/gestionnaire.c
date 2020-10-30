@@ -174,7 +174,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
     case 1 :
       if(nbOption == 1)
         return cdNoOptions();
-      return cdPerso(nbOption, command[1]);
+      return cdPerso(command[1]);
     // break;
   }
   return 0;
