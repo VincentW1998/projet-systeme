@@ -1,10 +1,10 @@
 #include "gestionnaire.h"
 #include "tar.h"
-
+#include "my_cd.h"
 int affichagePrompt() { // affichage du prompt
   write(1, KBLU, strlen(KBLU));
   write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
-  if(TARPATH!=NULL){
+  if(*TARPATH != '\0'){ // si TARPATH non vide
     write(1,"/", 1);
     write(1, TARPATH, strlen(TARPATH));
   }
@@ -148,16 +148,16 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 
   }
   else {
-    if(TARPATH != NULL)
-      commandTar(command);
-    else if(commandPersonnalisee(command) == -1) //command perso sans pipe
+    if(*TARPATH != '\0')
+      commandTar(nbOption, command);
+    else if(commandPersonnalisee(nbOption, command) == -1) //command perso sans pipe
        execCommand(command); // command sans le pipe
   }
 
   return; // 0 if has no pipe, and 1 if has pipe
 }
 
-int commandPersonnalisee(char ** command) {
+int commandPersonnalisee(int nbOption , char ** command) {
   int nbCommand = 2;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
@@ -172,13 +172,15 @@ int commandPersonnalisee(char ** command) {
     case -1 : return -1;
     case 0 : exit(0);
     case 1 :
-      cdPerso(command[1]);
-      break;
+      if(nbOption == 1)
+        return cdNoOptions();
+      return cdPerso(command[1]);
+    // break;
   }
   return 0;
 }
 
-int commandTar(char ** command) {
+int commandTar(int nbOption, char ** command) {
   int nbCommand = 9;
   char *cmdTar[nbCommand];
   int numeroCommand = -1;
@@ -206,7 +208,8 @@ int commandTar(char ** command) {
       write(1, "\n", 2);
       return 0;
     case 1 :
-      // return navigateTar(command[1]);
+      if(nbOption == 1)
+        return cdNoOptions();
       return navigate(command[1]);
     case 8 :
       exit(0);
@@ -216,6 +219,7 @@ int commandTar(char ** command) {
 }
 
 int estTar(char * token) { // verifie si un token est un .tar
+  printf("estTAR\n");
   char * temp = malloc(strlen(token)+1);
   memcpy(temp,token,strlen(token));
   char * tok = strtok_r(temp, ".",&temp);
@@ -246,19 +250,6 @@ int existTar(char * token){
   return -1;
 }
 
-int moveTo(char * path, char * tarball){
-
-  char * pwd = getcwd(NULL, 0);
-
-  if(chdir(path)){
-    perror("pathError:");
-    return -1;
-  }
-  if(!existTar(tarball))
-    return 0;
-  chdir(pwd);
-  return -1;
-}
 
 // prends un path et verifie si il y a un tar dans le path
 // fonction qui appelle hasTar = cdPerso
@@ -290,195 +281,36 @@ void * findTar(char * path){
   return NULL;
 }
 
-// fonction pere = commandTar
-int navigate(char * path){// ..
-  char * fullpath[100];
-  char * token;
-  char * tmp = malloc(strlen(path)+1);
-  memcpy(tmp,path,strlen(path));
-
-  int i = 0;
-  while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
-    if(!strcmp(token,"..")){
-
-      if(i == 0) dotdot(tmp);
-      else{
-        free(fullpath[i-1]);
-
-        i--;
-      }
-    }
-    else { // si c'est pas ..
-      // printf("token pour fullpath : %s\n", token);
-      fullpath[i] = malloc(strlen(token)+1);
-      memcpy(fullpath[i],token,strlen(token));
-      strcat(fullpath[i],"/");
-      i++;
-    }
-
-  }
-  if(i == 0)return 0;
-
-  //transformation du tableau de string("java") en chaine de caractere
-  for(int x = 1;x<i;x++){
-    strcat(fullpath[0],fullpath[x]);
-    // printf("fullpath[0] : %s\n", fullpath[0]);
-  }
-
-  char * tmp2 = malloc(sizeof(char)+1);
-  char * tarp = malloc(strlen(TARPATH)+1);
-  memcpy(tarp,TARPATH,strlen(TARPATH));// tarp = TARPATH copie
-  token = strtok_r(tarp,"/",&tarp);
-  // printf("tarp :%s\n", tarp);
-
-  // if(!strcmp(token, tarp)){
-  //   printf("fullpath %s:\n", fullpath[0]);
-  //
-  //   return checkPath(fullpath[0], token);
-  // }
-
-  if(tarp[0] != '\0'){
-    // printf("ici\n");
-    memcpy(tmp2,tarp,strlen(tarp));
-    strcat(tmp2, "/");
-    // printf("tmp2 copie de tarp :%s\n", tmp2);
-    strcat(tmp2,fullpath[0]);
-    // printf("tmp2 strcat fullpath :%s\n", tmp2);
-    return checkPath(tmp2, token); // token toujours le fichier.tar
-  }
-  return checkPath(fullpath[0], token);
-
-}
-
-int checkPath(char * path, char * token){
+int checkPath(char * path, char * token, int typeflag){
+  printf("dans le Check\n");
+  printf("token :%s\n", token);
+  printf("%s!\n", path);
   int file, n;
   if((file = open(token,O_RDONLY)) == -1){perror("error"); return -1;}
 
   struct posix_header * p = malloc(sizeof(struct posix_header));
-
   while((n = read(file,p,BLOCKSIZE))>0){
-    if(((p-> typeflag == '5') && (!strncmp(path, p -> name, strlen(path)))) ){
-      // printf("checkpath while\n");
-      // if(TARPATH[strlen(TARPATH-1)]!='/') strcat(TARPATH, "/");
-      if(token[strlen(token) -1] != '/'){
-        strcat(token, "/");
-      }
-      TARPATH = NULL;
-      if(path[strlen(path)-1]=='/') {
-        // strncat(TARPATH,path,strlen(path)-1);
-
-        TARPATH = malloc(strlen(token) + strlen(path));
-        strcpy(TARPATH, token);
-        strncat(TARPATH, path, strlen(path) - 1);
-      }
-
-      else {
-        // strcat(TARPATH,path);
-        TARPATH = malloc(strlen(token) + strlen(path) + 1);
-        strcpy(TARPATH, token);
-        strncat(TARPATH, path, strlen(path));
-      }
+    printf("%s!\n",p->name );
+    if(((typeflag == 5) && (p-> typeflag == '5') && (!strncmp(path, p -> name, strlen(path)))) ){
+      size_t length = strlen(path);
+      strcpy(TARPATH,"\0");//problem
+      if(path[strlen(path)-1]=='/') length--;
+      TARPATH = realloc(TARPATH, strlen(token) + length + 1);
+      strcpy(TARPATH,token);
+      strncat(TARPATH,"/",strlen("/"));
+      strncat(TARPATH, path, length);
+      free(token);
+      close(file);
       return 0;
     }
+    else if(typeflag == 0 && p-> typeflag == '0' && !strcmp(p->name, path)){
+      free(token);
+      close(file);
+      return 0;
+     }
     lseek(file,ceil(atoi(p->size)/512.)*BLOCKSIZE,SEEK_CUR);
   }
+  free(token);
+  close(file);
   return -1;
-}
-
-// fonction pere : navigate
-int dotdot(char * path){//..
-  char * token;
-  char * tmp2 = malloc(sizeof(char)+1);
-  if(TARPATH == NULL){   //tarpath null
-
-    if(findTar(path) == NULL){ // il y a pas de tar
-    return chdir(path);
-    }
-    else { //il y un tar
-      while((token = strtok_r(path,"/\n",&path))!=NULL){
-        if(!estTar(token)) break;
-        strcat(tmp2,token);
-        strcat(tmp2,"/");
-      }
-      if(chdir(tmp2)) return -1;
-      memcpy(TARPATH,token,strlen(token));
-      return 0;
-    }
-  } // fin TARPATH == NULL
-
-  // ici TARPATH != NULL
-  char * tmp = malloc(strlen(TARPATH)+1);
-  memcpy(tmp,TARPATH,strlen(TARPATH));
-  // printf("Avant le while\n");
-  while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
-    // printf("Dans le while\n");
-    // printf("tmp : %s\n", tmp);
-    if(tmp[0] == '\0'){// Pas SUR
-
-
-      if(strlen(tmp2) != 0){
-        // printf("tmp2 :%s\n", tmp2);
-        TARPATH = NULL;
-        TARPATH = malloc(strlen(tmp2));
-        strncpy(TARPATH,tmp2, strlen(tmp2) - 1);
-        // printf("tarpath apres copy tmp2 : %s\n", TARPATH);
-      }
-      else TARPATH = NULL;
-
-      return 0;
-    }
-    strcat(tmp2,token);
-    strcat(tmp2,"/");
-  }
-
-
-  return -1;
-}
-
-// fonction qui appelle cdPerso = commandPersonnalisee
-int cdPerso(char * path){
-
-  if(!hasTar(path)){ // si dans le path il y un tar
-    if(TARPATH==NULL){
-        // printf("cdPerso path :%s\n", path);
-       char * tmp = cd(path);
-      if(tmp != NULL) {// en gros si path est du genre fichier.tar
-        TARPATH = malloc(strlen(tmp) + 1);
-        strcpy(TARPATH, tmp);
-        return 0;
-      }
-      return -1;
-    }
-    else{
-      return 0;
-    }
-  }
-  chdir(path);
-  return 0;
-}
-
-
-void * cd (char * path) { //ex: path = leTest.tar
-  char * basicPath = malloc(sizeof(char)+1);
-  char * token;
-  char * tmp = malloc(strlen(path)+1);
-  memcpy(tmp,path,strlen(path));
-  while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
-    if(!estTar(token)){
-      if(strlen(basicPath) == 0){
-        if(!existTar(token))
-          return token;
-      }
-      else {
-        if(!moveTo(basicPath,token)){
-          return token;
-        }
-      }
-    }
-    strcat(basicPath,token);
-    strcat(basicPath,"/");
-  }
-  // free(tmp);
-  // free(basicPath);
-  return NULL;
 }
