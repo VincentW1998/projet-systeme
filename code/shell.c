@@ -7,8 +7,9 @@ int main(int argc, char const *argv[]) {
   char * command[100];
   char * commandPipe[100];
   int nbOption = 0;
-  TARPATH = NULL;
-
+  TARPATH = malloc(1);
+  strcpy(TARPATH,"\0");
+  
   while(1) { // boucle infinie
     affichagePrompt();
     nbOption = 0;
@@ -17,7 +18,7 @@ int main(int argc, char const *argv[]) {
 
       // separe buff en command, option, path dans une variable command[]
       nbOption = separateurCommand(buff, command);
-      
+
       findPipeAndExec(nbOption, command, commandPipe);
 
       // on remet à null le tableau qui prenait les differentes commandes

@@ -1,6 +1,6 @@
 #include "my_cd.h"
 #include "gestionnaire.h"
-#include "tar.h"
+// #include "tar.h"
 int moveTo(char * path, char * tarball){
   char * pwd = getcwd(NULL, 0);
 
@@ -15,15 +15,16 @@ int moveTo(char * path, char * tarball){
 }
 
 int cdNoOptions(){
-  if(TARPATH != NULL) // docker
+  if(*TARPATH != '\0') // docker
+    strcpy(TARPATH,"\0");
   //if(TARPATH[0]=='\0')
-    TARPATH = NULL;
+    // TARPATH = NULL;
   chdir(getenv("HOME"));
   return 0;
 }
 
 // fonction pere = commandTar
-int navigate(char * path){// ..
+int navigate(char * path){ // ..
   if(path[0] == '/') return cd(path); // si le path est absolu
   char * fullpath[100]; // liste qui va separer le path
   char * token;
@@ -32,10 +33,11 @@ int navigate(char * path){// ..
 
   int i = 0;
   while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
+    printf("dans le while\n");
     if(!strcmp(token,"..")){
+
       if(i == 0) dotdot(tmp); //si le path nous mene hors du tarball
       else{
-        printf("f%s!\n",fullpath[i]);
         fullpath[i-1] = NULL;// on recule d'un cran dans le path
         i--;
       }
@@ -53,76 +55,43 @@ int navigate(char * path){// ..
     strcat(fullpath[0],"/");
     strcat(fullpath[0],fullpath[x]);
   }
+  if(*TARPATH == '\0') cdPerso(fullpath[0]);
+
   printf("FULLPATH:%s!\n",fullpath[0]);
-  char * tarp = malloc(strlen(TARPATH)+1);
+  char * tarp = malloc(strlen(TARPATH)+1); //problem
   //memcpy(tarp,TARPATH,strlen(TARPATH));// tarp = TARPATH copie
   strcpy(tarp, TARPATH);
-  token = strtok_r(tarp,"/", &tarp);
+
+  token = strtok_r(tarp,"/",&tarp);
+  // char * tarfile = malloc(strlen(token)+1);
+  // strcpy(tarfile, token);
+  // token = strtok_r(tarp,"/",&tarp);
+  // rest = strtok_r(tarp,"/",&tarp);
 //docker
-  if(tarp != NULL){
-    //if(tarp[0]!='\0'){
+  if((strlen(TARPATH) - strlen(token)) > 0){ // pb docker
+    // if(tarp[0]!='\0'){
+    printf("tarp pas null\n");
     char * tmp2 = malloc(strlen(tarp) + strlen(fullpath[0]) + 2);
     strcpy(tmp2,tarp);
     strcat(tmp2, "/");
-    strncat(tmp2,fullpath[0],strlen(fullpath[0])); // vide le token ici jsp pourquoi
-
-    return checkPath(tmp2, token); // token toujours le fichier.tar
+    strncat(tmp2,fullpath[0],strlen(fullpath[0]));
+    return checkPath(tmp2, token, 5); // token toujours le fichier.tar
   }
-  return checkPath(fullpath[0], token);
+  return checkPath(fullpath[0], token, 5);
 
-}
-
-int checkPath(char * path, char * token){
-  printf("le fichier tar : %s!\n", token);
-  int file, n;
-  if((file = open(token,O_RDONLY)) == -1){perror("error"); return -1;}
-
-  struct posix_header * p = malloc(sizeof(struct posix_header));
-
-  while((n = read(file,p,BLOCKSIZE))>0){
-    printf("%s!\n",p->name );
-    if(((p-> typeflag == '5') && (!strncmp(path, p -> name, strlen(path)))) ){
-
-      printf("checkpath while\n");
-      // if(TARPATH[strlen(TARPATH-1)]!='/') strcat(TARPATH, "/");
-      if(token[strlen(token) -1] != '/'){
-        strcat(token, "/");
-      }
-      TARPATH = NULL;
-      if(path[strlen(path)-1]=='/') {
-        // strncat(TARPATH,path,strlen(path)-1);
-
-        TARPATH = malloc(strlen(token) + strlen(path));
-        strcpy(TARPATH, token);
-        strncat(TARPATH, path, strlen(path) - 1);
-      }
-
-      else {
-        // strcat(TARPATH,path);
-        TARPATH = malloc(strlen(token) + strlen(path) + 1);
-        strcpy(TARPATH, token);
-        strncat(TARPATH, path, strlen(path));
-      }
-      printf("TARPATH at the end : %s!\n", TARPATH);
-      close(file);
-      return 0;
-    }
-    lseek(file,ceil(atoi(p->size)/512.)*BLOCKSIZE,SEEK_CUR);
-  }
-  close(file);
-  return -1;
 }
 
 // fonction pere : navigate
 int dotdot(char * path){//..
-  printf("dotot\n");
   char * token;
   char * tmp2 = malloc(sizeof(char)+1);
-  if(TARPATH == NULL){   //tarpath null
-
-    if(findTar(path) == NULL){ // il y a pas de tar
+  if(*TARPATH == '\0'){   //tarpath null
+    // printf("yes\n");
+    // if(*path == '\0') docker
+    if(path == NULL) return chdir("..");
+    if(findTar(path) == NULL){ // il n'y a pas de tar
       printf("pas de tar\n");
-    return chdir(path);
+      return chdir(path);
     }
     else { //il y un tar
       while((token = strtok_r(path,"/\n",&path))!=NULL){
@@ -135,44 +104,39 @@ int dotdot(char * path){//..
       return 0;
     }
   } // fin TARPATH == NULL
-
+printf("dotdot\n");
   // ici TARPATH != NULL
   char * tmp = malloc(strlen(TARPATH)+1);
   memcpy(tmp,TARPATH,strlen(TARPATH));
-  // printf("Avant le while\n");
-  while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
-    // printf("Dans le while\n");
-    // printf("tmp : %s\n", tmp);
-    if(tmp == NULL){// Pas SUR
-    //if(tmp[0]=='\0'){//docker
-
-      if(strlen(tmp2) != 0){
-        // printf("tmp2 :%s\n", tmp2);
-        TARPATH = NULL;
-        TARPATH = malloc(strlen(tmp2));
-        strncpy(TARPATH,tmp2, strlen(tmp2) - 1);
-        // printf("tarpath apres copy tmp2 : %s\n", TARPATH);
-      }
-      else TARPATH = NULL;
-
-      return 0;
-    }
-    strcat(tmp2,token);
-    strcat(tmp2,"/");
+  // int length = 0;
+  while((token = strtok_r(tmp,"/",&tmp))!=NULL){
+    tmp2 = realloc(tmp2,strlen(token)+1);
+    strcpy(tmp2,token);
   }
 
-
-  return -1;
+  if((strlen(TARPATH) - strlen(tmp2))!=0){
+    char * newTARPATH = malloc(strlen(TARPATH) - strlen(tmp2));
+    strncpy(newTARPATH, TARPATH,strlen(TARPATH) - strlen(tmp2) - 1);
+    TARPATH = realloc(TARPATH, strlen(newTARPATH) + 1);
+    strcpy(TARPATH, newTARPATH);
+  }
+  else {
+    TARPATH = realloc(TARPATH, 1);
+    strcpy(TARPATH, "\0");
+  }
+  return 0;
 }
 
 // fonction qui appelle cdPerso = commandPersonnalisee
 int cdPerso(char * path){
   if(!hasTar(path)) return cd(path); // si dans le path il y un tar
+  printf("lepath:%s\n", path);
   chdir(path);
   return 0;
 }
 
 int cd(char * path){
+  printf("cd\n");
   char * basicPath = malloc(sizeof(char)+1);
   char * token;
   if(path[0]=='/') strcpy(basicPath,"/");
@@ -180,9 +144,11 @@ int cd(char * path){
     if(!estTar(token)){
       if(basicPath[0] != '\0' && moveTo(basicPath, token)) return -1;
       if(existTar(token)) return -1;
-      TARPATH = malloc(strlen(token)+1);
+      TARPATH = realloc(TARPATH, strlen(token)+1);
       strncpy(TARPATH,token,strlen(token));
-      if(path == NULL) return 0;
+      printf("peut etre\n");
+      if(path == NULL) return 0; //pb
+      printf("non\n");
       break;
     }
     strncat(basicPath, token,strlen(token));
@@ -190,7 +156,7 @@ int cd(char * path){
   }
   printf("le reste du path:%s!\n",path );
   if(navigate(path)){
-    TARPATH = NULL;
+    strcpy(TARPATH,"\0");
     return -1;
   }
   return 0;

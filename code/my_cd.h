@@ -5,7 +5,7 @@ int cdNoOptions();
 
 int navigate(char * path);
 
-int checkPath(char * path, char * token);
+// int checkPath(char * path, char * token);
 
 int dotdot(char * path);
 
