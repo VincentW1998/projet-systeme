@@ -1,3 +1,5 @@
+#ifndef MYMKDIR_H
+#define MYMKDIR_H
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -13,4 +15,5 @@ int rmdir(const char *path);
 
 int my_mkdir(const char *path);
 
-int mkdirTar(const char * path);
+struct posix_header newHeader(const char * path);
+#endif

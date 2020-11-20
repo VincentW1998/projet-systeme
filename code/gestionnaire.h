@@ -1,5 +1,6 @@
+#ifndef GESTIONNAIRE_H
+#define GESTIONNAIRE_H
 #define BUFSIZE 512
-// #include "tar.h"
 #define KBLU  "\x1B[34m"
 #define RESET "\x1B[0m"
 #include <stdlib.h>
@@ -12,7 +13,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <math.h>
-
 
 char * TARPATH;
 
@@ -41,5 +41,6 @@ int existTar(char * token);
 int hasTar(char * pathError);
 
 void * findTar(char * path);
-
 int checkPath(char * path, char * token, int typeflag);
+
+#endif

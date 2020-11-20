@@ -1,5 +1,4 @@
 #include "gestionnaire.h"
-#include "my_mkdir.h"
 
 int main(int argc, char const *argv[]) {
   char str [BUFSIZE];

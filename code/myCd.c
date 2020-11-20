@@ -1,6 +1,7 @@
-#include "my_cd.h"
+#include "myCd.h"
 #include "gestionnaire.h"
-// #include "tar.h"
+#include "tar.h"
+
 int moveTo(char * path, char * tarball){
   char * pwd = getcwd(NULL, 0);
 
@@ -160,4 +161,37 @@ int cd(char * path){
     return -1;
   }
   return 0;
+}
+int checkPath(char * path, char * token, int typeflag){
+  printf("dans le Check\n");
+  printf("token :%s\n", token);
+  printf("%s!\n", path);
+  int file, n;
+  if((file = open(token,O_RDONLY)) == -1){perror("error"); return -1;}
+
+  struct posix_header * p = malloc(sizeof(struct posix_header));
+  while((n = read(file,p,BLOCKSIZE))>0){
+    printf("%s!\n",p->name );
+    if(((typeflag == 5) && (p-> typeflag == '5') && (!strncmp(path, p -> name    , strlen(path)))) ){
+      size_t length = strlen(path);
+      strcpy(TARPATH,"\0");//problem
+      if(path[strlen(path)-1]=='/') length--;
+      TARPATH = realloc(TARPATH, strlen(token) + length + 1);
+      strcpy(TARPATH,token);
+      strncat(TARPATH,"/",strlen("/"));
+      strncat(TARPATH, path, length);
+      free(token);
+      close(file);
+      return 0;
+    }
+    else if(typeflag == 0 && p-> typeflag == '0' && !strcmp(p->name, path)){
+      free(token);
+      close(file);
+      return 0;
+     }
+    lseek(file,ceil(atoi(p->size)/512.)*BLOCKSIZE,SEEK_CUR);
+  }
+  free(token);
+  close(file);
+  return -1;
 }
