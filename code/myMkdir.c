@@ -2,24 +2,6 @@
 #include "gestionnaire.h"
 #include "tar.h"
 
-/* void set_checksum(struct posix_header *hd) {
-  memset(hd->chksum,' ',8);
-  unsigned int sum = 0;
-  char *p = (char *)hd;
-  for (int i=0; i < BLOCKSIZE; i++) { sum += p[i]; }
-  sprintf(hd->chksum,"%06o",sum);
-}
-
-
-int check_checksum(struct posix_header *hd) {
-  unsigned int checksum;
-  sscanf(hd->chksum,"%o ", &checksum);
-  unsigned int sum = 0;
-  char *p = (char *)hd;
-  for (int i=0; i < BLOCKSIZE; i++) { sum += p[i]; }
-  for (int i=0;i<8;i++) { sum += ' ' - hd->chksum[i]; }
-  return (checksum == sum);
-}*/
 struct posix_header newHeader(const char * path) {
   struct posix_header hd;
   struct stat st;
@@ -30,7 +12,7 @@ struct posix_header newHeader(const char * path) {
   mkdir(pathDos, 0700);
 
   stat(pathDos, &st);
-  
+
   struct group * grp = getgrgid(st.st_gid);
 
   memset(&hd, '\0', sizeof(struct posix_header)); //initialise le struct avec des '\0'
@@ -51,7 +33,7 @@ struct posix_header newHeader(const char * path) {
   memset(hd.devminor, '\0', sizeof(hd.devminor));
   memset(hd.prefix, '\0', sizeof(hd.prefix));
   memset(hd.junk, '\0', sizeof(hd.junk));
-  
+
 
   set_checksum(&hd);
 
