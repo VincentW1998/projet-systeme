@@ -47,7 +47,7 @@ struct posix_header
    Then hd->chksum is set to contain the octal encoding of this
    sum (on 6 bytes), followed by '\0' and ' '.
 */
-void set_checksum(struct posix_header *hd) {
+/*void set_checksum(struct posix_header *hd) {
   memset(hd->chksum,' ',8);
   unsigned int sum = 0;
   char *p = (char *)hd;
@@ -64,7 +64,7 @@ int check_checksum(struct posix_header *hd) {
   for (int i=0; i < BLOCKSIZE; i++) { sum += p[i]; }
   for (int i=0;i<8;i++) { sum += ' ' - hd->chksum[i]; }
   return (checksum == sum);
-}
-//void set_checksum(struct posix_header *hd);
-//int check_checksum(struct posix_header *hd);
+}*/
+void set_checksum(struct posix_header *hd);
+int check_checksum(struct posix_header *hd);
 #endif
