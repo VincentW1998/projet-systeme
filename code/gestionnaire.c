@@ -212,6 +212,8 @@ int commandTar(int nbOption, char ** command) {
       if(nbOption == 1)
         return cdNoOptions();
       return navigate(command[1]);
+    //case 3 :
+      //return mkdirTar();
     case 8 :
       exit(0);
   }
