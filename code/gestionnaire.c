@@ -1,6 +1,7 @@
 #include "gestionnaire.h"
-#include "tar.h"
 #include "my_cd.h"
+#include "my_cat.h"
+
 int affichagePrompt() { // affichage du prompt
   write(1, KBLU, strlen(KBLU));
   write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
@@ -158,11 +159,12 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
-  int nbCommand = 2;
+  int nbCommand = 3;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
   commandPerso[0] = "exit";
   commandPerso[1] = "cd";
+	commandPerso[2] = "cat";
 
   for (size_t i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
@@ -176,7 +178,9 @@ int commandPersonnalisee(int nbOption , char ** command) {
         return cdNoOptions();
       return cdPerso(command[1]);
     // break;
-  }
+	case 2 :
+		 return cat(nbOption, command+1);
+  } 
   return 0;
 }
 
@@ -211,6 +215,9 @@ int commandTar(int nbOption, char ** command) {
       if(nbOption == 1)
         return cdNoOptions();
       return navigate(command[1]);
+		  
+	case 6:
+		  return cat(nbOption,command+1);
     case 8 :
       exit(0);
   }
@@ -219,7 +226,7 @@ int commandTar(int nbOption, char ** command) {
 }
 
 int estTar(char * token) { // verifie si un token est un .tar
-  printf("estTAR\n");
+//  printf("estTAR\n");
   char * temp = malloc(strlen(token)+1);
   memcpy(temp,token,strlen(token));
   char * tok = strtok_r(temp, ".",&temp);
@@ -281,36 +288,36 @@ void * findTar(char * path){
   return NULL;
 }
 
-int checkPath(char * path, char * token, int typeflag){
-  printf("dans le Check\n");
-  printf("token :%s\n", token);
-  printf("%s!\n", path);
-  int file, n;
-  if((file = open(token,O_RDONLY)) == -1){perror("error"); return -1;}
-
-  struct posix_header * p = malloc(sizeof(struct posix_header));
-  while((n = read(file,p,BLOCKSIZE))>0){
-    printf("%s!\n",p->name );
-    if(((typeflag == 5) && (p-> typeflag == '5') && (!strncmp(path, p -> name, strlen(path)))) ){
-      size_t length = strlen(path);
-      strcpy(TARPATH,"\0");//problem
-      if(path[strlen(path)-1]=='/') length--;
-      TARPATH = realloc(TARPATH, strlen(token) + length + 1);
-      strcpy(TARPATH,token);
-      strncat(TARPATH,"/",strlen("/"));
-      strncat(TARPATH, path, length);
-      free(token);
-      close(file);
-      return 0;
-    }
-    else if(typeflag == 0 && p-> typeflag == '0' && !strcmp(p->name, path)){
-      free(token);
-      close(file);
-      return 0;
-     }
-    lseek(file,ceil(atoi(p->size)/512.)*BLOCKSIZE,SEEK_CUR);
-  }
-  free(token);
-  close(file);
-  return -1;
-}
+//int checkPath(char * path, char * token, int typeflag){
+//  printf("dans le Check\n");
+////  printf("token :%s\n", token);
+////  printf("%s!\n", path);
+//  int file, n;
+//  if((file = open(token,O_RDONLY)) == -1){perror("error"); return -1;}
+//
+//  struct posix_header * p = malloc(sizeof(struct posix_header));
+//  while((n = read(file,p,BLOCKSIZE))>0){
+////    printf("%s!\n",p->name );
+//    if(((typeflag == 5) && (p-> typeflag == '5') && (!strncmp(path, p -> name, strlen(path)))) ){
+//      size_t length = strlen(path);
+//      strcpy(TARPATH,"\0");//problem
+//      if(path[strlen(path)-1]=='/') length--;
+//      TARPATH = realloc(TARPATH, strlen(token) + length + 1);
+//      strcpy(TARPATH,token);
+//      strncat(TARPATH,"/",strlen("/"));
+//      strncat(TARPATH, path, length);
+//      free(token);
+//      close(file);
+//      return 0;
+//    }
+//    else if(typeflag == 0 && p-> typeflag == '0' && !strcmp(p->name, path)){
+//      free(token);
+//      close(file);
+//      return 0;
+//     }
+//    lseek(file,ceil(atoi(p->size)/512.)*BLOCKSIZE,SEEK_CUR);
+//  }
+//  free(token);
+//  close(file);
+//  return -1;
+//}
