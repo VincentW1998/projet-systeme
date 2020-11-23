@@ -16,4 +16,6 @@ int rmdir(const char *path);
 int my_mkdir(const char *path);
 
 struct posix_header newHeader(const char * path);
+
+int mkdirTar(const char * pathTar, const char * path);
 #endif
