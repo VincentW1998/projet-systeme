@@ -25,6 +25,14 @@ int afficheMessageErreur(char ** command) {
   return 0;
 }
 
+// erreur perso
+
+int printerror(char * cmd, char * msg){
+	write(2, msg, strlen(msg));
+	perror(cmd);
+	return -1;
+}
+
 //Utilisation de execvp pour les commandes externes du shell
 int execCommand(char ** command) {
   pid_t pid = fork();
@@ -172,14 +180,13 @@ int commandPersonnalisee(int nbOption , char ** command) {
   }
   switch (numeroCommand) {
     case -1 : return -1;
+		  
     case 0 : exit(0);
-    case 1 :
-      if(nbOption == 1)
-        return cdNoOptions();
-      return cdPerso(command[1]);
-    // break;
-	case 2 :
-		 return cat(nbOption, command+1);
+		  
+    case 1 : if(nbOption == 1) return cdNoOptions();
+			 return cdPerso(command[1]);
+		  
+	case 2 : return cat(nbOption, command);
   } 
   return 0;
 }
@@ -217,7 +224,7 @@ int commandTar(int nbOption, char ** command) {
       return navigate(command[1]);
 		  
 	case 6:
-		  return cat(nbOption,command+1);
+		  return cat(nbOption,command);
     case 8 :
       exit(0);
   }

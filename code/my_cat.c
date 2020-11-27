@@ -26,13 +26,21 @@ int showContent(int file, struct posix_header * p){
 	return 0;
 }
 
-//int simpleCat(char * path){
-//	int f;
-//	if((f = fork()) == -1){ perror("fork :"); exit(1);}
-//	if(f == 0)	execlp("cat","path");
-//	wait(NULL);
-//	return 0;
-//}
+int simpleCat(char * path){
+	int f;
+	char * cmd[3] = { "cat", path }; // on ajoute 1 a la taille pour que le                                    cat s'arrete apres un null
+	switch (f = fork()) {
+		case -1 : perror("fork :");
+			      exit(1);
+			
+		case 0 : if(execCommand(cmd) == -1) perror("cat");
+			
+		default: signal(SIGINT, SIG_IGN); // ignore le signal SIGINT
+			     wait(NULL);
+			     write(1,"\n",1);
+			     return 0;
+	}
+}
 
 int CatFile (char * path){
 	char * deplacement;
@@ -50,10 +58,22 @@ int CatFile (char * path){
 	
 	deplacement = malloc(strlen(path) - strlen(lastToken) + 1); // on copie path - la taille du dernier token
 	strncpy(deplacement, path, strlen(path) - strlen(lastToken));
-	if((*TARPATH == '\0' && cdPerso(deplacement) == -1) || (*TARPATH != '\0' && navigate(deplacement) == -1)){
-		perror("bad address");
-		return -1;
+//	if((*TARPATH == '\0' && cdPerso(deplacement) == -1) || (*TARPATH != '\0' && navigate(deplacement) == -1)){
+//		perror("bad address");
+//		return -1;
+//	}
+	if(*TARPATH == '\0'){
+		if(cdPerso(deplacement) == -1){
+			perror("bad address");
+			return -1;
+		}
 	}
+	else
+		if(navigate(deplacement) == -1){
+			perror("bad address");
+			return -1;
+		}
+	
 	// fin deplacement
 	if(checkpath(lastToken) == -1){
 		free(lastToken);
@@ -102,40 +122,37 @@ int checkpath(char * path){
 		return -1;
 	}
 	//si on est hors d'un tarball on exec juste cat
-		if((f = fork()) == -1){ perror("fork :"); exit(1);}
-		if(f == 0)	execlp("cat","path");
-		wait(NULL);
-		return 0;
+//		if((f = fork()) == -1){ perror("fork :"); exit(1);}
+//		if(f == 0)	execlp("cat","path");
+//		wait(NULL);
+	printf("i'm here \n");
+	return simpleCat(path);
+//		return 0;
 }
 
 
 
 int cat(int nbOption, char ** path){
+	int f;
+	if(nbOption < 2)
+		switch (f = fork()) {
+			case -1 : perror("fork :");
+					  exit(1);
+				
+			case 0 : execCommand(path);
+				
+			default: signal(SIGINT, SIG_IGN); // ignore le signal SIGINT
+				     wait(NULL);
+			         write(1,"\n",1);
+				     return 0;
+		}
+	
 	myPos = getcwd(NULL, 0); // je sauvegarde ma position
 	myPosTar = malloc(strlen(TARPATH) + 1);
 	strcpy(myPosTar, TARPATH);
-//	printf("nbOption : %d\n",nbOption);
-//	if(CatRec(nbOption-1, path) == -1){
-//		goToInitialPos();
-//		free(myPosTar);
-//		return -1;
-//	}
-//	free(myPosTar);
-//	return 0;
-	//
-	for(int i=0 ; i<nbOption-1;i++){
-		printf("path : %s \n",path[i]);
-//		if(strlen(path[i]) != 0){
-//			printf("in for\n");
-//			if(*TARPATH == '\0' && hasTar(path[i]) == 0){
-//				if(simpleCat(path[i]) == -1) return -1;
-//				return 0;
-//			}
-			
-		 if(CatFile(path[i]) == -1){goToInitialPos(); return -1; }
-//			if(isAbsolute(path[i])){ if(CatFile(path[i]) == -1){goToInitialPos(); return -1; }}// path absolu
-//			else {if(relativeCat(path[i]) == -1){goToInitialPos(); return -1; }} // path relatif
-		}
+	for(int i=1 ; i<nbOption;i++){
+		printf(YELLOW "path : %s \n" RESET,path[i]);
+		if(CatFile(path[i]) == -1){goToInitialPos(); return -1; }
 	}
 	free(myPosTar);
 	return 0;
