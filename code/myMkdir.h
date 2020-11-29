@@ -18,4 +18,6 @@ int my_mkdir(const char *path);
 struct posix_header newHeader(const char * path);
 
 int mkdirTar(const char * pathTar, const char * path);
+
+char * createPathForMkdir(const char * path);
 #endif

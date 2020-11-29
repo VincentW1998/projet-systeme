@@ -42,6 +42,17 @@ struct posix_header newHeader(const char * path) {
   return hd;
 }
 
+char * createPathForMkdir(const char * path) {
+  int length = strlen(TARPATH) + strlen(path) + 3; // +3 car on rajoute 2 slash et il y a le caractere zero qui termine une chaine de caracteres.
+  char * pathWithFolder = malloc(length);
+  pathWithFolder[0] = '\0';
+  strncat(pathWithFolder, TARPATH, strlen(TARPATH));
+  strncat(pathWithFolder, "/", 1);
+  strncat(pathWithFolder, path, strlen(path));
+  strncat(pathWithFolder, "/", 1);
+  return pathWithFolder;
+}
+
 int mkdirTar(const char * pathTar, const char * path) {
   int fd;
   fd = open(pathTar, O_WRONLY); // on ouvre le fichier tar
@@ -49,7 +60,12 @@ int mkdirTar(const char * pathTar, const char * path) {
     perror("open fichier Tar");
     return -1;
   }
-  lseek(fd, -1024, SEEK_END); // on se positionne au debut de l'avant dernier block de fin 
+
+ // concatene path et TARPATH et rajoute un slash a la fin 
+  char * pathWithFolder = createPathForMkdir(path); 
+  printf("pathWithFolder : %s\n", pathWithFolder);
+// on se positionne au debut de l'avant dernier block de fin 
+  lseek(fd, -1024, SEEK_END); 
 
   struct posix_header hd = newHeader(path); // on creer le nouvel entete
   write(fd, &hd, BLOCKSIZE); // on ecrit l'entete dans le fichier tar
@@ -67,5 +83,9 @@ int my_mkdir (const char * path) {
         return 0;
     }
     return -1;
+}
+
+int pathExist(int fd, const char * pathWithFolder) {
+  return 0; 
 }
 
