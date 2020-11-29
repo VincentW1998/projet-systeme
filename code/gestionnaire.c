@@ -52,7 +52,7 @@ int execCommand(char ** command) {
   return 0;
 }
 
-// pour les commandes externes du shell avec un pipi
+// pour les commandes externes du shell avec un pipe
 int execCommandPipe(char ** command, char ** commandPipe) {
   int fd[2];
   if(pipe(fd) < -1){
