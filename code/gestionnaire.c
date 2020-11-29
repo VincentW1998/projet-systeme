@@ -253,10 +253,17 @@ int estTar(char * token) { // verifie si un token est un .tar
 }
 
 int existTar(char * token){
+	char * tar = malloc(strlen(token) + 1);
+	strcpy(tar, token);
   DIR * dir = opendir(".");
   struct dirent * cur;
+
   while((cur = readdir(dir)) > 0){
-    if(!strcmp(cur->d_name,token)) return 0;
+	  if(strcmp(cur->d_name,tar) == 0){
+		  closedir(dir);
+		  return 0;
+		  
+	  }
   }
   closedir(dir);
   write(2,"no such file or directory:\n",strlen("no such file or directory:\n"));
@@ -273,16 +280,16 @@ int hasTar(char * path){
     //copie du path
     char * tmp = malloc(strlen(path)+1);
     memcpy(tmp,path,strlen(path));
-
+//	strcpy(tmp,path);
 
     while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
       if(!estTar(token)){
-        // free((tmp));
+//         free(tmp);
         return 0;
       }
       i++;
     }
-    // free(tmp);
+//     free(tmp);
   return -1;
 }
 

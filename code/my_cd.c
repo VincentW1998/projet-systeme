@@ -20,57 +20,106 @@ int cdPerso(char * path){
 	chdir(path);
 	return 0;
 }
+//
+//// se charge des path hors du TARBALL
+//// se charge aussi de renter dans le .tar
+//int cd(char * path ){
+//	if(path[0] == '/')return cdAbs(path);
+//	char * tmp = malloc(strlen(path) + 1), *stdPath, *tbPath, *token;
+//	strcpy(tmp, path);
+//	int l = 0;
+//	//	printf("ici\n");
+//	while((token = strtok_r(tmp, "/", &tmp)) != NULL){
+//		if(estTar(token) == 0) break;
+//		l += 1 + strlen(token);
+//	}
+//	if(l > 0){ // si il y un path avant le tar
+//		if(path[0] != '/') l--;
+//		stdPath = malloc(l + 1);
+//		strncpy(stdPath, path, l);
+//		chdir(stdPath);
+//		free(stdPath);
+//	}
+//	if(l < strlen(path)){
+//		if(existTar(token) == -1){
+//			perror("le fichier n'existe pas");
+//			return -1;
+//		}
+//		TARPATH = realloc(TARPATH, strlen(token) + 1);
+//		strcpy(TARPATH, token);
+//
+//
+//		if( (l + strlen(token)) == strlen(path) ) return 0;
+//		l += strlen(token) + 1; // on rajoute la taille du tar au nb de char a sauter + /
+//		tbPath = malloc(l + 1);
+//		strcpy(tbPath, path+l);
+//		if((tbPath[0] == '/' && navigate(tbPath+1) == -1 )|| (tbPath[0] != '/' && navigate(tbPath) == -1)){
+//			TARPATH = realloc(TARPATH,1);
+//			strcpy(TARPATH,"\0");
+//
+//			printf("cd 2 : %s \n", path); // ici
+//			free(tbPath);
+//			return -1;
+//		}
+//		free(tbPath);
+//	}
+//	else{
+//		TARPATH = realloc(TARPATH, 1);
+//		TARPATH[0] = '\0';
+//
+//	}
+//	return 0;
+//}
 
-// se charge des path hors du TARBALL
-// se charge aussi de renter dans le .tar
-int cd(char * path ){
-	if(path[0] == '/')return cdAbs(path);
-	char * tmp = malloc(strlen(path) + 1), *stdPath, *tbPath, *token;
-	strcpy(tmp, path);
-	int l = 0;
-	//	printf("ici\n");
-	while((token = strtok_r(tmp, "/", &tmp)) != NULL){
-		if(estTar(token) == 0) break;
-		l += 1 + strlen(token);
-	}
-	if(l > 0){ // si il y un path avant le tar
-		if(path[0] != '/') l--;
-		stdPath = malloc(l + 1);
-		strncpy(stdPath, path, l);
-		chdir(stdPath);
-		free(stdPath);
-	}
-	if(l < strlen(path)){
-		if(existTar(token) == -1){
-			perror("le fichier n'existe pas");
-			return -1;
+	int cd(char * path ){
+		if(path[0] == '/')return cdAbs(path);
+		char * tmp = malloc(strlen(path) + 1), *stdPath, *tbPath, *token;
+		strcpy(tmp, path);
+		int l = 0;
+		//	printf("ici\n");
+		while((token = strtok_r(tmp, "/", &tmp)) != NULL){
+			if(estTar(token) == 0) break;
+			l += 1 + strlen(token);
 		}
-		TARPATH = realloc(TARPATH, strlen(token) + 1);
-		strcpy(TARPATH, token);
-//		setTarpath(token); // change
-		
-		if( (l + strlen(token)) == strlen(path) ) return 0;
-		l += strlen(token) + 1; // on rajoute la taille du tar au nb de char a sauter + /
-		tbPath = malloc(l + 1);
-		strcpy(tbPath, path+l);
-		if((tbPath[0] == '/' && navigate(tbPath+1) == -1 )|| (tbPath[0] != '/' && navigate(tbPath) == -1)){
-			TARPATH = realloc(TARPATH,1);
-			strcpy(TARPATH,"\0");
-//			setTarpath("\0"); // change
-			printf("cd 2 : %s \n", path); // ici
+		if(l > 0){ // si il y un path avant le tar
+			if(path[0] != '/') l--;
+			stdPath = malloc(l + 1);
+			strncpy(stdPath, path, l);
+			chdir(stdPath);
+			free(stdPath);
+		}
+		if(l < strlen(path)){
+			printf("existTar \n");
+			if(existTar(token) == -1){
+				perror("le fichier n'existe pas");
+				return -1;
+			}
+//			TARPATH = realloc(TARPATH, strlen(token) + 1);
+//			strcpy(TARPATH, token);
+			setTarpath(token);
+			printf("TARPATH 100: %s \n",TARPATH);
+			
+			
+			if( (l + strlen(token)) == strlen(path) ) return 0;
+			l += strlen(token) + 1; // on rajoute la taille du tar au nb de char a sauter + /
+			tbPath = malloc(l + 1);
+			strcpy(tbPath, path+l);
+			if((tbPath[0] == '/' && navigate(tbPath+1) == -1 )|| (tbPath[0] != '/' && navigate(tbPath) == -1)){
+//				TARPATH = realloc(TARPATH,1);
+//				strcpy(TARPATH,"\0");
+				setTarpath("\0");
+				printf("cd 2 : %s \n", path); // ici
+				free(tbPath);
+				return -1;
+			}
 			free(tbPath);
-			return -1;
 		}
-		free(tbPath);
+		else{
+			setTarpath("\0");
+			
+		}
+		return 0;
 	}
-	else{
-		TARPATH = realloc(TARPATH, 1);
-		TARPATH[0] = '\0';
-//		setTarpath("\0"); // change
-	}
-	return 0;
-}
-
 
 // se charge du path depuis un tarball
 // NE SE CHARGE PAS DE RENTRER DANS LE .TAR (voir cd pour ça)
@@ -79,9 +128,10 @@ int navigate(char * path){
 	if(path[0] == '/') return cdAbs(path);
 	char *fullpath[50], *tmp, *token, *tar;
 	tmp = malloc(strlen(TARPATH) + 1);
-	strncpy(tmp, TARPATH, strlen(TARPATH));
+	strcpy(tmp, TARPATH);
 	tar = strtok_r(tmp, "/\0",&tmp); // on stock le .tar
-	tar = resTar(tar); // resolution pb char etrange apres le .tar
+//	tar = resTar(tar); // resolution pb char etrange apres le .tar
+
 	int i = 0; // nb d'elements dans TARPATH;
 	int l = 0; //nb de char parcourus dans path
 	if(strlen(tar) < strlen(TARPATH)){ //on stock le tarpath dans FP
@@ -91,7 +141,8 @@ int navigate(char * path){
 		}
 	}
 	// on passe au path
-	tmp = realloc(tmp, strlen(path) + 1);
+//	tmp = realloc(tmp, strlen(path) + 1); // change
+	tmp = malloc(strlen(path) + 1);
 	strcpy(tmp, path); // on copie le path
 	for(;(token = strtok_r(tmp,"/\n",&tmp)) != NULL; i++, l+= strlen(token) + 1){
 		
@@ -119,11 +170,12 @@ int navigate(char * path){
 		
 	}
 	
-	free(tmp); tmp = NULL;
+//	free(tmp); tmp = NULL; // changes
 	if(i == 0){
 		setTarpath(tar);
 		return 0;
 	}
+	
 	if(checkfp(tar, fullpath, i) == -1){ printf(RED"failed2\n"RESET); return -1; }//exit
 	
 	for(int x = 1; x < i; x++){
@@ -132,7 +184,8 @@ int navigate(char * path){
 		strncat(fullpath[0], fullpath[x], strlen(fullpath[x]));
 		free(fullpath[x]); fullpath[x] = NULL;
 	}
-	tmp = realloc(tmp, strlen(tar) + strlen(fullpath[0]) + 2);
+//	tmp = realloc(tmp, strlen(tar) + strlen(fullpath[0]) + 2); // change
+	tmp = malloc(strlen(tar) + strlen(fullpath[0]) + 2);
 	strcpy(tmp, tar);
 	strncat(tmp, "/", 1);
 	strncat(tmp, fullpath[0], strlen(fullpath[0]));
@@ -191,7 +244,7 @@ int checkfp(char *tar, char *fullpath[50], int i){
 		strncat(path, "/", 1);
 		strncat(path, fullpath[x], strlen(fullpath[x]));
 	}
-	
+//
 //		printf(RED"CheckFP : %s \n"RESET, path);
 //	    printf(RED"CheckFP TAR : %s! size :%lu\n"RESET, tar, strlen(tar));
 
@@ -243,19 +296,21 @@ void goToInitial(){ // retourne a la position sauvegardée
 	free(PosTar);
 }
 
-char * resTar(char * tar){// resolution du pb qui revoyais un .tar avec des char bizzare apres le .tar
-	char * tmp = malloc(strlen(tar) + 1);
-	strcpy(tmp, tar);
-	
-	char * newTar, * token;
-	token = strstr(tmp,".tar");
-	
-	newTar = malloc(strlen(tar) - strlen(token) + 5);
-	strncpy(newTar, tar, strlen(tar) - strlen(token));
-	strcat(newTar,".tar");
-	free(tmp);
-	return newTar;
-}
+//char * resTar(char * tar){// resolution du pb qui revoyais un .tar avec des char bizzare apres le .tar
+//	char * tmp = malloc(strlen(tar) + 1);
+//	strcpy(tmp, tar);
+//	printf("tmp : %s \n", tmp);
+//	char * newTar, * token;
+//	token = strstr(tmp,".tar");
+//	printf("strstr : %s \n", token);
+//	printf("tar : %s ", tar);
+//	newTar = malloc(strlen(tar) - strlen(token) + 5);
+//	strncpy(newTar, tar, strlen(tar) - strlen(token));
+//	printf("newTar : %s ", newTar);
+//	strcat(newTar,".tar");
+//	free(tmp);
+//	return newTar;
+//}
 
 
 // fonction pere = commandTar

@@ -25,4 +25,4 @@ void goToInitial();
 
 int cdAbs(char * path);
 
-char * resTar(char * tar);
+//char * resTar(char * tar);
