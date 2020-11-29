@@ -1,6 +1,8 @@
 #include "gestionnaire.h"
-#include "tar.h"
-#include "my_cd.h"
+#include "myCd.h"
+#include "myMkdir.h"
+//#include "tar.h"
+
 int affichagePrompt() { // affichage du prompt
   write(1, KBLU, strlen(KBLU));
   write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
@@ -211,6 +213,8 @@ int commandTar(int nbOption, char ** command) {
       if(nbOption == 1)
         return cdNoOptions();
       return navigate(command[1]);
+    case 3 :
+      return mkdirTar("dos.tar", "DossierB");
     case 8 :
       exit(0);
   }
@@ -281,7 +285,7 @@ void * findTar(char * path){
   return NULL;
 }
 
-int checkPath(char * path, char * token, int typeflag){
+/*int checkPath(char * path, char * token, int typeflag){
   printf("dans le Check\n");
   printf("token :%s\n", token);
   printf("%s!\n", path);
@@ -313,4 +317,4 @@ int checkPath(char * path, char * token, int typeflag){
   free(token);
   close(file);
   return -1;
-}
+}*/
