@@ -1,6 +1,9 @@
 #ifndef GESTIONNAIRE_H
 #define GESTIONNAIRE_H
 #define BUFSIZE 512
+
+#define RED "\x1B[31m"
+#define YELLOW "\x1B[33m"
 #define KBLU  "\x1B[34m"
 #define RESET "\x1B[0m"
 #include <stdlib.h>
@@ -41,6 +44,6 @@ int existTar(char * token);
 int hasTar(char * pathError);
 
 void * findTar(char * path);
-int checkPath(char * path, char * token, int typeflag);
+
 
 #endif

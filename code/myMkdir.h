@@ -7,7 +7,7 @@
 #include <string.h>
 #include <grp.h>
 #include <pwd.h>
-#include <uuid/uuid.h>
+//#include <uuid/uuid.h>
 
 int mkdir(const char *path, mode_t mode);
 
