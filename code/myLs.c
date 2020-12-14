@@ -4,14 +4,6 @@
 
 // ls sans path en arguments
 int LsWithoutPath(){
-//	char * token;
-//	if(*TARPATH != '\0'){
-//		token = strstr(TARPATH, ".tar");
-//		if(strcmp(token, ".tar")){// si le tarpath est a la racine du tarball
-//		}
-//		return 0;
-//	}
-//	return -1;
 	if(*TARPATH == '\0')
 		simpleLs();
 	else printOccurences();
@@ -20,33 +12,22 @@ int LsWithoutPath(){
 
 // Ls sans options avec un path
 int lsRep(char * path){
-	
 	//je me deplace dans le dossier a lister
 	if(*TARPATH == '\0'){
 		if(cdPerso(path) == -1){
 			perror("bad address");
 			return -1;
 		}
-		if(*TARPATH == '\0')
-			simpleLs();
-		else printOccurences();
 	}
-	else{
-		if(navigate(path) == -1){
+	else if(navigate(path) == -1){
 			perror("bad address");
 			return -1;
-		}
-	
-		if(*TARPATH == '\0'){
-			printf("simple ls \n");
-			simpleLs();
-		}
-		else{
-			printf("printOccur \n");
-			printOccurences();
-		}
 	}
 	// fin deplacement
+	
+	if(*TARPATH == '\0') simpleLs();
+	else printOccurences();
+
 	return 0;
 }
 					
