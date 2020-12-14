@@ -39,7 +39,7 @@ int cd(char * path ){
 		free(stdPath);
 	}
 	if(l < strlen(path)){
-		printf("existTar \n");
+//		printf("existTar \n");
 		if(existTar(token) == -1){
 			perror("le fichier n'existe pas");
 			return -1;
@@ -212,7 +212,8 @@ int checkPath(char * path, char * token){
 	//	printf("dans le Check\n");
 	//	  printf(RED"token :%s\n"RESET, token);
 	//	  printf(RED"path to be checked : %s!\n"RESET, path);
-	int file, n;
+	int file;
+	ssize_t n;
 	if((file = open(token,O_RDONLY)) == -1){perror("error"); return -1;}
 	
 	struct posix_header * p = malloc(sizeof(struct posix_header));

@@ -2,6 +2,8 @@
 #include "myCd.h"
 #include "myCat.h"
 #include "myMkdir.h"
+#include "myLs.h"
+
 //#include "tar.h"
 
 int affichagePrompt() { // affichage du prompt
@@ -41,6 +43,8 @@ int execCommand(char ** command) {
           afficheMessageErreur(command);
       break;
     default :
+	  if(strcmp(command[0], "cat") == 0)
+		signal(SIGINT, SIG_IGN);
       wait(&w);
   }
   return 0;
@@ -161,12 +165,13 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
-	int nbCommand = 3;
+	int nbCommand = 4;
 	char * commandPerso[nbCommand];
 	int numeroCommand = -1;
 	commandPerso[0] = "exit";
 	commandPerso[1] = "cd";
 	commandPerso[2] = "cat";
+	commandPerso[3] = "ls";
 	
 	for (size_t i = 0; i < nbCommand; i++) {
 		if(!strcmp(commandPerso[i], command[0]))
@@ -181,6 +186,9 @@ int commandPersonnalisee(int nbOption , char ** command) {
 			     return cdPerso(command[1]);
 			
 		case 2 : return cat(nbOption, command);
+			
+		case 3 : return ls(nbOption, command);
+//		case 3 : printf("je fait ls \n");
 	}
 	return 0;
 }
@@ -213,6 +221,9 @@ int commandTar(int nbOption, char ** command) {
 		     return 0;
 	case 1 : if(nbOption == 1) return cdNoOptions();
 			   return navigate(command[1]);
+	
+//	case 2 : printf("je fait ls 2 \n");
+	case 2: return ls(nbOption, command);
 		  
 	case 3 : return mkdirTar("dos.tar", "DossierB");
 		  
@@ -292,4 +303,10 @@ void * findTar(char * path){
 	while((token = strtok_r(tmp, "/\n", &tmp)) != NULL)
 		if(!estTar(token)) return token;
 	return NULL;
+}
+
+void returnToPos(char * pos, char * posTar){
+	chdir(pos);
+	TARPATH = realloc(TARPATH, strlen(posTar) + 1);
+	strcpy(TARPATH, posTar);
 }
