@@ -19,3 +19,5 @@ COPY code/tar.c /home/projet/tar.c
 COPY code/mon_cp.c /home/projet/mon_cp.c
 COPY code/mon_rm.c /home/projet/mon_rm.c
 COPY code/mon_mv.c /home/projet/mon_mv.c
+COPY code/myMkdir.c /home/projet/myMkdir.c
+COPY code/myMkdir.h /home/projet/myMkdir.h
