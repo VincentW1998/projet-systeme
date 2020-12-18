@@ -214,7 +214,7 @@ int commandTar(int nbOption, char ** command) {
 	case 1 : if(nbOption == 1) return cdNoOptions();
 			   return navigate(command[1]);
 		  
-	case 3 : return mkdirTar("dos.tar", "DossierB");
+	case 3 : return mkdirTar(nbOption, command);
 		  
 	case 6:  return cat(nbOption,command);
 		  
