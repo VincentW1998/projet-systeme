@@ -293,3 +293,12 @@ void * findTar(char * path){
 		if(!estTar(token)) return token;
 	return NULL;
 }
+
+/* return the tar repository from TARPATH */
+char * substringTar() {
+  char *tmp = malloc(strlen(TARPATH) + 1);
+  memcpy(tmp, TARPATH, strlen(TARPATH));
+  char * token;
+  token = strtok_r(tmp, "/\n", &tmp);
+  return token;
+}
