@@ -15,7 +15,8 @@ struct posix_header newHeader(const char * path) {
 
   struct group * grp = getgrgid(st.st_gid);
 
-  memset(&hd, '\0', sizeof(struct posix_header)); //initialise le struct avec des '\0'
+  //initialise le struct avec des '\0'
+  memset(&hd, '\0', sizeof(struct posix_header));
   // on remplit les champs du struct posix_header
   strncpy(hd.name, path, 100);
   snprintf(hd.mode, sizeof(hd.mode), "%07o", st.st_mode); //mode
@@ -43,13 +44,20 @@ struct posix_header newHeader(const char * path) {
 }
 
 char * createPathForMkdir(const char * path) {
-  int length = strlen(TARPATH) + strlen(path) + 3; // +3 car on rajoute 2 slash et il y a le caractere zero qui termine une chaine de caracteres.
+
+  char * suiteName = subWithoutTar();
+
+/* +3 car on rajoute 2 slash et il y a le caractere zero qui termine une
+ * chaine de caracteres. */
+int length = strlen(suiteName) + strlen(path) + 3;
   char * pathWithFolder = malloc(length);
   pathWithFolder[0] = '\0';
-  strncat(pathWithFolder, TARPATH, strlen(TARPATH));
-  strncat(pathWithFolder, "/", 1);
+  strncat(pathWithFolder, suiteName, strlen(suiteName));
+//  strncat(pathWithFolder, "/", 1);
+  strcat(pathWithFolder, "/");
   strncat(pathWithFolder, path, strlen(path));
-  strncat(pathWithFolder, "/", 1);
+//  strncat(pathWithFolder, "/", 1);
+  strcat(pathWithFolder, "/");
   return pathWithFolder;
 }
 
@@ -62,17 +70,20 @@ int mkdirTar(const char * path) {
     return -1;
   }
 
- // concatene path et TARPATH et rajoute un slash a la fin 
-  char * pathWithFolder = createPathForMkdir(path); 
+ // concatene path et TARPATH et rajoute un slash a la fin
+  char * pathWithFolder = createPathForMkdir(path);
   printf("pathWithFolder : %s\n", pathWithFolder);
-// on se positionne au debut de l'avant dernier block de fin 
+// on se positionne au debut de l'avant dernier block de fin
   lseek(fd, -1024, SEEK_END); 
 
-  struct posix_header hd = newHeader(path); // on creer le nouvel entete
+  // on creer le nouvel entete
+  struct posix_header hd = newHeader(pathWithFolder);
   write(fd, &hd, BLOCKSIZE); // on ecrit l'entete dans le fichier tar
-  lseek(fd, 0, SEEK_END); // on se place a la fin du fichier 
+  lseek(fd, 0, SEEK_END); // on se place a la fin du fichier
   char blockEnd[BLOCKSIZE];
-  memset(blockEnd, 0, BLOCKSIZE); // on creer un block de 512 octets rempli de '\0'
+
+  // on creer un block de 512 octets rempli de '\0'
+  memset(blockEnd, 0, BLOCKSIZE);
   write(fd, blockEnd, BLOCKSIZE); // on rajoute ce block a la fin du fichier
   close(fd);
   return 1;

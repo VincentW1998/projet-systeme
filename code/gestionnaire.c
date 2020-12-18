@@ -302,3 +302,12 @@ char * substringTar() {
   token = strtok_r(tmp, "/\n", &tmp);
   return token;
 }
+
+/* return string contains TARPATH without tar repository */
+char * subWithoutTar() {
+  char * tmp = malloc(strlen(TARPATH) + 1);
+  memcpy(tmp, TARPATH, strlen(TARPATH));
+  char * token;
+  token = strtok_r(tmp, "/\n", &tmp);
+  return tmp;
+}
