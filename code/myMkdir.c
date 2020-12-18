@@ -53,9 +53,10 @@ char * createPathForMkdir(const char * path) {
   return pathWithFolder;
 }
 
-int mkdirTar(const char * pathTar, const char * path) {
+int mkdirTar(const char * path) {
   int fd;
-  fd = open(pathTar, O_WRONLY); // on ouvre le fichier tar
+  char * tarName = substringTar();
+  fd = open(tarName, O_WRONLY); // on ouvre le fichier tar
   if (fd < 0){
     perror("open fichier Tar");
     return -1;
