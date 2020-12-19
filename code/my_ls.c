@@ -3,8 +3,7 @@
 char s [blocksize];
 
 int typeFic(struct stat st){
-
-  int n;
+	
   if(S_ISREG(st.st_mode))
     strcpy(s,"-");
 

@@ -173,7 +173,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
 	commandPerso[2] = "cat";
 	commandPerso[3] = "ls";
 	
-	for (size_t i = 0; i < nbCommand; i++) {
+	for (int i = 0; i < nbCommand; i++) {
 		if(!strcmp(commandPerso[i], command[0]))
 			numeroCommand = i;
 	}
@@ -188,7 +188,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
 		case 2 : return cat(nbOption, command);
 			
 		case 3 : return ls(nbOption, command);
-//		case 3 : printf("je fait ls \n");
+
 	}
 	return 0;
 }
@@ -207,7 +207,7 @@ int commandTar(int nbOption, char ** command) {
   cmdTar[7] = "cp";
   cmdTar[8] = "exit";
 
-  for (size_t i = 0; i < nbCommand; i++) {
+  for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(cmdTar[i], command[0]))
       numeroCommand = i;
   }
@@ -222,7 +222,6 @@ int commandTar(int nbOption, char ** command) {
 	case 1 : if(nbOption == 1) return cdNoOptions();
 			   return navigate(command[1]);
 	
-//	case 2 : printf("je fait ls 2 \n");
 	case 2: return ls(nbOption, command);
 		  
 	case 3 : return mkdirTar("dos.tar", "DossierB");
