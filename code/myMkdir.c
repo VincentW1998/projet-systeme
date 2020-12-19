@@ -26,8 +26,9 @@ struct posix_header newHeader(const char * path) {
   snprintf(hd.size, sizeof(hd.size), "%011o",(int) st.st_size); // size
   snprintf(hd.mtime, sizeof(hd.mtime), "%011o",(int) st.st_mtime); // mtime
   hd.typeflag = '5'; // typeflag
-  memcpy(hd.magic, TMAGIC, strlen(TMAGIC)); // magic
-  memcpy(hd.version, TVERSION, strlen(TVERSION)); // version
+  memcpy(hd.magic, OLDGNU_MAGIC, strlen(OLDGNU_MAGIC));
+//  memcpy(hd.magic, TMAGIC, strlen(TMAGIC)); // magic
+// memcpy(hd.version, TVERSION, strlen(TVERSION)); // version
   strncpy(hd.uname, usr -> pw_name, 32); // uname
   strncpy(hd.gname, grp -> gr_name, 32); // gname
   memset(hd.linkname, '\0', sizeof(hd.linkname)); // linkname
