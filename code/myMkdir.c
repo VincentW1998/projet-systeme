@@ -74,38 +74,26 @@ int mkdirTar(int nbOption,char ** command) {
 }
 
 int createRepo(char * path){
-
-  // concatene path et TARPATH et rajoute un slash a la fin
-  char * pathWithFolder = createPathForMkdir(path);
-  int n;
+  int fd, n;
 
   char * tarName = substringTar();
 
-  if((n = checkEntete(tarName, pathWithFolder)) == 1) {
-    return -1;
-  }
-
-  int fd;
   fd = open(tarName, O_RDWR); // on ouvre le fichier tar
   if (fd < 0){
     perror("open fichier Tar");
     return -1;
   }
+  // concatene path et TARPATH et rajoute un slash a la fin
+  char * pathWithFolder = createPathForMkdir(path);
 
-// on se positionne au debut de l'avant dernier block de fin
-  lseek(fd, -1024, SEEK_END);
-
- // struct posix_header hd = newHeader(newName); // on creer le nouvel entete
   struct posix_header hd = newHeader(pathWithFolder);
-  write(fd, &hd, BLOCKSIZE); // on ecrit l'entete dans le fichier tar
-  lseek(fd, 0, SEEK_END); // on se place a la fin du fichier
-  char blockEnd[BLOCKSIZE];
 
-  // on creer un block de 512 octets rempli de '\0'
-  memset(blockEnd, '\0', BLOCKSIZE);
-  write(fd, blockEnd, BLOCKSIZE); // on rajoute ce block a la fin du fichier
-  close(fd);
-  return 1;
+
+  if((n = checkEntete2(tarName, pathWithFolder, &hd)) == 1) {
+    return -1;
+  }
+
+ return 1;
 }
 
 int my_mkdir (const char * path) {
