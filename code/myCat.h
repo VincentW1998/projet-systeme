@@ -1,7 +1,7 @@
 #ifndef MYCAT_H
 #define MYCAT_H
-
-void goToInitialPos();
+#include "tar.h"
+void goToInitialPos(void);
 
 int showContent(int file, struct posix_header * p);
 

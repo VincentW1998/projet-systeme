@@ -2,6 +2,8 @@
 #include "myCd.h"
 #include "myCat.h"
 #include "myMkdir.h"
+#include "myLs.h"
+
 //#include "tar.h"
 
 int affichagePrompt() { // affichage du prompt
@@ -41,6 +43,8 @@ int execCommand(char ** command) {
           afficheMessageErreur(command);
       break;
     default :
+	  if(strcmp(command[0], "cat") == 0)
+		signal(SIGINT, SIG_IGN);
       wait(&w);
   }
   return 0;
@@ -161,28 +165,32 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
-  int nbCommand = 3;
-  char * commandPerso[nbCommand];
-  int numeroCommand = -1;
-  commandPerso[0] = "exit";
-  commandPerso[1] = "cd";
-  commandPerso[2] = "cat";
+	int nbCommand = 4;
+	char * commandPerso[nbCommand];
+	int numeroCommand = -1;
+	commandPerso[0] = "exit";
+	commandPerso[1] = "cd";
+	commandPerso[2] = "cat";
+	commandPerso[3] = "ls";
+	
+	for (int i = 0; i < nbCommand; i++) {
+		if(!strcmp(commandPerso[i], command[0]))
+			numeroCommand = i;
+	}
+	switch (numeroCommand) {
+		case -1 : return -1;
+			
+		case 0 : exit(0);
+			
+		case 1 : if(nbOption == 1) return cdNoOptions();
+			     return cdPerso(command[1]);
+			
+		case 2 : return cat(nbOption, command);
+			
+		case 3 : return ls(nbOption, command);
 
-  for (size_t i = 0; i < nbCommand; i++) {
-    if(!strcmp(commandPerso[i], command[0]))
-      numeroCommand = i;
-  }
-  switch (numeroCommand) {
-    case -1 : return -1;
-
-    case 0 : exit(0);
-
-    case 1 : if(nbOption == 1) return cdNoOptions();
-           return cdPerso(command[1]);
-
-    case 2 : return cat(nbOption, command);
-  }
-  return 0;
+	}
+	return 0;
 }
 
 int commandTar(int nbOption, char ** command) {
@@ -199,7 +207,7 @@ int commandTar(int nbOption, char ** command) {
   cmdTar[7] = "cp";
   cmdTar[8] = "exit";
 
-  for (size_t i = 0; i < nbCommand; i++) {
+  for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(cmdTar[i], command[0]))
       numeroCommand = i;
   }
@@ -208,41 +216,32 @@ int commandTar(int nbOption, char ** command) {
     case -1 : return -1;
 
     case 0 : write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
-         write(1, "/", 1);
-         write(1, TARPATH, strlen(TARPATH));
-         write(1, "\n", 2);
-         return 0;
-  case 1 : if(nbOption == 1) return cdNoOptions();
-         return navigate(command[1]);
-
-  case 3 : return mkdirTar(nbOption, command);
-
-  case 6:  return cat(nbOption,command);
-
-  case 8 : exit(0);
+		     write(1, "/", 1);
+		     write(1, TARPATH, strlen(TARPATH));
+		     write(1, "\n", 2);
+		     return 0;
+	case 1 : if(nbOption == 1) return cdNoOptions();
+			   return navigate(command[1]);
+	
+	case 2: return ls(nbOption, command);
+		  
+	case 3 : return mkdirTar("dos.tar", "DossierB");
+		  
+	case 6:  return cat(nbOption,command);
+		  
+	case 8 : exit(0);
   }
   return -1;
 
 }
 
 int estTar(char * token) { // verifie si un token est un .tar
-               //  printf("estTAR\n");
-  char * temp = malloc(strlen(token)+1);
-  memcpy(temp,token,strlen(token));
-  char * tok = strtok_r(temp, ".",&temp);
-  char * name = NULL;
-
-  while((tok = strtok_r(temp, ".\n",&temp)) != NULL) {
-    name = malloc(strlen(tok) + 1);
-    strcpy(name, tok);
-  }
-  if(name != NULL && !strcmp(name, "tar")){
-    // free(temp);
-    return 0;
-  }
-
-  // free(temp);
-  return -1;
+	char * tmp = malloc(strlen(token) +1 );
+	strcpy(tmp, token);
+	char * tok = strtok_r(tmp,"/",&tok);
+//	free(tmp);
+	if(hasTar(tok) == 0) return 0;
+	return -1;
 }
 
 int existTar(char * token){
@@ -268,22 +267,10 @@ int existTar(char * token){
 // prends un path et verifie si il y a un tar dans le path
 // fonction qui appelle hasTar = cdPerso
 int hasTar(char * path){
-  char * token;
-  int i = 0;
-  //copie du path
-  char * tmp = malloc(strlen(path)+1);
-  memcpy(tmp,path,strlen(path));
-  //	strcpy(tmp,path);
-
-  while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
-    if(!estTar(token)){
-      //         free(tmp);
-      return 0;
-    }
-    i++;
-  }
-  //     free(tmp);
-  return -1;
+	char * token;
+	if( (token = strstr(path,".tar/")) !=NULL) return 0;
+	if( ((token = strstr(path,".tar"))!=NULL) && (strcmp(token,".tar") == 0) ) return 0;
+	return -1;
 }
 
 void * findTar(char * path){
@@ -310,4 +297,12 @@ char * subWithoutTar() {
   strcpy(tmp, TARPATH);
   strtok_r(tmp, "/\n", &tmp);
   return tmp;
+}
+
+void returnToPos(char * pos, char * posTar){
+	chdir(pos);
+	TARPATH = realloc(TARPATH, strlen(posTar) + 1);
+	if(strlen(posTar) == 0) 
+		strcpy(TARPATH,"");
+	else strcpy(TARPATH, posTar);
 }
