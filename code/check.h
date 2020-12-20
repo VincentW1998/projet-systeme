@@ -8,7 +8,7 @@
 #include <grp.h>
 #include <pwd.h>
 #include <fcntl.h>
-
+#include "tar.h"
 int found;
 char buf[512];
 

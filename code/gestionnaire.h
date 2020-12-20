@@ -49,4 +49,6 @@ void * findTar(char * path);
 char * substringTar();
 
 char * subWithoutTar();
+
+void returnToPos(char * pos, char * posTar);
 #endif

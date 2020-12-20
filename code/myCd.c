@@ -169,7 +169,7 @@ int checkfp(char *tar, char *fullpath[50], int i){
 
   for(int x = 1; x < i; x++){
     path = realloc(path, strlen(path) + strlen(fullpath[x]) + 2);
-    strncat(path, "/", 1);
+    strcat(path, "/");
     strncat(path, fullpath[x], strlen(fullpath[x]));
   }
 

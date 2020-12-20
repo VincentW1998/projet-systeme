@@ -211,7 +211,6 @@ int commandTar(int nbOption, char ** command) {
     if(!strcmp(cmdTar[i], command[0]))
       numeroCommand = i;
   }
-  printf("nbOption : %d\n", nbOption);
   switch (numeroCommand) {
     case -1 : return -1;
 
