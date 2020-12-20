@@ -20,10 +20,12 @@ struct posix_header newHeader(const char * path) {
   memset(&hd, '\0', sizeof(struct posix_header));
   // on remplit les champs du struct posix_header
   strncpy(hd.name, path, 100);
-  snprintf(hd.mode, sizeof(hd.mode), "%07o", st.st_mode); //mode
+  strcpy(hd.mode, "0000755");
+//  snprintf(hd.mode, sizeof(hd.mode), "%07o", st.st_mode); //mode
   snprintf(hd.uid, sizeof(hd.uid), "%07o", st.st_uid); // uid
   snprintf(hd.gid, sizeof(hd.gid),"%07o", st.st_gid); // gid
-  snprintf(hd.size, sizeof(hd.size), "%011o",(int) st.st_size); // size
+  strcpy(hd.size, "00000000000");
+ // snprintf(hd.size, sizeof(hd.size), "%011o",(int) st.st_size); // size
   snprintf(hd.mtime, sizeof(hd.mtime), "%011o",(int) st.st_mtime); // mtime
   hd.typeflag = '5'; // typeflag
   memcpy(hd.magic, OLDGNU_MAGIC, strlen(OLDGNU_MAGIC));
