@@ -6,3 +6,4 @@ shell
 mon_cp
 mon_rm
 mon_mv
+*.tar

@@ -17,7 +17,9 @@ int my_mkdir(const char *path);
 
 struct posix_header newHeader(const char * path);
 
-int mkdirTar(const char * pathTar, const char * path);
+int mkdirTar(int nbOption, char **path);
 
 char * createPathForMkdir(const char * path);
+
+int createRepo(char * path);
 #endif

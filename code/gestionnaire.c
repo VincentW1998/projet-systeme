@@ -211,9 +211,10 @@ int commandTar(int nbOption, char ** command) {
     if(!strcmp(cmdTar[i], command[0]))
       numeroCommand = i;
   }
+  printf("nbOption : %d\n", nbOption);
   switch (numeroCommand) {
     case -1 : return -1;
-		  
+
     case 0 : write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
 		     write(1, "/", 1);
 		     write(1, TARPATH, strlen(TARPATH));
@@ -244,22 +245,22 @@ int estTar(char * token) { // verifie si un token est un .tar
 }
 
 int existTar(char * token){
-	char * tar = malloc(strlen(token) + 1);
-	strcpy(tar, token);
-	DIR * dir = opendir(".");
-	struct dirent * cur;
-	
-	while((cur = readdir(dir)) > 0){
-		if(strcmp(cur->d_name,tar) == 0){
-			closedir(dir);
-			return 0;
-			
-		}
-	}
-	closedir(dir);
-	write(2,"no such file or directory:\n",strlen("no such file or directory:\n"));
-	perror("error: ");
-	return -1;
+  char * tar = malloc(strlen(token) + 1);
+  strcpy(tar, token);
+  DIR * dir = opendir(".");
+  struct dirent * cur;
+
+  while((cur = readdir(dir)) > 0){
+    if(strcmp(cur->d_name,tar) == 0){
+      closedir(dir);
+      return 0;
+
+    }
+  }
+  closedir(dir);
+  write(2,"no such file or directory:\n",strlen("no such file or directory:\n"));
+  perror("error: ");
+  return -1;
 }
 
 
@@ -273,12 +274,29 @@ int hasTar(char * path){
 }
 
 void * findTar(char * path){
-	char * tmp = malloc(strlen(path)+1);
-	memcpy(tmp,path,strlen(path));
-	char * token;
-	while((token = strtok_r(tmp, "/\n", &tmp)) != NULL)
-		if(!estTar(token)) return token;
-	return NULL;
+  char * tmp = malloc(strlen(path)+1);
+  memcpy(tmp,path,strlen(path));
+  char * token;
+  while((token = strtok_r(tmp, "/\n", &tmp)) != NULL)
+    if(!estTar(token)) return token;
+  return NULL;
+}
+
+/* return the tar repository from TARPATH */
+char * substringTar() {
+  char *tmp = malloc(strlen(TARPATH) + 1);
+  strcpy(tmp, TARPATH);
+  char * token;
+  token = strtok_r(tmp, "/\n", &tmp);
+  return token;
+}
+
+/* return string contains TARPATH without tar repository */
+char * subWithoutTar() {
+  char * tmp = malloc(strlen(TARPATH) + 1);
+  strcpy(tmp, TARPATH);
+  strtok_r(tmp, "/\n", &tmp);
+  return tmp;
 }
 
 void returnToPos(char * pos, char * posTar){

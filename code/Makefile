@@ -9,13 +9,15 @@ shell.o : shell.c gestionnaire.h
 
 gestionnaire.o : gestionnaire.c gestionnaire.h myCd.h
 
-myCd.o : myCd.c myCd.h gestionnaire.h tar.h
+myCd.o : myCd.c myCd.h gestionnaire.h check.h
 
 myCat.o : myCat.c myCat.h tar.h
 
+check.o : check.c check.h tar.h
+
 tar.o : tar.c tar.h
 
-myMkdir.o : myMkdir.c myMkdir.h tar.h
+myMkdir.o : myMkdir.c myMkdir.h check.h tar.h
 
 myLs.o : myLs.c myLs.h tar.h
 #mon_cp : mon_cp.c
