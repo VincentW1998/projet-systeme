@@ -27,7 +27,6 @@ int cd(char * path ){
   char * tmp = malloc(strlen(path) + 1), *stdPath, *tbPath, *token;
   strcpy(tmp, path);
   int l = 0;
-  //	printf("ici\n");
   while((token = strtok_r(tmp, "/", &tmp)) != NULL){
     if(estTar(token) == 0) break;
     l += 1 + strlen(token);
@@ -40,7 +39,6 @@ int cd(char * path ){
     free(stdPath);
   }
   if(l < strlen(path)){
-    printf("existTar \n");
     if(existTar(token) == -1){
       perror("le fichier n'existe pas");
       return -1;
@@ -59,7 +57,6 @@ int cd(char * path ){
       //				TARPATH = realloc(TARPATH,1);
       //				strcpy(TARPATH,"\0");
       setTarpath("\0");
-      printf("cd 2 : %s \n", path); // ici
       free(tbPath);
       return -1;
     }
@@ -106,7 +103,7 @@ int navigate(char * path){
         }
         return cdPerso(path + strlen(tmp));
       }
-      if(checkfp(tar, fullpath, i) == -1){printf(RED"failed\n"RESET);return -1;} // exit
+      if(checkfp(tar, fullpath, i) == -1){return -1;} // exit
       free(fullpath[i-1]);
       i -= 2;
     }
@@ -127,7 +124,7 @@ int navigate(char * path){
     return 0;
   }
 
-  if(checkfp(tar, fullpath, i) == -1){ printf(RED"failed2\n"RESET); return -1; }//exit
+  if(checkfp(tar, fullpath, i) == -1){ return -1; }//exit
 
   for(int x = 1; x < i; x++){
     fullpath[0] = realloc(fullpath[0], strlen(fullpath[0]) + strlen(fullpath[x]) + 2);
@@ -190,7 +187,6 @@ int checkfp(char *tar, char *fullpath[50], int i){
   strcpy(path, fullpath[0]);
 
   for(int x = 1; x < i; x++){
-    //		printf("AJOUT : %s \n", fullpath[x]);
     path = realloc(path, strlen(path) + strlen(fullpath[x]) + 2);
     strncat(path, "/", 1);
     strncat(path, fullpath[x], strlen(fullpath[x]));
