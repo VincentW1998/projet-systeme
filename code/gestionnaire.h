@@ -16,10 +16,11 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <math.h>
+#include <time.h>
 
 char * TARPATH;
 
-int affichagePrompt();
+int affichagePrompt(void);
 
 int afficheMessageErreur(char ** command);
 
@@ -45,5 +46,6 @@ int hasTar(char * pathError);
 
 void * findTar(char * path);
 
+void returnToPos(char * pos, char * posTar);
 
 #endif

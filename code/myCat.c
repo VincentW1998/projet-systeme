@@ -1,6 +1,6 @@
 #include "gestionnaire.h"
 #include "myCd.h"
-#include "tar.h"
+//#include "tar.h"
 #include "myCat.h"
 
 char * myPos, * myPosTar;
@@ -13,7 +13,7 @@ void goToInitialPos(){
 
 int showContent(int file, struct posix_header * p){
 	char buffer [BLOCKSIZE];
-	int n;
+	ssize_t n;
 	for(int i=0; i < ceil(atoi(p->size)/512.) ; i++){
 		if((n = read(file, buffer, BLOCKSIZE)) > 0){
 			write(1,buffer,n);
@@ -88,7 +88,8 @@ int CatFile (char * path){
 int checkpath(char * path){
 	char * token;
 	char * filePath;
-	int f, n;
+	int f;
+	ssize_t n;
 	struct posix_header * p = malloc(sizeof(struct posix_header));
 	char * tmp = malloc(strlen(TARPATH) + 1);
 	strcpy(tmp,TARPATH);
@@ -143,6 +144,7 @@ int cat(int nbOption, char ** path){
 				write(1,"\n",1);
 				return 0;
 		}
+	
 	
 	myPos = getcwd(NULL, 0); // je sauvegarde ma position
 	myPosTar = malloc(strlen(TARPATH) + 1);
