@@ -16,7 +16,10 @@ void next_header(int fd, unsigned int filesize);
 
 int read_header(int fd, char *path);
 
+int read_header2(int fd, char *path, struct posix_header * newHd);
+
 int checkEntete(char * tarName, char * path);
 
+int checkEntete2(char * tarName, char * path, struct posix_header * hd);
 
 #endif
