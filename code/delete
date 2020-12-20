@@ -4,4 +4,4 @@ rm dos.tar
 make cleanall
 tar cf dos.tar DossierA
 make shell
-./shell
+gdb shell
