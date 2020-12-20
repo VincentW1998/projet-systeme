@@ -1,0 +1,52 @@
+#include "check.h"
+#include "tar.h"
+
+
+
+int found;
+char buf[BLOCKSIZE];
+
+
+void next_header(int fd, unsigned int filesize) {
+  unsigned int nblocks = (filesize + BLOCKSIZE - 1) >> BLOCKBITS;
+  for(int i = 0; i < nblocks; i++) {
+    int nb = read(fd, buf, BLOCKSIZE);
+    if(nb == -1) {
+      perror("read");
+    }
+  }
+}
+
+int read_header(int fd, char *path) {
+  struct posix_header hd;
+  unsigned int filesize = 0;
+  int nb = read(fd, &hd, BLOCKSIZE);
+  if(nb == -1) {
+    perror("read");
+    return -1;
+  }
+  found = 0;
+
+  if(hd.name[0] == '\0') return -1;
+  printf("name : %s\n", hd.name);
+  if(strcmp(hd.name, path) == 0) found = 1;
+  sscanf(hd.size, "%o", &filesize);
+  return filesize;
+}
+
+int checkEntete(char * tarName, char * path) {
+  int fd;
+  int filesize = 0;
+  fd = open(tarName, O_RDONLY);
+  while(1) {
+    filesize = read_header(fd, path);
+    if (filesize == -1) break;
+    if (found) {
+      close(fd);
+      return 1;
+    }
+    next_header(fd, filesize);
+  }
+  close (fd);
+  return -1;
+}
