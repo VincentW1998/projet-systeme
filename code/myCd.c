@@ -17,7 +17,6 @@ int cdPerso(char * path){
 }
 
 int cd(char * path ){
-	
 	if(path[0] == '/')return cdAbs(path);
 	char * tmp = malloc(strlen(path) + 1), *stdPath, *tbPath, *token;
 	strcpy(tmp, path);
