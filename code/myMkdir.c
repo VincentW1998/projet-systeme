@@ -1,5 +1,6 @@
 #include "myMkdir.h"
 #include "gestionnaire.h"
+#include "check.h"
 #include "tar.h"
 
 struct posix_header newHeader(const char * path) {
@@ -9,7 +10,7 @@ struct posix_header newHeader(const char * path) {
   struct passwd * usr = getpwuid(uid);
 
   char * pathDos = "DossierVide";
-  mkdir(pathDos, 0700); // creer un dossier vide model
+  mkdir(pathDos, 0755); // creer un dossier vide model
 
   stat(pathDos, &st);
 
@@ -18,7 +19,6 @@ struct posix_header newHeader(const char * path) {
 //initialise le struct avec des '\0'
   memset(&hd, '\0', sizeof(struct posix_header));
   // on remplit les champs du struct posix_header
-  printf("Pathname dans newHeader : %s\n", path);
   strncpy(hd.name, path, 100);
   snprintf(hd.mode, sizeof(hd.mode), "%07o", st.st_mode); //mode
   snprintf(hd.uid, sizeof(hd.uid), "%07o", st.st_uid); // uid
@@ -28,7 +28,7 @@ struct posix_header newHeader(const char * path) {
   hd.typeflag = '5'; // typeflag
   memcpy(hd.magic, OLDGNU_MAGIC, strlen(OLDGNU_MAGIC));
 //  memcpy(hd.magic, TMAGIC, strlen(TMAGIC)); // magic
-// memcpy(hd.version, TVERSION, strlen(TVERSION)); // version
+ // memcpy(hd.version, TVERSION, strlen(TVERSION)); // version
   strncpy(hd.uname, usr -> pw_name, 32); // uname
   strncpy(hd.gname, grp -> gr_name, 32); // gname
   memset(hd.linkname, '\0', sizeof(hd.linkname)); // linkname
@@ -36,10 +36,8 @@ struct posix_header newHeader(const char * path) {
   memset(hd.devminor, '\0', sizeof(hd.devminor)); // devminor
   memset(hd.prefix, '\0', sizeof(hd.prefix)); // prefix
   memset(hd.junk, '\0', sizeof(hd.junk)); // junk
-
-
   set_checksum(&hd); // checksum
-
+  check_checksum(&hd);
   rmdir(pathDos); // on supprime le dossier model
 
   return hd;
@@ -65,7 +63,6 @@ int length = strlen(suiteName) + strlen(path) + 3;
 
 int mkdirTar(int nbOption,char ** command) {
 
-
   for (int i = 1; i < nbOption; i++) {
     if(createRepo(command[i]) == -1)
       return -1;
@@ -75,17 +72,24 @@ int mkdirTar(int nbOption,char ** command) {
 }
 
 int createRepo(char * path){
-  int fd;
+
+  // concatene path et TARPATH et rajoute un slash a la fin
+  char * pathWithFolder = createPathForMkdir(path);
+  int n;
+
   char * tarName = substringTar();
-  fd = open(tarName, O_WRONLY); // on ouvre le fichier tar
+
+  if((n = checkEntete(tarName, pathWithFolder)) == 1) {
+    return -1;
+  }
+
+  int fd;
+  fd = open(tarName, O_RDWR); // on ouvre le fichier tar
   if (fd < 0){
     perror("open fichier Tar");
     return -1;
   }
 
-  // concatene path et TARPATH et rajoute un slash a la fin
-  char * pathWithFolder = createPathForMkdir(path);
-  printf("pathWithFolder : %s\n", pathWithFolder);
 // on se positionne au debut de l'avant dernier block de fin
   lseek(fd, -1024, SEEK_END);
 
@@ -108,8 +112,4 @@ int my_mkdir (const char * path) {
         return 0;
     }
     return -1;
-}
-
-int pathExist(int fd, const char * pathWithFolder) {
-  return 0;
 }
