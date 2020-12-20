@@ -225,7 +225,7 @@ int commandTar(int nbOption, char ** command) {
 	
 	case 2: return ls(nbOption, command);
 		  
-	case 3 : return mkdirTar("dos.tar", "DossierB");
+	case 3 : return mkdirTar(nbOption, command);
 		  
 	case 6:  return cat(nbOption,command);
 		  
