@@ -235,22 +235,11 @@ int commandTar(int nbOption, char ** command) {
 }
 
 int estTar(char * token) { // verifie si un token est un .tar
-						   //  printf("estTAR\n");
-	char * temp = malloc(strlen(token)+1);
-	memcpy(temp,token,strlen(token));
-	char * tok = strtok_r(temp, ".",&temp);
-	char * name = NULL;
-	
-	while((tok = strtok_r(temp, ".\n",&temp)) != NULL) {
-		name = malloc(strlen(tok) + 1);
-		strcpy(name, tok);
-	}
-	if(name != NULL && !strcmp(name, "tar")){
-		// free(temp);
-		return 0;
-	}
-	
-	// free(temp);
+	char * tmp = malloc(strlen(token) +1 );
+	strcpy(tmp, token);
+	char * tok = strtok_r(tmp,"/",&tok);
+//	free(tmp);
+	if(hasTar(tok) == 0) return 0;
 	return -1;
 }
 
@@ -278,20 +267,8 @@ int existTar(char * token){
 // fonction qui appelle hasTar = cdPerso
 int hasTar(char * path){
 	char * token;
-	int i = 0;
-	//copie du path
-	char * tmp = malloc(strlen(path)+1);
-	memcpy(tmp,path,strlen(path));
-	//	strcpy(tmp,path);
-	
-	while((token = strtok_r(tmp,"/\n",&tmp))!=NULL){
-		if(!estTar(token)){
-			//         free(tmp);
-			return 0;
-		}
-		i++;
-	}
-	//     free(tmp);
+	if( (token = strstr(path,".tar/")) !=NULL) return 0;
+	if( ((token = strstr(path,".tar"))!=NULL) && (strcmp(token,".tar") == 0) ) return 0;
 	return -1;
 }
 
@@ -307,5 +284,7 @@ void * findTar(char * path){
 void returnToPos(char * pos, char * posTar){
 	chdir(pos);
 	TARPATH = realloc(TARPATH, strlen(posTar) + 1);
-	strcpy(TARPATH, posTar);
+	if(strlen(posTar) == 0) 
+		strcpy(TARPATH,"");
+	else strcpy(TARPATH, posTar);
 }
