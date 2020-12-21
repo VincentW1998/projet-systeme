@@ -27,7 +27,6 @@ int read_header(int fd, char *path) {
   found = 0;
 
   if(hd.name[0] == '\0') return -1;
-  printf("name : %s\n", hd.name);
   if(strcmp(hd.name, path) == 0) found = 1;
   sscanf(hd.size, "%o", &filesize);
   return filesize;
@@ -42,7 +41,6 @@ int read_header2(int fd, char *path, struct posix_header * newHd) {
     return -1;
   }
   found = 0;
-  printf("lseek : %ld\n", lseek(fd, 0, SEEK_CUR));
 
   if(hd.name[0] == '\0') {
     lseek(fd, -512, SEEK_CUR);
@@ -52,7 +50,7 @@ int read_header2(int fd, char *path, struct posix_header * newHd) {
     write(fd, blockEnd, BLOCKSIZE);
 
     return -1;
-  }  printf("name : %s\n", hd.name);
+  }
   if(strcmp(hd.name, path) == 0) found = 1;
   sscanf(hd.size, "%o", &filesize);
   return filesize;
