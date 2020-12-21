@@ -11,31 +11,31 @@ void goToInitialPos(){
 }
 
 int showContent(int file, struct posix_header * p){
-	char buffer [BLOCKSIZE];
-	ssize_t n;
-	for(int i=0; i < ceil(atoi(p->size)/512.) ; i++){
-		if((n = read(file, buffer, BLOCKSIZE)) > 0){
-			write(1,buffer,n);
-		}
-	}
-	close(file);
-	return 0;
+  char buffer [BLOCKSIZE];
+  ssize_t n;
+  for(int i=0; i < ceil(atoi(p->size)/512.) ; i++){
+    if((n = read(file, buffer, BLOCKSIZE)) > 0){
+      write(1,buffer,n);
+    }
+  }
+  close(file);
+  return 0;
 }
 
 int simpleCat(char * path){
-	int f;
-	char * cmd[3] = { "cat", path }; // on ajoute 1 a la taille pour que le                                    cat s'arrete apres un null
-	switch (f = fork()) {
-		case -1 : perror("fork :");
-			exit(1);
-			
-		case 0 : if(execCommand(cmd) == -1) perror("cat");
-			
-		default: signal(SIGINT, SIG_IGN); // ignore le signal SIGINT
-			wait(NULL);
-			write(1,"\n",1);
-			return 0;
-	}
+  int f;
+  char * cmd[3] = { "cat", path }; // on ajoute 1 a la taille pour que le                                    cat s'arrete apres un null
+  switch (f = fork()) {
+    case -1 : perror("fork :");
+      exit(1);
+      
+    case 0 : if(execCommand(cmd) == -1) perror("cat");
+      
+    default: signal(SIGINT, SIG_IGN); // ignore le signal SIGINT
+      wait(NULL);
+      write(1,"\n",1);
+      return 0;
+  }
 }
 
 int CatFile (char * path){
