@@ -12,6 +12,7 @@ int cdNoOptions(){
 
 // fonction qui appelle cdPerso = commandPersonnalisee
 int cdPerso(char * path){
+  memset(TARPATH,0, strlen(TARPATH));
   if(hasTar(path) == 0) return cd(path); // si dans le path il y un tar
   chdir(path);
   return 0;
@@ -85,7 +86,8 @@ int navigate(char * path){
           setTarpath("\0");
           return 0;
         }
-        return cdPerso(path + strlen(tmp));
+  //      return cdPerso(path + strlen(tmp));
+          return cdPerso(tmp);
       }
       if(checkfp(tar, fullpath, i) == -1){perror("cd");return -1;} // exit
       free(fullpath[i-1]);
@@ -93,6 +95,8 @@ int navigate(char * path){
     }
     else{
       if(estTar(token) != 0){
+  //strcpy(TARPATH, posTar);
+  //strcpy(TARPATH, posTar);
         fullpath[i] = malloc(strlen(token) + 1);
         strcpy(fullpath[i], token);
       }

@@ -5,7 +5,6 @@
 #include <string.h>
 
 
-
 char * pos, * posTar;
 
 void storePosition();
