@@ -11,7 +11,7 @@ gestionnaire.o : gestionnaire.c gestionnaire.h myCd.h
 
 myCd.o : myCd.c myCd.h gestionnaire.h check.h
 
-myCat.o : myCat.c myCat.h tar.h
+myCat.o : myCat.c myCat.h tar.h storeRestore.h
 
 check.o : check.c check.h tar.h
 
