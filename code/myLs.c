@@ -2,6 +2,8 @@
 #include "myCd.h"
 #include "gestionnaire.h"
 #include "check.h"
+#include "storeRestore.h"
+
 // ls sans path en arguments
 int LsWithoutPath(int withL){
   if(*TARPATH == '\0')

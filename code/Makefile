@@ -22,7 +22,7 @@ tar.o : tar.c tar.h
 myMkdir.o : myMkdir.c myMkdir.h check.h tar.h myCd.h storeRestore.h
 
 
-myLs.o : myLs.c myLs.h tar.h
+myLs.o : myLs.c myLs.h tar.h check.h storeRestore.h
 #mon_cp : mon_cp.c
 #
 #mon_rm : mon_rm.c
