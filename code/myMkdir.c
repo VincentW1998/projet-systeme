@@ -47,7 +47,9 @@ int length = strlen(suiteName) + strlen(path) + 3;
   char * pathWithFolder = malloc(length);
   pathWithFolder[0] = '\0';
   strncat(pathWithFolder, suiteName, strlen(suiteName));
-  strcat(pathWithFolder, "/");
+  if (suiteName[0] != '\0') {
+    strcat(pathWithFolder, "/");
+  }
   strncat(pathWithFolder, path, strlen(path));
   strcat(pathWithFolder, "/");
   return pathWithFolder;
