@@ -298,13 +298,6 @@ char * subWithoutTar() {
   return tmp;
 }
 
-void returnToPos(char * pos, char * posTar){
-  chdir(pos);
-  TARPATH = realloc(TARPATH, strlen(posTar) + 1);
-  if(strlen(posTar) == 0) 
-    strcpy(TARPATH,"");
-  else strcpy(TARPATH, posTar);
-}
 
 /* take a string path and return a substring of this path without the
  * last repository*/
