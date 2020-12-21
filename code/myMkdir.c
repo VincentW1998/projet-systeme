@@ -45,7 +45,7 @@ char * createPathForMkdir(const char * path) {
 
 /* +3 car on rajoute 2 slash et il y a le caractere zero qui termine une
  * chaine de caracteres. */
-int length = strlen(suiteName) + strlen(path) + 3;
+  int length = strlen(suiteName) + strlen(path) + 3;
   char * pathWithFolder = malloc(length);
   pathWithFolder[0] = '\0';
   strncat(pathWithFolder, suiteName, strlen(suiteName));
@@ -68,11 +68,7 @@ int mkdirTar(int nbOption,char ** command) {
 }
 
 int createRepo(char * path){
-
-//  pos = getcwd(NULL, 0);
- // posTar = malloc(strlen(TARPATH) + 1);
-  //strcpy(posTar, TARPATH);
-  storePosition();
+  storePosition(); // store position
 
   char * pathNavigate= subWithoutRepo(path);
   if(navigate(pathNavigate) == -1) return -1;
@@ -80,9 +76,6 @@ int createRepo(char * path){
 
   if (TARPATH[0] == '\0') {
     mkdirNoTar(pathMkdir);
-//    chdir(pos);
- //   TARPATH = realloc(TARPATH, strlen(posTar) + 1);
-  //  strcpy(TARPATH, posTar);
     restorePosition();
     return 1;
   }
@@ -103,9 +96,6 @@ int createRepo(char * path){
   if((n = checkEntete2(tarName, pathWithFolder, &hd)) == 1) {
     return -1;
   }
-//  chdir(pos);
- // TARPATH = realloc(TARPATH, strlen(posTar) + 1);
-  //strcpy(TARPATH, posTar);
   restorePosition();
 
  return 1;
