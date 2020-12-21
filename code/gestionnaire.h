@@ -50,5 +50,7 @@ char * substringTar();
 
 char * subWithoutTar();
 
-void returnToPos(char * pos, char * posTar);
+char * subWithoutRepo(char * path);
+
+char * subWithRepo(char * path);
 #endif
