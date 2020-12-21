@@ -51,4 +51,6 @@ char * substringTar();
 char * subWithoutTar();
 
 void returnToPos(char * pos, char * posTar);
+
+char * subWithoutRepo(char * path);
 #endif

@@ -66,6 +66,8 @@ int mkdirTar(int nbOption,char ** command) {
 }
 
 int createRepo(char * path){
+
+  char * test = subWithoutRepo(path);
   int fd, n;
   char * tarName = substringTar();
 
