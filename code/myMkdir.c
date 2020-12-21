@@ -5,32 +5,25 @@
 
 struct posix_header newHeader(const char * path) {
   struct posix_header hd;
-  struct stat st;
   uid_t uid = getuid();
   struct passwd * usr = getpwuid(uid);
+  time_t lastModif;
+  time(&lastModif);
 
-  char * pathDos = "DossierVide";
-  mkdir(pathDos, 0755); // creer un dossier vide model
-
-  stat(pathDos, &st);
-
-  struct group * grp = getgrgid(st.st_gid);
+  struct group * grp = getgrgid(usr -> pw_gid);
 
 //initialise le struct avec des '\0'
   memset(&hd, '\0', sizeof(struct posix_header));
   // on remplit les champs du struct posix_header
   strncpy(hd.name, path, 100);
   strcpy(hd.mode, "0000755");
-//  snprintf(hd.mode, sizeof(hd.mode), "%07o", st.st_mode); //mode
-  snprintf(hd.uid, sizeof(hd.uid), "%07o", st.st_uid); // uid
-  snprintf(hd.gid, sizeof(hd.gid),"%07o", st.st_gid); // gid
+  snprintf(hd.uid, sizeof(hd.uid), "%07o", usr -> pw_uid); // uid
+  snprintf(hd.gid, sizeof(hd.gid),"%07o", usr -> pw_gid); // gid
+
   strcpy(hd.size, "00000000000");
- // snprintf(hd.size, sizeof(hd.size), "%011o",(int) st.st_size); // size
-  snprintf(hd.mtime, sizeof(hd.mtime), "%011o",(int) st.st_mtime); // mtime
+  snprintf(hd.mtime, sizeof(hd.mtime), "%lo", lastModif); // mtime
   hd.typeflag = '5'; // typeflag
   memcpy(hd.magic, OLDGNU_MAGIC, strlen(OLDGNU_MAGIC));
-//  memcpy(hd.magic, TMAGIC, strlen(TMAGIC)); // magic
- // memcpy(hd.version, TVERSION, strlen(TVERSION)); // version
   strncpy(hd.uname, usr -> pw_name, 32); // uname
   strncpy(hd.gname, grp -> gr_name, 32); // gname
   memset(hd.linkname, '\0', sizeof(hd.linkname)); // linkname
@@ -40,7 +33,6 @@ struct posix_header newHeader(const char * path) {
   memset(hd.junk, '\0', sizeof(hd.junk)); // junk
   set_checksum(&hd); // checksum
   check_checksum(&hd);
-  rmdir(pathDos); // on supprime le dossier model
 
   return hd;
 }
@@ -55,10 +47,8 @@ int length = strlen(suiteName) + strlen(path) + 3;
   char * pathWithFolder = malloc(length);
   pathWithFolder[0] = '\0';
   strncat(pathWithFolder, suiteName, strlen(suiteName));
-//  strncat(pathWithFolder, "/", 1);
   strcat(pathWithFolder, "/");
   strncat(pathWithFolder, path, strlen(path));
-//  strncat(pathWithFolder, "/", 1);
   strcat(pathWithFolder, "/");
   return pathWithFolder;
 }
@@ -75,7 +65,6 @@ int mkdirTar(int nbOption,char ** command) {
 
 int createRepo(char * path){
   int fd, n;
-
   char * tarName = substringTar();
 
   fd = open(tarName, O_RDWR); // on ouvre le fichier tar
@@ -88,7 +77,6 @@ int createRepo(char * path){
 
   struct posix_header hd = newHeader(pathWithFolder);
 
-
   if((n = checkEntete2(tarName, pathWithFolder, &hd)) == 1) {
     return -1;
   }
@@ -96,10 +84,4 @@ int createRepo(char * path){
  return 1;
 }
 
-int my_mkdir (const char * path) {
-    int n;
-    if((n = mkdir(path, 0777) > -1)){
-        return 0;
-    }
-    return -1;
-}
+
