@@ -17,7 +17,7 @@ check.o : check.c check.h tar.h
 
 tar.o : tar.c tar.h
 
-myMkdir.o : myMkdir.c myMkdir.h check.h tar.h
+myMkdir.o : myMkdir.c myMkdir.h check.h tar.h myCd.h
 
 myLs.o : myLs.c myLs.h tar.h
 #mon_cp : mon_cp.c

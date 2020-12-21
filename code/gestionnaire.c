@@ -320,3 +320,16 @@ char * subWithoutRepo(char * path) {
       }
   return result;
 }
+
+char * subWithRepo(char * path) {
+  char *tmp = malloc(strlen(path) + 1);
+  char * token;
+  strcpy(tmp, path);
+  char * result = malloc(strlen(path) + 1);
+  strcpy(result, "");
+  while((token = strtok_r(tmp, "/", &tmp)) != NULL) {
+    if(strlen(tmp) == 0)
+      strcat(result, token);
+  }
+  return result;
+}

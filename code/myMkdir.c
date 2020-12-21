@@ -2,6 +2,7 @@
 #include "gestionnaire.h"
 #include "check.h"
 #include "tar.h"
+#include "myCd.h"
 
 struct posix_header newHeader(const char * path) {
   struct posix_header hd;
@@ -67,7 +68,14 @@ int mkdirTar(int nbOption,char ** command) {
 
 int createRepo(char * path){
 
-  char * test = subWithoutRepo(path);
+  pos = getcwd(NULL, 0);
+  posTar = malloc(strlen(TARPATH) + 1);
+  strcpy(posTar, TARPATH);
+
+  char * pathNavigate= subWithoutRepo(path);
+  if(navigate(pathNavigate) == -1) return -1;
+
+  char * pathMkdir = subWithRepo(path);
   int fd, n;
   char * tarName = substringTar();
 
@@ -77,13 +85,16 @@ int createRepo(char * path){
     return -1;
   }
   // concatene path et TARPATH et rajoute un slash a la fin
-  char * pathWithFolder = createPathForMkdir(path);
+  char * pathWithFolder = createPathForMkdir(pathMkdir);
 
   struct posix_header hd = newHeader(pathWithFolder);
 
   if((n = checkEntete2(tarName, pathWithFolder, &hd)) == 1) {
     return -1;
   }
+  chdir(pos);
+  TARPATH = realloc(TARPATH, strlen(posTar) + 1);
+  strcpy(TARPATH, posTar);
 
  return 1;
 }

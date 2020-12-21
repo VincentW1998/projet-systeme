@@ -9,6 +9,7 @@
 #include <pwd.h>
 #include <time.h>
 
+char * pos, * posTar;
 
 struct posix_header newHeader(const char * path);
 
