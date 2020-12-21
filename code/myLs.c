@@ -1,8 +1,7 @@
 #include "myLs.h"
 #include "myCd.h"
 #include "gestionnaire.h"
-#include "storeRestore.h"
-
+#include "check.h"
 // ls sans path en arguments
 int LsWithoutPath(int withL){
   if(*TARPATH == '\0')
@@ -40,31 +39,32 @@ void simpleLs(int withL){
 }
 
 void printOccurences(int withL){ //si withL = 1 on affiche ls -l
-  char * tmp = malloc(strlen(TARPATH) + 1);
-  strcpy(tmp, TARPATH);
-  char * tar = strtok_r(tmp, "/\0",&tmp);
-  int f;
-  ssize_t n;
-  write(1,TARPATH,strlen(TARPATH));
-  write(1,":\n", 2);
-  if((f = open(tar, O_RDONLY)) == -1) perror("open tar:");
-  struct posix_header * p = malloc(sizeof(struct posix_header));
-  while((n = read(f,p,BLOCKSIZE)) > 0){
-    if(strlen(TARPATH) > strlen(tar)){
-      if(validPath(TARPATH + strlen(tar)+1 ,p->name) == 0){
-        if(withL == 1) optionL(p,f);
-        write(1,p->name + strlen(TARPATH + strlen(tar) + 1)+ 1, strlen(p->name + strlen(TARPATH + strlen(tar) + 1)));
-        write(1,"\n",1);
-      }
-    }
-    else if(validPath("", p->name) == 0){
-      if(withL == 1) optionL(p,f);
-      write(1,p->name, strlen(p->name));
-      write(1,"\n",1);
-    }
-    lseek(f,ceil(atoi(p->size)/512.)*BLOCKSIZE,SEEK_CUR);
-  }
-  close(f);
+	char * tmp = malloc(strlen(TARPATH) + 1);
+	strcpy(tmp, TARPATH);
+	char * tar = strtok_r(tmp, "/\0",&tmp);
+	int f;
+	ssize_t n;
+	write(1,TARPATH,strlen(TARPATH));
+	write(1,":\n", 2);
+	if((f = open(tar, O_RDONLY)) == -1) perror("open tar:");
+	struct posix_header * p = malloc(sizeof(struct posix_header));
+	while((n = read(f,p,BLOCKSIZE)) > 0){
+		if(p->name[0] == '\0') break;
+		if(strlen(TARPATH) > strlen(tar)){
+			if(validPath(TARPATH + strlen(tar)+1 ,p->name) == 0){
+				if(withL == 1) optionL(p,f);
+				write(1,p->name + strlen(TARPATH + strlen(tar) + 1)+ 1, strlen(p->name + strlen(TARPATH + strlen(tar) + 1)));
+				write(1,"\n",1);
+			}
+		}
+		else if(validPath("", p->name) == 0){
+			if(withL == 1) optionL(p,f);
+			write(1,p->name, strlen(p->name));
+			write(1,"\n",1);
+		}
+			next_header(f, atoi(p->size));
+	}
+	close(f);
 }
 
 // check si target est visible depuis path 1
