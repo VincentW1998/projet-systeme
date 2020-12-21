@@ -74,8 +74,16 @@ int createRepo(char * path){
 
   char * pathNavigate= subWithoutRepo(path);
   if(navigate(pathNavigate) == -1) return -1;
-
   char * pathMkdir = subWithRepo(path);
+
+  if (TARPATH[0] == '\0') {
+    mkdirNoTar(pathMkdir);
+    chdir(pos);
+    TARPATH = realloc(TARPATH, strlen(posTar) + 1);
+    strcpy(TARPATH, posTar);
+    return 1;
+  }
+
   int fd, n;
   char * tarName = substringTar();
 
@@ -99,4 +107,13 @@ int createRepo(char * path){
  return 1;
 }
 
-
+/* use the exec mkdir */
+int mkdirNoTar(char * path){
+  char * command[2];
+  command[0] = malloc(strlen("mkdir") + 1);
+  command[1] = malloc(strlen(path) + 1);
+  strcpy(command[0], "mkdir");
+  strcpy(command[1], path);
+  execCommand(command);
+  return 1;
+}

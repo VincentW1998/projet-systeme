@@ -50,7 +50,7 @@ int execCommand(char ** command) {
   return 0;
 }
 
-// pour les commandes externes du shell avec un pipi
+// pour les commandes externes du shell avec un pipe
 int execCommandPipe(char ** command, char ** commandPipe) {
   int fd[2];
   if(pipe(fd) < -1){
@@ -306,21 +306,27 @@ void returnToPos(char * pos, char * posTar){
   else strcpy(TARPATH, posTar);
 }
 
+/* take a string path and return a substring of this path without the
+ * last repository*/
 char * subWithoutRepo(char * path) {
   char * token;
   char * tmp = malloc(strlen(path) + 1);
   strcpy(tmp, path);
   char * result = malloc(strlen(path) + 1);
   strcpy(result, "");
+  token = strtok_r(tmp, "/", &tmp);
+  if(strlen(tmp) != 0)
+    strcat(result, token);
   while((token = strtok_r(tmp, "/", &tmp)) != NULL ) {
     if(strlen(tmp) != 0) {
-      strcat(result, token);
       strcat(result, "/");
+      strcat(result, token);
     }
       }
   return result;
 }
 
+/* take a string path and return the last repository of this path*/
 char * subWithRepo(char * path) {
   char *tmp = malloc(strlen(path) + 1);
   char * token;

@@ -18,4 +18,6 @@ int mkdirTar(int nbOption, char **path);
 char * createPathForMkdir(const char * path);
 
 int createRepo(char * path);
+
+int mkdirNoTar(char * path);
 #endif
