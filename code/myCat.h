@@ -9,7 +9,7 @@ int simpleCat(char * path);
 
 int CatFile (char * path);
 
-int checkpath(char * path);
+int readFile(char * path, char * tar);
 
 int cat(int nbOption, char ** path);
 

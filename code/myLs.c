@@ -1,7 +1,7 @@
 #include "myLs.h"
 #include "myCd.h"
 #include "gestionnaire.h"
-
+#include "check.h"
 // ls sans path en arguments
 int LsWithoutPath(int withL){
 	if(*TARPATH == '\0')
@@ -53,6 +53,7 @@ void printOccurences(int withL){ //si withL = 1 on affiche ls -l
 	if((f = open(tar, O_RDONLY)) == -1) perror("open tar:");
 	struct posix_header * p = malloc(sizeof(struct posix_header));
 	while((n = read(f,p,BLOCKSIZE)) > 0){
+		if(p->name[0] == '\0') break;
 		if(strlen(TARPATH) > strlen(tar)){
 			if(validPath(TARPATH + strlen(tar)+1 ,p->name) == 0){
 				if(withL == 1) optionL(p,f);
@@ -65,7 +66,7 @@ void printOccurences(int withL){ //si withL = 1 on affiche ls -l
 			write(1,p->name, strlen(p->name));
 			write(1,"\n",1);
 		}
-		lseek(f,ceil(atoi(p->size)/512.)*BLOCKSIZE,SEEK_CUR);
+			next_header(f, atoi(p->size));
 	}
 	close(f);
 }
