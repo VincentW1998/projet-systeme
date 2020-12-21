@@ -3,6 +3,7 @@
 #include "check.h"
 #include "tar.h"
 #include "myCd.h"
+#include "storeRestore.h"
 
 struct posix_header newHeader(const char * path) {
   struct posix_header hd;
@@ -68,9 +69,10 @@ int mkdirTar(int nbOption,char ** command) {
 
 int createRepo(char * path){
 
-  pos = getcwd(NULL, 0);
-  posTar = malloc(strlen(TARPATH) + 1);
-  strcpy(posTar, TARPATH);
+//  pos = getcwd(NULL, 0);
+ // posTar = malloc(strlen(TARPATH) + 1);
+  //strcpy(posTar, TARPATH);
+  storePosition();
 
   char * pathNavigate= subWithoutRepo(path);
   if(navigate(pathNavigate) == -1) return -1;
@@ -78,9 +80,10 @@ int createRepo(char * path){
 
   if (TARPATH[0] == '\0') {
     mkdirNoTar(pathMkdir);
-    chdir(pos);
-    TARPATH = realloc(TARPATH, strlen(posTar) + 1);
-    strcpy(TARPATH, posTar);
+//    chdir(pos);
+ //   TARPATH = realloc(TARPATH, strlen(posTar) + 1);
+  //  strcpy(TARPATH, posTar);
+    restorePosition();
     return 1;
   }
 
@@ -100,9 +103,10 @@ int createRepo(char * path){
   if((n = checkEntete2(tarName, pathWithFolder, &hd)) == 1) {
     return -1;
   }
-  chdir(pos);
-  TARPATH = realloc(TARPATH, strlen(posTar) + 1);
-  strcpy(TARPATH, posTar);
+//  chdir(pos);
+ // TARPATH = realloc(TARPATH, strlen(posTar) + 1);
+  //strcpy(TARPATH, posTar);
+  restorePosition();
 
  return 1;
 }
