@@ -18,8 +18,13 @@ int read_header(int fd, char *path);
 
 int read_header2(int fd, char *path, struct posix_header * newHd);
 
+int read_header(int fd, char *path);
+
 int checkEntete(char * tarName, char * path);
 
 int checkEntete2(char * tarName, char * path, struct posix_header * hd);
 
+int checkEntete3(char * tarName, char * path);
+
+int decalage(int fd, int pos);
 #endif

@@ -91,15 +91,4 @@ int createRepo(char * path){
  return 1;
 }
 
-/* use the exec mkdir */
-/*
-int mkdirNoTar(char * path){
-  char * command[2];
-  command[0] = malloc(strlen("mkdir") + 1);
-  command[1] = malloc(strlen(path) + 1);
-  strcpy(command[0], "mkdir");
-  strcpy(command[1], path);
-  execCommand(command);
-  return 1;
-}
-*/
+

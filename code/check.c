@@ -68,9 +68,15 @@ int read_header3(int fd, char *path) {
   
   if(hd.name[0] == '\0') return -1;
   if(strcmp(hd.name, path) == 0) {
+    int n = lseek(fd, 0, SEEK_CUR); // position actuelle
+    int taille = decalage(fd, n); // trouve le decalage
+    char buf[taille];
+    read(fd, &buf, taille); // lecture du reste du fichier
+    lseek(fd, n - 512, SEEK_SET); // go to initial position minus 512
     found = 1;
+    write(fd, buf, taille); // write over 
 
-
+    return 0;
   }
   sscanf(hd.size, "%o", &filesize);
   return filesize;
@@ -113,7 +119,7 @@ int checkEntete2(char * tarName, char * path, struct posix_header * hd) {
 int checkEntete3(char * tarName, char * path) {
   int fd;
   int filesize = 0;
-  fd = open(tarName, O_RDONLY);
+  fd = open(tarName, O_RDWR);
   while(1) {
     filesize = read_header3(fd, path);
     if (filesize == -1) break;
@@ -127,3 +133,9 @@ int checkEntete3(char * tarName, char * path) {
   return -1;
 }
 
+int decalage(int fd, int pos) {
+  int fin = lseek(fd, 0, SEEK_END);
+  int taille = fin - pos;
+  lseek(fd, pos, SEEK_SET);
+  return taille;
+}

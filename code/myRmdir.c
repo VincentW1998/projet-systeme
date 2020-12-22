@@ -40,7 +40,7 @@ int deleteRepo(char * path) {
 
   char * pathWithFolder = createPath(pathRmdir);
 
-  if((n = checkEntete(tarName, pathWithFolder)) == -1) {
+  if((n = checkEntete3(tarName, pathWithFolder)) == -1) {
     restorePosition();
     return -1;
   }
