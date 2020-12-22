@@ -9,7 +9,7 @@ shell.o : shell.c gestionnaire.h
 
 gestionnaire.o : gestionnaire.c gestionnaire.h myCd.h
 
-myCd.o : myCd.c myCd.h gestionnaire.h check.h
+myCd.o : myCd.c myCd.h gestionnaire.h check.h storeRestore.h
 
 myCat.o : myCat.c myCat.h tar.h storeRestore.h
 
