@@ -23,10 +23,29 @@ int deleteRepo(char * path) {
   char *pathRmdir = subWithRepo(path);
 
   if (TARPATH[0] == '\0') {
-    rmdirNoTar(pathRmdir);
+    commandNoTar("rmdir", pathRmdir);
     restorePosition();
+    return 1;
+  }
+  
+  int fd, n;
+  
+  char * tarName = substringTar();
+
+  fd = open(tarName, O_RDWR);
+  if(fd < 0) {
+    perror("open fichier Tar");
+    return -1;
   }
 
+  char * pathWithFolder = createPath(pathRmdir);
+
+  if((n = checkEntete(tarName, pathWithFolder)) == -1) {
+    restorePosition();
+    return -1;
+  }
+  restorePosition();
+  return 1;
 }
 
 

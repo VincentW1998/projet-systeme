@@ -84,6 +84,7 @@ int createRepo(char * path){
   struct posix_header hd = newHeader(pathWithFolder);
 
   if((n = checkEntete2(tarName, pathWithFolder, &hd)) == 1) {
+    restorePosition();
     return -1;
   }
   restorePosition();

@@ -3,6 +3,7 @@
 #include "myCat.h"
 #include "myMkdir.h"
 #include "myLs.h"
+#include "myRmdir.h"
 
 //#include "tar.h"
 
@@ -193,7 +194,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
 
     case 4 : return mkdirTar(nbOption, command);
 
-//    case 5 : return rmdirTar(nbOption, command);
+    case 5 : return rmdirTar(nbOption, command);
 
   }
   return 0;
