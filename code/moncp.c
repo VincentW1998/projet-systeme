@@ -41,3 +41,30 @@ int cpfichier_intratar(int fichier,char *fic,char *c){
   pwrite(fichier,tnull,1024,decalage);
   return 0;
 }
+
+int cpfichier_intertar(int fichier1, int fichier2, char *fic, char *c){
+  rechercher(fichier1,1,fic);
+  fin(fichier2);
+
+  struct posix_header entete;
+  ssize_t lect = read(fichier1,&entete,512);
+
+  strncpy(entete.name,c,100);
+  set_checksum(&entete);
+
+  write(fichier2,&entete,512);
+
+  char *tampon [512];
+  char *ctaille = entete.size;
+  int taille;
+  int sc = sscanf(ctaille,"%o",&taille);
+  int nb = ((taille+512-1)/512);
+
+  for (int i = 0; i<nb;i++){
+    read(fichier1,&tampon,512);
+    write(fichier2,tampon,512);
+  }
+  char *tnull[1024];
+  memset(tnull,(int)'\0',1024);
+  write(fichier2,tnull,1024);
+}
