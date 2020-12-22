@@ -168,32 +168,35 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
-	int nbCommand = 4;
-	char * commandPerso[nbCommand];
-	int numeroCommand = -1;
-	commandPerso[0] = "exit";
-	commandPerso[1] = "cd";
-	commandPerso[2] = "cat";
-	commandPerso[3] = "ls";
-	
-	for (int i = 0; i < nbCommand; i++) {
-		if(!strcmp(commandPerso[i], command[0]))
-			numeroCommand = i;
-	}
-	switch (numeroCommand) {
-		case -1 : return -1;
-			
-		case 0 : exit(0);
-			
-		case 1 : if(nbOption == 1) return cdNoOptions();
-			return cdPerso(command[1]);
-			
-		case 2 : return cat(nbOption, command);
-			
-		case 3 : return ls(nbOption, command);
-			
-	}
-	return 0;
+  int nbCommand = 5;
+  char * commandPerso[nbCommand];
+  int numeroCommand = -1;
+  commandPerso[0] = "exit";
+  commandPerso[1] = "cd";
+  commandPerso[2] = "cat";
+  commandPerso[3] = "ls";
+  commandPerso[4] = "mkdir";
+  
+  for (int i = 0; i < nbCommand; i++) {
+    if(!strcmp(commandPerso[i], command[0]))
+      numeroCommand = i;
+  }
+  switch (numeroCommand) {
+    case -1 : return -1;
+      
+    case 0 : exit(0);
+      
+    case 1 : if(nbOption == 1) return cdNoOptions();
+           return cdPerso(command[1]);
+      
+    case 2 : return cat(nbOption, command);
+      
+    case 3 : return ls(nbOption, command);
+
+    case 4 : return mkdirTar(nbOption, command);
+
+  }
+  return 0;
 }
 
 int commandTar(int nbOption, char ** command) {
