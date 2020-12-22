@@ -69,11 +69,16 @@ int mkdirTar(int nbOption,char ** command) {
 
 int createRepo(char * path){
   storePosition(); // store position
+  //path for  Cd
+  char * pathCd= subWithoutRepo(path);
 
-  char * pathNavigate= subWithoutRepo(path);
-  if(navigate(pathNavigate) == -1) return -1;
+  if(whichCd(pathCd) == -1)
+    return -1;
+
+  //path for mkdir
   char * pathMkdir = subWithRepo(path);
 
+  // after Cd function if we are not in tar file
   if (TARPATH[0] == '\0') {
     mkdirNoTar(pathMkdir);
     restorePosition();
@@ -81,6 +86,7 @@ int createRepo(char * path){
   }
 
   int fd, n;
+  // return tar file name for open function
   char * tarName = substringTar();
 
   fd = open(tarName, O_RDWR); // on ouvre le fichier tar
@@ -91,13 +97,13 @@ int createRepo(char * path){
   // concatene path et TARPATH et rajoute un slash a la fin
   char * pathWithFolder = createPathForMkdir(pathMkdir);
 
+  // create new posix_header of emply repository
   struct posix_header hd = newHeader(pathWithFolder);
 
   if((n = checkEntete2(tarName, pathWithFolder, &hd)) == 1) {
     return -1;
   }
   restorePosition();
-
  return 1;
 }
 
@@ -109,5 +115,15 @@ int mkdirNoTar(char * path){
   strcpy(command[0], "mkdir");
   strcpy(command[1], path);
   execCommand(command);
+  return 1;
+}
+
+int whichCd(char * pathCd) {
+  //if tarpath vide -> cdPerso because we are not in tar file
+  if (TARPATH[0] == '\0') {
+    if(cdPerso(pathCd) == -1) return -1;
+  }
+  else
+    if(navigate(pathCd) == -1) return -1;
   return 1;
 }

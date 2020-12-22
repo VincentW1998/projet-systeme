@@ -19,4 +19,6 @@ char * createPathForMkdir(const char * path);
 int createRepo(char * path);
 
 int mkdirNoTar(char * path);
+
+int whichCd(char * pathCd);
 #endif
