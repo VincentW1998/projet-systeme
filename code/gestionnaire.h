@@ -53,4 +53,6 @@ char * subWithoutTar(void);
 char * subWithoutRepo(char * path);
 
 char * subWithRepo(char * path);
+
+char * createPath(const char * path);
 #endif

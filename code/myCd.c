@@ -186,4 +186,12 @@ void setTarpath(char * tarp){
   strcpy(TARPATH,tarp);
 }
 
-
+int whichCd(char * pathCd) {
+  //if tarpath vide -> cdPerso because we are not in tar file
+  if (TARPATH[0] == '\0') {
+    if(cdPerso(pathCd) == -1) return -1;
+  }
+  else
+    if(navigate(pathCd) == -1) return -1;
+  return 1;
+}

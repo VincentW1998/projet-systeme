@@ -165,7 +165,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
-  int nbCommand = 5;
+  int nbCommand = 6;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
   commandPerso[0] = "exit";
@@ -173,6 +173,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
   commandPerso[2] = "cat";
   commandPerso[3] = "ls";
   commandPerso[4] = "mkdir";
+  commandPerso[5] = "rmdir";
   
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
@@ -191,6 +192,8 @@ int commandPersonnalisee(int nbOption , char ** command) {
     case 3 : return ls(nbOption, command);
 
     case 4 : return mkdirTar(nbOption, command);
+
+//    case 5 : return rmdirTar(nbOption, command);
 
   }
   return 0;
@@ -336,4 +339,23 @@ char * subWithRepo(char * path) {
       strcat(result, token);
   }
   return result;
+}
+
+
+char * createPath(const char * path) {
+
+  char * suiteName = subWithoutTar();
+
+/* +3 car on rajoute 2 slash et il y a le caractere zero qui termine une
+ * chaine de caracteres. */
+  int length = strlen(suiteName) + strlen(path) + 3;
+  char * pathWithFolder = malloc(length);
+  pathWithFolder[0] = '\0';
+  strncat(pathWithFolder, suiteName, strlen(suiteName));
+  if (suiteName[0] != '\0') {
+    strcat(pathWithFolder, "/");
+  }
+  strncat(pathWithFolder, path, strlen(path));
+  strcat(pathWithFolder, "/");
+  return pathWithFolder;
 }

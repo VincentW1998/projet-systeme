@@ -39,24 +39,6 @@ struct posix_header newHeader(const char * path) {
   return hd;
 }
 
-char * createPathForMkdir(const char * path) {
-
-  char * suiteName = subWithoutTar();
-
-/* +3 car on rajoute 2 slash et il y a le caractere zero qui termine une
- * chaine de caracteres. */
-  int length = strlen(suiteName) + strlen(path) + 3;
-  char * pathWithFolder = malloc(length);
-  pathWithFolder[0] = '\0';
-  strncat(pathWithFolder, suiteName, strlen(suiteName));
-  if (suiteName[0] != '\0') {
-    strcat(pathWithFolder, "/");
-  }
-  strncat(pathWithFolder, path, strlen(path));
-  strcat(pathWithFolder, "/");
-  return pathWithFolder;
-}
-
 int mkdirTar(int nbOption,char ** command) {
 
   for (int i = 1; i < nbOption; i++) {
@@ -95,7 +77,7 @@ int createRepo(char * path){
     return -1;
   }
   // concatene path et TARPATH et rajoute un slash a la fin
-  char * pathWithFolder = createPathForMkdir(pathMkdir);
+  char * pathWithFolder = createPath(pathMkdir);
 
   // create new posix_header of emply repository
   struct posix_header hd = newHeader(pathWithFolder);
@@ -118,12 +100,3 @@ int mkdirNoTar(char * path){
   return 1;
 }
 
-int whichCd(char * pathCd) {
-  //if tarpath vide -> cdPerso because we are not in tar file
-  if (TARPATH[0] == '\0') {
-    if(cdPerso(pathCd) == -1) return -1;
-  }
-  else
-    if(navigate(pathCd) == -1) return -1;
-  return 1;
-}

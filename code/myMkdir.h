@@ -14,7 +14,7 @@ struct posix_header newHeader(const char * path);
 
 int mkdirTar(int nbOption, char **path);
 
-char * createPathForMkdir(const char * path);
+//char * createPathForMkdir(const char * path);
 
 int createRepo(char * path);
 
