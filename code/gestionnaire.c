@@ -359,3 +359,13 @@ char * createPath(const char * path) {
   strcat(pathWithFolder, "/");
   return pathWithFolder;
 }
+
+int commandNoTar(char * cmd, char * path) {
+  char * command[2];
+  command[0] = malloc(strlen(cmd) + 1);
+  command[1] = malloc(strlen(path) + 1);
+  strcpy(command[0], cmd);
+  strcpy(command[1], path);
+  execCommand(command);
+  return 1;
+}

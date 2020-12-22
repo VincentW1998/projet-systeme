@@ -62,7 +62,8 @@ int createRepo(char * path){
 
   // after Cd function if we are not in tar file
   if (TARPATH[0] == '\0') {
-    mkdirNoTar(pathMkdir);
+    //mkdirNoTar(pathMkdir);
+    commandNoTar("mkdir", pathMkdir);
     restorePosition();
     return 1;
   }
@@ -90,6 +91,7 @@ int createRepo(char * path){
 }
 
 /* use the exec mkdir */
+/*
 int mkdirNoTar(char * path){
   char * command[2];
   command[0] = malloc(strlen("mkdir") + 1);
@@ -99,4 +101,4 @@ int mkdirNoTar(char * path){
   execCommand(command);
   return 1;
 }
-
+*/

@@ -55,4 +55,6 @@ char * subWithoutRepo(char * path);
 char * subWithRepo(char * path);
 
 char * createPath(const char * path);
+
+int commandNoTar(char * cmd, char * path);
 #endif
