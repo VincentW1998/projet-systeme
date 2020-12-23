@@ -305,6 +305,17 @@ char * getPathBeforeTar(char * path){ // return the path before TARPATH
 	return beforeTar;
 }
 
+char * getLastToken(char * path){ // return lastToken in path
+	char * lastToken = malloc(1), * token;
+	char * tmp = malloc( strlen(path) + 1); // copy of the path
+	strcpy(tmp, path);
+	while((token = strtok_r(tmp, "/",&tmp) )!= NULL){ //retrieve the next token that contains /
+		lastToken = realloc(lastToken,strlen(token) + 1);
+		strcpy(lastToken, token);
+	}
+	return lastToken;
+}
+
 /* return the tar repository from TARPATH */
 char * substringTar() {
   char *tmp = malloc(strlen(TARPATH) + 1);
