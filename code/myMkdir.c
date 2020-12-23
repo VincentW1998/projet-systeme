@@ -79,11 +79,10 @@ int createRepo(char * path){
   // concatene path et TARPATH et rajoute un slash a la fin
   char * pathWithFolder = createPath(pathMkdir);
 
-  // create new posix_header of emply repository
-//  struct posix_header  hd = newHeader(pathWithFolder);
+  // create new posix_header of emply repository and put in global variable
   newHd = newHeader(pathWithFolder);
 
-  if((n = checkEntete2(tarName, pathWithFolder)) == 1) {
+  if((n = checkEntete(tarName, pathWithFolder)) == 1) {
     restorePosition();
     return -1;
   }

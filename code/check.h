@@ -17,18 +17,12 @@ char buf[512];
 void next_header(int fd, unsigned int filesize);
 
 int read_header(int fd, char *path);
-int read_header2(int fd, char *path);
-
-//int read_header2(int fd, char *path, struct posix_header * newH);
-
-int read_header(int fd, char *path);
 
 int checkEntete(char * tarName, char * path);
-int checkEntete2(char * tarName, char * path);
-
-//int checkEntete2(char * tarName, char * path, struct posix_header * hd2);
 
 int checkEntete3(char * tarName, char * path);
 
 int decalage(int fd, int pos);
+
+int hasPosixHeader(int fd);
 #endif

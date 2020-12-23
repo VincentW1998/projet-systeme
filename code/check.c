@@ -28,13 +28,7 @@ int read_header(int fd, char *path) {
   found = 0;
   
   if(hd.name[0] == '\0') {
-    if(newHd.name != NULL) {
-      lseek(fd, -512, SEEK_CUR);
-      char blockEnd[BLOCKSIZE];
-      memset(blockEnd, '\0', BLOCKSIZE);
-      write(fd, &newHd, BLOCKSIZE);
-      write(fd, blockEnd, BLOCKSIZE);
-    }
+    hasPosixHeader(fd);
     return -1;
   }
   if(strcmp(hd.name, path) == 0) found = 1;
@@ -42,54 +36,6 @@ int read_header(int fd, char *path) {
   return filesize;
 }
 
-int read_header2(int fd, char *path) {
-  struct posix_header hd;
-  unsigned int filesize = 0;
-  size_t nb = read(fd, &hd, BLOCKSIZE);
-  if(nb == -1) {
-    perror("read");
-    return -1;
-  }
-  found = 0;
-  
-  if(hd.name[0] == '\0') {
-    lseek(fd, -512, SEEK_CUR);
-    char blockEnd[BLOCKSIZE];
-    memset(blockEnd, '\0', BLOCKSIZE);
-    write(fd, &newHd, BLOCKSIZE);
-    write(fd, blockEnd, BLOCKSIZE);
-    
-    return -1;
-  }
-  if(strcmp(hd.name, path) == 0) found = 1;
-  sscanf(hd.size, "%o", &filesize);
-  return filesize;
-}
-
-// read header pour mkdir
-/*int read_header2(int fd, char *path, struct posix_header * newH) {
-  struct posix_header hd;
-  unsigned int filesize = 0;
-  size_t nb = read(fd, &hd, BLOCKSIZE);
-  if(nb == -1) {
-    perror("read");
-    return -1;
-  }
-  found = 0;
-  
-  if(hd.name[0] == '\0') {
-    lseek(fd, -512, SEEK_CUR);
-    char blockEnd[BLOCKSIZE];
-    memset(blockEnd, '\0', BLOCKSIZE);
-    write(fd, &newHd, BLOCKSIZE);
-    write(fd, blockEnd, BLOCKSIZE);
-    
-    return -1;
-  }
-  if(strcmp(hd.name, path) == 0) found = 1;
-  sscanf(hd.size, "%o", &filesize);
-  return filesize;
-}*/
 
 // read header pour rmdir
 int read_header3(int fd, char *path) {
@@ -121,7 +67,7 @@ int read_header3(int fd, char *path) {
 int checkEntete(char * tarName, char * path) {
   int fd;
   int filesize = 0;
-  fd = open(tarName, O_RDONLY);
+  fd = open(tarName, O_RDWR);
   while(1) {
     filesize = read_header(fd, path);
     if (filesize == -1) break;
@@ -134,41 +80,6 @@ int checkEntete(char * tarName, char * path) {
   close (fd);
   return -1;
 }
-
-int checkEntete2(char * tarName, char * path) {
-  int fd;
-  int filesize = 0;
-  fd = open(tarName, O_RDWR);
-  while(1) {
-    filesize = read_header2(fd, path);
-    if (filesize == -1) break;
-    if (found) {
-      close(fd);
-      return 1;
-    }
-    next_header(fd, filesize);
-  }
-  close (fd);
-  return -1;
-}
-
-// check pour mkdir
-/*int checkEntete2(char * tarName, char * path, struct posix_header * hd2) {
-  int fd;
-  int filesize = 0;
-  fd = open(tarName, O_RDWR);
-  while(1) {
-    filesize = read_header2(fd, path, hd2);
-    if (filesize == -1) break;
-    if (found) {
-      close(fd);
-      return 1;
-    }
-    next_header(fd, filesize);
-  }
-  close (fd);
-  return -1;
-}*/
 
 // check pour rmdir
 int checkEntete3(char * tarName, char * path) {
@@ -193,4 +104,17 @@ int decalage(int fd, int pos) {
   int taille = fin - pos;
   lseek(fd, pos, SEEK_SET);
   return taille;
+}
+
+// check if we have a posixHeader created by mkdir command
+int hasPosixHeader(int fd){
+  if(newHd.name[0] != '\0') {
+    lseek(fd, -512, SEEK_CUR);
+    char blockEnd[BLOCKSIZE];
+    memset(blockEnd, '\0', BLOCKSIZE);
+    write(fd, &newHd, BLOCKSIZE);
+    write(fd, blockEnd, BLOCKSIZE);
+    return 1;
+  }
+  return -1;
 }
