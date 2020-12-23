@@ -30,14 +30,14 @@ int copier(char *a, char *b, int pos){
   return pos+i;
 }
 
-int cleartab(int pos, char *b){
-  int i = 0;
-  while(i<strlen(b)){
-    b[pos+i]='\0';
-    i++;
-  }
-  return 1;
-}
+/*int cleartab(int pos, char *b){
+ * int i = 1;
+ *while(pos+i<strlen(b)){
+ *  b[pos+i]='\0';
+ *  i++;
+ *}
+ *return 1;
+}*/
   
 
 int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
@@ -76,6 +76,11 @@ int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
     copier(r,b,pos1);
     
     int ft=open(b,O_CREAT|O_RDWR|S_IRWXU);
+
+    if(ft<=0){
+      perror("Ouverture f : ");
+      return -1;
+    }
     
     char tampon[512];
     debut(fichier);
@@ -100,7 +105,7 @@ int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
     return ft;
     //return 1;
   }
-  else return -1;
+  else return fichier;
 }
 
 int rm_r_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
@@ -169,10 +174,10 @@ int rm_r_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
      return (ft);
      //return 1;
    }
-   else return 0;
+   else return fichier;
 }
 
-void main(){
+/**void main(){
   int f = open("t.tar",O_RDWR);
   
   if(f<=0){
@@ -183,4 +188,4 @@ void main(){
   //rm_r_tar(f,"./","./t.tar","a/");
   //rmfichier_tar(f,"./","./t.tar","a/c");
   close(f);
-}
+  }**/
