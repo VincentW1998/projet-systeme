@@ -9,6 +9,9 @@
 #include <pwd.h>
 #include <fcntl.h>
 #include "tar.h"
+
+struct posix_header newHd;
+int rmdirOn; // if we are using rmdir command -> 1 else 0
 int found;
 char buf[512];
 
@@ -16,10 +19,11 @@ void next_header(int fd, unsigned int filesize);
 
 int read_header(int fd, char *path);
 
-int read_header2(int fd, char *path, struct posix_header * newHd);
-
 int checkEntete(char * tarName, char * path);
 
-int checkEntete2(char * tarName, char * path, struct posix_header * hd);
+int decalage(int fd, int pos);
 
+int hasPosixHeader(int fd);
+
+int hasRmdirOn(int fd);
 #endif
