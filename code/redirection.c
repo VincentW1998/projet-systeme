@@ -1,5 +1,30 @@
 #include "redirection.h"
+#include "gestionnaire.h"
+#include "storeRestore.h"
+#include "myCd.h"
+
+/* check if the path(last token) is a directory
+ should be used with cd to get to path without last token */
+int isDirectory(char * lastToken){
+	struct stat st;
+	if(TARPATH[0] == '\0' )//check if stat has worked and if the file is a directory
+		return (stat(lastToken, &st) != -1) && (S_ISDIR(st.st_mode));
+	else return lastToken[strlen(lastToken)-1] == '/';
+}
 
 int redirection(char * path){
+	storePosition();
+	filePipe[0] = 1;
+	char * lastToken = getLastToken(path);
+	if(*TARPATH == '\0') // move to path before last token
+		cdPerso(pathWithoutLastToken(path,lastToken)); //suposed to exit if directory does not exist
+	else navigate(pathWithoutLastToken(path,lastToken));
+	//a decommenter
+	//	if(whichCd(pathWithoutLastToken(path,lastToken)) == -1) return -1;
+	if(isDirectory(lastToken) == 1) {//check if lastToken is a directory
+		restorePosition();
+		return -1;
+	}
+
 	return 0;
 }
