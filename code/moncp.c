@@ -61,15 +61,20 @@ int cpfichier_intertar
   fichier2 = clear(fichier2,dossierarchive, cheminarchive,dest);
   //clear va supprimer le fichier qui va être écrasé.
   fin(fichier2);
-
+  
   struct posix_header entete;
   ssize_t lect = read(fichier1,&entete,512);
-
-  strncpy(entete.name,dest,100);
-  set_checksum(&entete);
-
+  
   write(fichier2,&entete,512);
-
+  if(check_checksum(&entete)==0){
+    printf("Test");
+  }
+  lseek(fichier2,-512,SEEK_CUR);
+  printf("Nom : %s\n", dest);
+  check_checksum(&entete);
+  // Problème ici, le checksum se forme mal pour une raison inconnue.
+  
+  lseek(fichier2,512,SEEK_CUR);
   char *tampon [512];
   char *ctaille = entete.size;
   int taille;
@@ -77,12 +82,14 @@ int cpfichier_intertar
   int nb = ((taille+512-1)/512);
 
   for (int i = 0; i<nb;i++){
-    read(fichier1,&tampon,512);
+    read(fichier1,tampon,512);
+    printf("TAMPON CONTENU %s\n",tampon);
     write(fichier2,tampon,512);
   }
   char *tnull[1024];
   memset(tnull,(int)'\0',1024);
   write(fichier2,tnull,1024);
+  fin(fichier2);
   return fichier2;
 }
 
@@ -95,37 +102,40 @@ int cp_r_intertar(int fichier1, int fichier2, char *dosarc2, char *arc2, char *f
     int taille;
     int sc = sscanf(ctaille,"%o",&taille);
     int nb = ((taille+512-1)/512);
-    char tab[500];
+    char tab[100];
     
     int i=0;
-    while(i<500 && i<strlen(c) && c[i]!='\0'){
+    while(i<100 && i<strlen(c)){
       tab[i]=c[i];
       i++;
     }
     int j=i;
     int k;
-
+    debut(fichier1);
+    debut(fichier2);
     while(read(fichier1,&entete,512)>0){
       ctaille = entete.size;
       taille;
       sc = sscanf(ctaille,"%o",&taille);
       nb = ((taille+512-1)/512);
 
-      if(strncmp(entete.name,fic,chm)!=0)
+      if(strncmp(entete.name,fic,chm)!=0){
 	lseek(fichier1,nb*512,SEEK_CUR);
+      }
       else {
 	k=0;
-	while((k+j)<500 && k<strlen(entete.name)){
+	while((k+j)<100 && k<strlen(entete.name)){
 	  tab[k+j]=entete.name[k];
 	  k++;
 	}
 	int parcours = lseek(fichier1,0,SEEK_CUR);
+	printf("PARCOURS : %d\n",parcours);
 	fichier2 = cpfichier_intertar(fichier1, fichier2, dosarc2, arc2,entete.name, tab);
-	lseek(fichier1,parcours,SEEK_SET);
+	lseek(fichier1,parcours,SEEK_SET);   
 	lseek(fichier1,nb*512,SEEK_CUR);
-	memset(tab,'\0',500);
+	memset(tab,'\0',100);
 	i=0;
-	while(i<500 && i<strlen(c)){
+	while(i<100 && i<strlen(c)){
 	  tab[i]=c[i];
 	  i++;
 	}
@@ -150,7 +160,6 @@ int main(){
   if (g<=0){
     perror("( g )");
   }
-  
   
   cp_r_intertar(g,f,"./","./b.tar","b/","a/");
 }
