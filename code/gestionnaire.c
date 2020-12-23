@@ -316,6 +316,14 @@ char * getLastToken(char * path){ // return lastToken in path
 	return lastToken;
 }
 
+//return the path without the last Token
+char * pathWithoutLastToken(char * path, char * lastToken){
+	// copy path - size of the last token
+	char * deplacement = malloc(strlen(path) - strlen(lastToken) + 1);
+	strncpy(deplacement, path, strlen(path) - strlen(lastToken));
+	return deplacement;
+}
+
 /* return the tar repository from TARPATH */
 char * substringTar() {
   char *tmp = malloc(strlen(TARPATH) + 1);

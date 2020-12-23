@@ -52,6 +52,8 @@ char * getPathBeforeTar(char * path);
 
 char * getLastToken(char * path);
 
+char * pathWithoutLastToken(char * path, char * lastToken);
+
 char * substringTar(void);
 
 char * subWithoutTar(void);
