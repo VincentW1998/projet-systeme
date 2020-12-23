@@ -40,22 +40,24 @@ struct posix_header newHeader(const char * path) {
 }
 
 int mkdirTar(int nbOption,char ** command) {
+  storePosition();
 
   for (int i = 1; i < nbOption; i++) {
-    if(createRepo(command[i]) == -1)
-      return -1;
+    if(createRepo(command[i]) == -1) {
+      write(2,"erreur : mkdir\n",strlen("erreur : mkdir\n"));
+    }
+    restorePosition();
+      //return -1;
   }
-
- return 1;
-}
+ return 1;}
 
 int createRepo(char * path){
-  storePosition(); // store position
+  //storePosition(); // store position
   //path for  Cd
   char * pathCd= subWithoutRepo(path);
 
   if(whichCd(pathCd) == -1) {
-    restorePosition();
+    //restorePosition();
     return -1;
   }
 
@@ -65,7 +67,7 @@ int createRepo(char * path){
   // after Cd function if we are not in tar file
   if (TARPATH[0] == '\0') {
     commandNoTar("mkdir", pathMkdir);
-    restorePosition();
+    //restorePosition();
     return 1;
   }
 
@@ -75,7 +77,7 @@ int createRepo(char * path){
 
   fd = open(tarName, O_RDWR); // on ouvre le fichier tar
   if (fd < 0){
-    restorePosition();
+    //restorePosition();
     perror("open fichier Tar");
     return -1;
   }
@@ -86,10 +88,10 @@ int createRepo(char * path){
   newHd = newHeader(pathWithFolder);
 
   if((n = checkEntete(tarName, pathWithFolder)) == 1) {
-    restorePosition();
+    //restorePosition();
     return -1;
   }
-  restorePosition();
+  //restorePosition();
  return 1;
 }
 

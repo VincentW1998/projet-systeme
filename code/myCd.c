@@ -143,9 +143,9 @@ int cdAbs(char * path){
     if(estTar(token)==0){
       if(n == 0)cdNoOptions();
       else{
-        tmp = NULL;
         tmp = malloc( n + 1);
         strncpy(tmp, path, n);
+        tmp[n] = '\0';
         if(chdir(tmp) == -1){
           return -1;
         }
