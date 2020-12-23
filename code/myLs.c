@@ -26,6 +26,12 @@ int lsRep(char * path, int withL){
 		return -1;
 	}
 	// fin deplacement
+	//a decommenter
+	//	if(whichCd(path) == -1) return -1;
+	//	if(TARPATH[0] == '\0'){
+	//		if(withL) return commandNoTar("ls","-l");
+	//		commandNoTar("ls","");
+	//	}
 	
 	if(*TARPATH == '\0') simpleLs(withL);
 	else printOccurences(withL);
