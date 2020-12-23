@@ -62,7 +62,6 @@ int createRepo(char * path){
 
   // after Cd function if we are not in tar file
   if (TARPATH[0] == '\0') {
-    //mkdirNoTar(pathMkdir);
     commandNoTar("mkdir", pathMkdir);
     restorePosition();
     return 1;
@@ -81,9 +80,10 @@ int createRepo(char * path){
   char * pathWithFolder = createPath(pathMkdir);
 
   // create new posix_header of emply repository
-  struct posix_header hd = newHeader(pathWithFolder);
+//  struct posix_header  hd = newHeader(pathWithFolder);
+  newHd = newHeader(pathWithFolder);
 
-  if((n = checkEntete2(tarName, pathWithFolder, &hd)) == 1) {
+  if((n = checkEntete2(tarName, pathWithFolder)) == 1) {
     restorePosition();
     return -1;
   }

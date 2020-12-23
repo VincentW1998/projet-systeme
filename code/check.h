@@ -9,20 +9,24 @@
 #include <pwd.h>
 #include <fcntl.h>
 #include "tar.h"
+
+struct posix_header newHd;
 int found;
 char buf[512];
 
 void next_header(int fd, unsigned int filesize);
 
 int read_header(int fd, char *path);
+int read_header2(int fd, char *path);
 
-int read_header2(int fd, char *path, struct posix_header * newHd);
+//int read_header2(int fd, char *path, struct posix_header * newH);
 
 int read_header(int fd, char *path);
 
 int checkEntete(char * tarName, char * path);
+int checkEntete2(char * tarName, char * path);
 
-int checkEntete2(char * tarName, char * path, struct posix_header * hd);
+//int checkEntete2(char * tarName, char * path, struct posix_header * hd2);
 
 int checkEntete3(char * tarName, char * path);
 

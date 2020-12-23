@@ -1,11 +1,11 @@
 #include "tar.h"
 #include "check.h"
 
-
+struct posix_header newHd;
 int found;
 char buf[BLOCKSIZE];
 
-
+// saut vers le prochain header
 void next_header(int fd, unsigned int filesize) {
   unsigned int nblocks = (filesize + BLOCKSIZE - 1) >> BLOCKBITS;
   for(int i = 0; i < nblocks; i++) {
@@ -16,6 +16,7 @@ void next_header(int fd, unsigned int filesize) {
   }
 }
 
+// read header pour cd
 int read_header(int fd, char *path) {
   struct posix_header hd;
   unsigned int filesize = 0;
@@ -26,13 +27,22 @@ int read_header(int fd, char *path) {
   }
   found = 0;
   
-  if(hd.name[0] == '\0') return -1;
+  if(hd.name[0] == '\0') {
+    if(newHd.name != NULL) {
+      lseek(fd, -512, SEEK_CUR);
+      char blockEnd[BLOCKSIZE];
+      memset(blockEnd, '\0', BLOCKSIZE);
+      write(fd, &newHd, BLOCKSIZE);
+      write(fd, blockEnd, BLOCKSIZE);
+    }
+    return -1;
+  }
   if(strcmp(hd.name, path) == 0) found = 1;
   sscanf(hd.size, "%o", &filesize);
   return filesize;
 }
 
-int read_header2(int fd, char *path, struct posix_header * newHd) {
+int read_header2(int fd, char *path) {
   struct posix_header hd;
   unsigned int filesize = 0;
   size_t nb = read(fd, &hd, BLOCKSIZE);
@@ -46,7 +56,7 @@ int read_header2(int fd, char *path, struct posix_header * newHd) {
     lseek(fd, -512, SEEK_CUR);
     char blockEnd[BLOCKSIZE];
     memset(blockEnd, '\0', BLOCKSIZE);
-    write(fd, newHd, BLOCKSIZE);
+    write(fd, &newHd, BLOCKSIZE);
     write(fd, blockEnd, BLOCKSIZE);
     
     return -1;
@@ -56,6 +66,32 @@ int read_header2(int fd, char *path, struct posix_header * newHd) {
   return filesize;
 }
 
+// read header pour mkdir
+/*int read_header2(int fd, char *path, struct posix_header * newH) {
+  struct posix_header hd;
+  unsigned int filesize = 0;
+  size_t nb = read(fd, &hd, BLOCKSIZE);
+  if(nb == -1) {
+    perror("read");
+    return -1;
+  }
+  found = 0;
+  
+  if(hd.name[0] == '\0') {
+    lseek(fd, -512, SEEK_CUR);
+    char blockEnd[BLOCKSIZE];
+    memset(blockEnd, '\0', BLOCKSIZE);
+    write(fd, &newHd, BLOCKSIZE);
+    write(fd, blockEnd, BLOCKSIZE);
+    
+    return -1;
+  }
+  if(strcmp(hd.name, path) == 0) found = 1;
+  sscanf(hd.size, "%o", &filesize);
+  return filesize;
+}*/
+
+// read header pour rmdir
 int read_header3(int fd, char *path) {
   struct posix_header hd;
   unsigned int filesize = 0;
@@ -81,7 +117,7 @@ int read_header3(int fd, char *path) {
   sscanf(hd.size, "%o", &filesize);
   return filesize;
 }
-
+// check pour cd
 int checkEntete(char * tarName, char * path) {
   int fd;
   int filesize = 0;
@@ -99,12 +135,12 @@ int checkEntete(char * tarName, char * path) {
   return -1;
 }
 
-int checkEntete2(char * tarName, char * path, struct posix_header * hd) {
+int checkEntete2(char * tarName, char * path) {
   int fd;
   int filesize = 0;
   fd = open(tarName, O_RDWR);
   while(1) {
-    filesize = read_header2(fd, path, hd);
+    filesize = read_header2(fd, path);
     if (filesize == -1) break;
     if (found) {
       close(fd);
@@ -116,6 +152,25 @@ int checkEntete2(char * tarName, char * path, struct posix_header * hd) {
   return -1;
 }
 
+// check pour mkdir
+/*int checkEntete2(char * tarName, char * path, struct posix_header * hd2) {
+  int fd;
+  int filesize = 0;
+  fd = open(tarName, O_RDWR);
+  while(1) {
+    filesize = read_header2(fd, path, hd2);
+    if (filesize == -1) break;
+    if (found) {
+      close(fd);
+      return 1;
+    }
+    next_header(fd, filesize);
+  }
+  close (fd);
+  return -1;
+}*/
+
+// check pour rmdir
 int checkEntete3(char * tarName, char * path) {
   int fd;
   int filesize = 0;
