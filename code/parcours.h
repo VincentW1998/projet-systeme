@@ -20,14 +20,16 @@ int suivant(int fichier){
   if(lect==0) return -1;
   
   if(lect<0){
-    perror("Echec de la lecture");
+    perror("Echec de la lecture dans suivant ");
     return -1;
   }
 
   if(entete.name[0]=='\0'){
+    //printf("cas ?\n");
     lseek(fichier,-512,SEEK_CUR);
     return 2;
   }
+  
   char *ctaille = entete.size;
   int taille;
   int sc = sscanf(ctaille,"%o",&taille);
@@ -38,14 +40,25 @@ int suivant(int fichier){
 }
 
 static int recherche(int fichier, int option, char *nom){
+  //printf("Looping\n");
   struct posix_header entete;
   ssize_t lect = read(fichier,&entete,512);
-
+  
   if(lect==0) return -1;
   
   if(lect<0){
-    perror("Echec de la lecture");
+    perror("Echec de la lecture dans recherche");
     return -1;
+  }
+
+  if(entete.name[0]=='\0'){
+    //printf("Je suis à la fin !!!");
+    return -1;
+  }
+  
+  if(check_checksum(&entete)==0){
+    printf("entete.name : %s\n",entete.name); 
+    perror("Mauvaise entête. Je suis bloqué dans recherche !\n");
   }
 
   if(strcmp(entete.name,nom)==0){
@@ -55,9 +68,16 @@ static int recherche(int fichier, int option, char *nom){
   }
 
   lseek(fichier,-512,SEEK_CUR);
-  if (suivant(fichier)==0)
-    return recherche(fichier,option,nom);
-  else return -1;
+
+  switch(suivant(fichier)){
+  case 2:
+    printf("over\n");
+    return -1
+  case 0:
+      return recherche(fichier,option,nom);
+  default :
+    return -1;
+  }
 }
 
 int rechercher (int fichier, int option, char *nom){
