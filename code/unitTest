@@ -14,4 +14,4 @@ cd ..
 make cleanall
 make shell
 ./shell
-# rm -rdf Test
+rm -rdf Test

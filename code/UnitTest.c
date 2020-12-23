@@ -1,15 +1,10 @@
-//
-//  UnitTest.c
-//  shell
-//
-//  Created by Félix Ngo on 22/12/2020.
-//
 
 #include "UnitTest.h"
 #include "gestionnaire.h"
 #include "storeRestore.h"
 #include "myCd.h"
 #define absPath "/home/projet/Test"
+
 void TCd1(){ //goes to Lvl1-B
 	storePosition();
 	printf(KBLU"TCd1 -> goes to Test/lvl1-B"RESET "\n");
@@ -18,7 +13,7 @@ void TCd1(){ //goes to Lvl1-B
 	restorePosition();
 }
 
-void TCd2(){ // goest to Lvl1-b with absolute path
+void TCd2(){ // goes to Lvl1-b with absolute path
 	storePosition();
 	printf(KBLU"TCd2 -> goes to %s/lvl1-B"RESET "\n",absPath);
 	cdPerso("/home/projet/Test/lvl1-B");
