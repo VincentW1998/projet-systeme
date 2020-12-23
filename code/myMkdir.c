@@ -54,8 +54,10 @@ int createRepo(char * path){
   //path for  Cd
   char * pathCd= subWithoutRepo(path);
 
-  if(whichCd(pathCd) == -1)
+  if(whichCd(pathCd) == -1) {
+    restorePosition();
     return -1;
+  }
 
   //path for mkdir
   char * pathMkdir = subWithRepo(path);
@@ -73,6 +75,7 @@ int createRepo(char * path){
 
   fd = open(tarName, O_RDWR); // on ouvre le fichier tar
   if (fd < 0){
+    restorePosition();
     perror("open fichier Tar");
     return -1;
   }
