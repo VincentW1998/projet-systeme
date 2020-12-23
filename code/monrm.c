@@ -23,12 +23,22 @@ int contient(char *dossier,char *nom){
 int copier(char *a, char *b, int pos){
   //copie a dans b à la position pos
   int i=0;
-  while(b[pos+i]=='\0' && a[i] != '\0'){
+  while(b[pos+i]=='\0' && a[i] != '\0' && pos+i < strlen(b) && i < strlen(a)){
     b[pos+i]=a[i];
     i++;
   }
-  return i;
+  return pos+i;
 }
+
+int cleartab(int pos, char *b){
+  int i = 0;
+  while(i<strlen(b)){
+    b[pos+i]='\0';
+    i++;
+  }
+  return 1;
+}
+  
 
 int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
   if(rechercher(fichier,1,c)==1){
@@ -86,8 +96,9 @@ int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
     close(fichier);
     unlink(cheminarchive);
     rename(b,cheminarchive);
-    close(ft);
-    return 1;
+    //close ft;
+    return ft;
+    //return 1;
   }
   else return -1;
 }
@@ -149,13 +160,14 @@ int rm_r_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
 	 }
        }
      }
-     printf("Je suis à la fin\n");
+     //printf("Je suis à la fin\n");
 
      close(fichier);
      unlink(cheminarchive);
      rename(b,cheminarchive);
-     close(ft);
-     return 1;
+     //close (ft)
+     return (ft);
+     //return 1;
    }
    else return 0;
 }
