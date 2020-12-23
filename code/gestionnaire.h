@@ -44,7 +44,7 @@ int existTar(char * token);
 
 int hasTar(char * pathError);
 
-void * findTar(char * path);
+char * findTar(char * path);
 
 char * pathFromTar(char * path);
 

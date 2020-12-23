@@ -275,15 +275,15 @@ int hasTar(char * path){
   return -1;
 }
 
-//void * findTar(char * path){
-//  char * tmp = malloc(strlen(path)+1);
-//  memcpy(tmp,path,strlen(path));
-//  char * token;
-//  while((token = strtok_r(tmp, "/\n", &tmp)) != NULL)
-//    if(!estTar(token)) return token;
-//  return NULL;
-//}
-
+char * findTar(char * path){ // return the .tar filename
+	if(hasTar(path) == -1) return NULL;
+	char * tarp = pathFromTar(path);
+	char * tmp = malloc(strlen(tarp) + 1);
+	strcpy(tmp,tarp);
+	char * tar;
+	tar = strtok_r(tmp,"/",&tmp);
+	return tar;
+}
 char * pathFromTar(char * path){ // return the path from the .tar
 	if(hasTar(path) == -1) return NULL;
 	char * tmp = malloc(strlen(path) + 1), *token;
