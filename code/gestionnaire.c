@@ -275,13 +275,26 @@ int hasTar(char * path){
   return -1;
 }
 
-void * findTar(char * path){
-  char * tmp = malloc(strlen(path)+1);
-  memcpy(tmp,path,strlen(path));
-  char * token;
-  while((token = strtok_r(tmp, "/\n", &tmp)) != NULL)
-    if(!estTar(token)) return token;
-  return NULL;
+//void * findTar(char * path){
+//  char * tmp = malloc(strlen(path)+1);
+//  memcpy(tmp,path,strlen(path));
+//  char * token;
+//  while((token = strtok_r(tmp, "/\n", &tmp)) != NULL)
+//    if(!estTar(token)) return token;
+//  return NULL;
+//}
+
+char * pathFromTar(char * path){ // return the path from the .tar
+	if(hasTar(path) == -1) return NULL;
+	char * tmp = malloc(strlen(path) + 1), *token;
+	strcpy(tmp,path);
+	size_t l = 0;
+	if(path[0] == '/') l++;
+	while((token = strtok_r(tmp, "/", &tmp)) != NULL){
+		if(estTar(token) == 1) return path+l;
+		l += 1 + strlen(token);
+	}
+	return NULL;
 }
 
 /* return the tar repository from TARPATH */

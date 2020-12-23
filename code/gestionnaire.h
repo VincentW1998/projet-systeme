@@ -46,6 +46,8 @@ int hasTar(char * pathError);
 
 void * findTar(char * path);
 
+char * pathFromTar(char * path);
+
 char * substringTar(void);
 
 char * subWithoutTar(void);
