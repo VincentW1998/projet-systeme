@@ -7,13 +7,8 @@
 #include <string.h>
 #include <grp.h>
 #include <pwd.h>
-//#include <uuid/uuid.h>
+#include <time.h>
 
-int mkdir(const char *path, mode_t mode);
-
-int rmdir(const char *path);
-
-int my_mkdir(const char *path);
 
 struct posix_header newHeader(const char * path);
 
@@ -22,4 +17,8 @@ int mkdirTar(int nbOption, char **path);
 char * createPathForMkdir(const char * path);
 
 int createRepo(char * path);
+
+int mkdirNoTar(char * path);
+
+int whichCd(char * pathCd);
 #endif

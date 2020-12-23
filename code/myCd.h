@@ -15,7 +15,6 @@ int checkfp(char *tar, char *fullpath[50], int i);
 
 void setTarpath(char * tarp);
 
-void goToInitial(void);
 
 int cdAbs(char * path);
 

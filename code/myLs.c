@@ -1,6 +1,8 @@
 #include "myLs.h"
 #include "myCd.h"
 #include "gestionnaire.h"
+#include "check.h"
+#include "storeRestore.h"
 
 // ls sans path en arguments
 int LsWithoutPath(int withL){
@@ -20,25 +22,21 @@ int lsRep(char * path, int withL){
 		}
 	}
 	else if(navigate(path) == -1){
-			perror("bad address");
-			return -1;
+		perror("bad address");
+		return -1;
 	}
 	// fin deplacement
-
+	
 	if(*TARPATH == '\0') simpleLs(withL);
 	else printOccurences(withL);
 	return 0;
 }
-					
+
 void simpleLs(int withL){
 	char * cmd[3] = {"ls"};
 	if(withL == 1)
 		cmd[1] = "-l";
-	if(fork() == 0){
-		execCommand(cmd);
-		exit(1);
-	}
-	wait(NULL);
+	execCommand(cmd);
 	return;
 }
 
@@ -53,6 +51,7 @@ void printOccurences(int withL){ //si withL = 1 on affiche ls -l
 	if((f = open(tar, O_RDONLY)) == -1) perror("open tar:");
 	struct posix_header * p = malloc(sizeof(struct posix_header));
 	while((n = read(f,p,BLOCKSIZE)) > 0){
+		if(p->name[0] == '\0') break;
 		if(strlen(TARPATH) > strlen(tar)){
 			if(validPath(TARPATH + strlen(tar)+1 ,p->name) == 0){
 				if(withL == 1) optionL(p,f);
@@ -65,7 +64,7 @@ void printOccurences(int withL){ //si withL = 1 on affiche ls -l
 			write(1,p->name, strlen(p->name));
 			write(1,"\n",1);
 		}
-		lseek(f,ceil(atoi(p->size)/512.)*BLOCKSIZE,SEEK_CUR);
+		next_header(f, atoi(p->size));
 	}
 	close(f);
 }
@@ -101,7 +100,7 @@ void typeFic(struct posix_header * p){
 	char * typeflag = malloc(2);
 	typeflag[0] = p->typeflag;
 	write(1,type[atoi(typeflag)],1);
-//	free(typeflag);
+	//	free(typeflag);
 }
 
 void rights(struct posix_header * p){
@@ -159,7 +158,7 @@ void usrAndGrp(struct posix_header * p){
 }
 
 void psize(struct posix_header * p){
-//	if(strcmp(p->name,"matin") == 0){ write(1,"\n",1);exit(EXIT_FAILURE);}
+	//	if(strcmp(p->name,"matin") == 0){ write(1,"\n",1);exit(EXIT_FAILURE);}
 	char * str = malloc(12);
 	char * endptr;
 	long size = strtol(p->size,&endptr,10); // equivalent de strtok -> atoi version long
@@ -190,7 +189,7 @@ long octalConverter (char * octal){ // convertit octal vers decimal : Char octal
 	}
 	return decimal;
 }
-		
+
 int countLinks(char * name ,int file){
 	size_t n;
 	int count = 2;
@@ -201,25 +200,23 @@ int countLinks(char * name ,int file){
 }
 
 int ls(int nbOptions, char ** path){
-	char *myPos, *myPosTar;
-	myPos = getcwd(NULL, 0); // je sauvegarde ma position
-	myPosTar = malloc(strlen(TARPATH) + 1);
-	if(*TARPATH == '\0') myPosTar[0] = '\0';
-	
+	storePosition();
 	int i = 1, withL = 0;
 	if(nbOptions < 2) return LsWithoutPath(0);
 	if(strcmp(path[1],"-l") == 0){
 		if(nbOptions == 2) return LsWithoutPath(1);
-	    i = 2;
+		i = 2;
 		withL = 1;
 	}
 	else i=1;
 	for(; i < nbOptions; i++){
-		if(lsRep(path[i],withL) == -1) {perror("no such file or directory"); returnToPos(myPos, myPosTar); return -1;}
-		returnToPos(myPos, myPosTar);
+		if(lsRep(path[i],withL) == -1) {
+			perror("no such file or directory");
+			restorePosition();
+			return -1;
+		}
+		restorePosition();
 	}
-	returnToPos(myPos, myPosTar);
-	free(myPosTar);
 	return 0;
 }
- 
+
