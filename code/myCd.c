@@ -20,7 +20,6 @@ int cdPerso(char * path){
 }
 
 int cd(char * path ){
-  //if(path[0] == '/')return cdAbs(path);
   char * tmp = malloc(strlen(path) + 1), *stdPath, *tbPath, *token;
   strcpy(tmp, path);
   int l = 0;
@@ -134,8 +133,9 @@ int navigate(char * path){
 
 // s'occupe des path commançant par / (path absolu)
 // fait appel a cd dès qu'il trouve un .tar
-int cdAbs(char * path){ // temporary fix
+int cdAbs(char * path){
   storePosition();
+  TARPATH[0] = '\0'; // vide le TARPATH
   char  * tmp = malloc(strlen(path) + 1);
   strcpy(tmp, path);
   char * token;
