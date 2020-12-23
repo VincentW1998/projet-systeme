@@ -39,7 +39,7 @@ int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
 
     if(lect<=0){
       perror("test");
-      return 1;
+      return -1;
     }
     
     char *ctaille = entete.size;
@@ -54,17 +54,16 @@ int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
     char r[250];
     strncpy(r,"temp1",5);
     char b[500];
-    int c[1];
+    int v[1];
     int i = 5;
     while(contient(chemindossier,r)){
-      getrandom(c,1,0);
-      c[0]=(c[0]%10)+48;
-      r[i]=c[0];
+      getrandom(v,1,0);
+      v[0]=(v[0]%10)+48;
+      r[i]=v[0];
       i++;
     }
     int pos1 = copier(chemindossier,b,0);
     copier(r,b,pos1);
-    printf("val b : %s\n",b);
     
     int ft=open(b,O_CREAT|O_RDWR|S_IRWXU);
     
@@ -93,7 +92,73 @@ int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
   else return -1;
 }
 
-int rm_r_tar(int fichier,char *chemindossier,char *cheminarchive,char *c);
+int rm_r_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
+   if(rechercher(fichier,1,c)==1){
+     int chm = strlen(c);
+     debut(fichier);
+     struct posix_header entete;
+     ssize_t lect = read(fichier,&entete,512);
+     
+     if(lect<=0){
+       perror("test");
+       return -1;
+     }
+    
+     char r[250];
+     strncpy(r,"temp1",5);
+     char b[500];
+     int var[1];
+     int i = 5;
+     while(contient(chemindossier,r)){
+       getrandom(var,1,0);
+       var[0]=(var[0]%10)+48;
+       r[i]=var[0];
+       i++;
+     }
+
+     int pos1 = copier(chemindossier,b,0);
+     copier(r,b,pos1);
+     int ft=open(b,O_CREAT|O_RDWR|S_IRWXU);
+     
+     char *ctaille;
+     int taille;
+     int sc;
+     int nb;
+     char *tampon[512];
+     debut(fichier);
+     while(read(fichier,&entete,512)>0){
+       //printf("While ");
+       
+       if(strncmp(entete.name,c,chm)==0){
+	 //printf("supprime\n");
+	 ctaille=entete.size;
+	 sscanf(ctaille,"%o",&taille);
+	 nb = (taille+512-1)/512;
+	 lseek(fichier,nb*512,SEEK_CUR);
+       }
+
+       else {
+	 //printf("ajoute\n");
+	 write(ft,&entete,512);
+	 ctaille=entete.size;
+	 sscanf(ctaille,"%o",&taille);
+	 nb = (taille+512-1)/512;
+	 for (int i =0 ; i < nb; i++){
+	   read(fichier,&tampon,512);
+	   write(ft,tampon,512);
+	 }
+       }
+     }
+     printf("Je suis à la fin\n");
+
+     close(fichier);
+     unlink(cheminarchive);
+     rename(b,cheminarchive);
+     close(ft);
+     return 1;
+   }
+   else return 0;
+}
 
 void main(){
   int f = open("t.tar",O_RDWR);
@@ -102,6 +167,8 @@ void main(){
     perror("Erreur ouverture");
     return;
   }
-  
-  rmfichier_tar(f,"./","./t.tar","a/c");
+
+  //rm_r_tar(f,"./","./t.tar","a/");
+  //rmfichier_tar(f,"./","./t.tar","a/c");
+  close(f);
 }
