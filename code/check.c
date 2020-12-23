@@ -1,10 +1,6 @@
 #include "tar.h"
 #include "check.h"
 
-struct posix_header newHd;
-int found;
-char buf[BLOCKSIZE];
-
 // saut vers le prochain header
 void next_header(int fd, unsigned int filesize) {
   unsigned int nblocks = (filesize + BLOCKSIZE - 1) >> BLOCKBITS;
@@ -16,7 +12,6 @@ void next_header(int fd, unsigned int filesize) {
   }
 }
 
-// read header pour cd
 int read_header(int fd, char *path) {
   struct posix_header hd;
   unsigned int filesize = 0;
@@ -26,44 +21,20 @@ int read_header(int fd, char *path) {
     return -1;
   }
   found = 0;
-  
   if(hd.name[0] == '\0') {
-    hasPosixHeader(fd);
+    hasPosixHeader(fd); // for mkdir
     return -1;
   }
-  if(strcmp(hd.name, path) == 0) found = 1;
-  sscanf(hd.size, "%o", &filesize);
-  return filesize;
-}
-
-
-// read header pour rmdir
-int read_header3(int fd, char *path) {
-  struct posix_header hd;
-  unsigned int filesize = 0;
-  size_t nb = read(fd, &hd, BLOCKSIZE);
-  if(nb == -1) {
-    perror("read");
-    return -1;
-  }
-  found = 0;
-  
-  if(hd.name[0] == '\0') return -1;
   if(strcmp(hd.name, path) == 0) {
-    int n = lseek(fd, 0, SEEK_CUR); // position actuelle
-    int taille = decalage(fd, n); // trouve le decalage
-    char buf[taille];
-    read(fd, &buf, taille); // lecture du reste du fichier
-    lseek(fd, n - 512, SEEK_SET); // go to initial position minus 512
     found = 1;
-    write(fd, buf, taille); // write over 
-
-    return 0;
+    if(rmdirOn)
+      hasRmdirOn(fd); // for rmdir
   }
   sscanf(hd.size, "%o", &filesize);
   return filesize;
 }
-// check pour cd
+
+
 int checkEntete(char * tarName, char * path) {
   int fd;
   int filesize = 0;
@@ -81,23 +52,6 @@ int checkEntete(char * tarName, char * path) {
   return -1;
 }
 
-// check pour rmdir
-int checkEntete3(char * tarName, char * path) {
-  int fd;
-  int filesize = 0;
-  fd = open(tarName, O_RDWR);
-  while(1) {
-    filesize = read_header3(fd, path);
-    if (filesize == -1) break;
-    if (found) {
-      close(fd);
-      return 1;
-    }
-    next_header(fd, filesize);
-  }
-  close (fd);
-  return -1;
-}
 
 int decalage(int fd, int pos) {
   int fin = lseek(fd, 0, SEEK_END);
@@ -117,4 +71,15 @@ int hasPosixHeader(int fd){
     return 1;
   }
   return -1;
+}
+
+int hasRmdirOn(int fd) {
+  int n = lseek(fd, 0, SEEK_CUR); // position actuelle
+  int taille = decalage(fd, n); // trouve le decalage
+  char buf[taille];
+  read(fd, &buf, taille); // lecture du reste du fichier
+  lseek(fd, n - 512, SEEK_SET); // go to initial position minus 512
+  found = 1;
+  write(fd, buf, taille); // write over 
+  return 0;
 }

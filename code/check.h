@@ -11,6 +11,7 @@
 #include "tar.h"
 
 struct posix_header newHd;
+int rmdirOn; // if we are using rmdir command -> 1 else 0
 int found;
 char buf[512];
 
@@ -20,9 +21,9 @@ int read_header(int fd, char *path);
 
 int checkEntete(char * tarName, char * path);
 
-int checkEntete3(char * tarName, char * path);
-
 int decalage(int fd, int pos);
 
 int hasPosixHeader(int fd);
+
+int hasRmdirOn(int fd);
 #endif

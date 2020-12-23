@@ -42,10 +42,14 @@ int deleteRepo(char * path) {
   char * pathWithFolder = createPath(pathRmdir); // tarpath + pathRmdir
 
   // if the path is found in tar file, we delete it
-  if((n = checkEntete3(tarName, pathWithFolder)) == -1) {
+  // else return -1
+  rmdirOn = 1;
+  if((n = checkEntete(tarName, pathWithFolder)) == -1) {
+    rmdirOn = 0;
     restorePosition(); // restore position
     return -1;
   }
+  rmdirOn = 0;
   restorePosition(); // restore position
   return 1;
 }
