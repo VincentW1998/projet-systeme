@@ -48,6 +48,8 @@ void * findTar(char * path);
 
 char * pathFromTar(char * path);
 
+char * getPathBeforeTar(char * path);
+
 char * substringTar(void);
 
 char * subWithoutTar(void);

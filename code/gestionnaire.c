@@ -297,6 +297,14 @@ char * pathFromTar(char * path){ // return the path from the .tar
 	return NULL;
 }
 
+char * getPathBeforeTar(char * path){ // return the path before TARPATH
+	if(hasTar(path) == -1) return NULL;
+	char * fromTar = pathFromTar(path);
+	char * beforeTar = malloc(strlen(path) - strlen(fromTar));
+	strncpy(beforeTar,path,strlen(path) - strlen(fromTar)-1);
+	return beforeTar;
+}
+
 /* return the tar repository from TARPATH */
 char * substringTar() {
   char *tmp = malloc(strlen(TARPATH) + 1);
