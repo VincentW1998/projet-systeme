@@ -12,6 +12,19 @@ int isDirectory(char * lastToken){
 	else return lastToken[strlen(lastToken)-1] == '/';
 }
 
+
+//redirection dup2 si hors du tar
+int redirect(char * lastToken){
+	if((filePipe[1] = open(lastToken, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR)) == -1){
+		perror("redirect");
+		restorePosition();
+		return -1;
+	}
+	dup2(filePipe[0], filePipe[1]);
+	restorePosition();
+	return 1;
+}
+
 int redirection(char * path){
 	storePosition();
 	filePipe[0] = 1;
@@ -25,6 +38,7 @@ int redirection(char * path){
 		restorePosition();
 		return -1;
 	}
+	if(TARPATH[0] == '\0') redirect(lastToken);
 
 	return 0;
 }
