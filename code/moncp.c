@@ -184,7 +184,7 @@ int cp_r_intertar(int fichier1, int fichier2, char *dosarc2, char *arc2, char *f
 
 int cp_r_intratar(int fichier, char *dosarc, char *arc, char *fic, char *c){
   if(fic==c){
-    perror("fichier identique");
+    perror("Copie inutile.");
     return fichier;
   }
   if(rechercher(fichier,0,fic)==1){
@@ -198,7 +198,6 @@ int cp_r_intratar(int fichier, char *dosarc, char *arc, char *fic, char *c){
     int t2;
     debut(fichier);   
     while(lseek(fichier,0,SEEK_CUR)<finfichier){
-      printf("BOUCLE %d < %d!\n",lseek(fichier,0,SEEK_CUR),finfichier);
       memset(&entete,'\0',512);
       read(fichier,&entete,512);
       lseek(fichier,-512,SEEK_CUR);
@@ -274,7 +273,7 @@ int cp_r_intratar(int fichier, char *dosarc, char *arc, char *fic, char *c){
 **/
 
 
-int main(){
+/**int main(){
   int f = open("a.tar",O_RDWR);
   if(f<=0){
     perror("( f )");
@@ -282,3 +281,4 @@ int main(){
   f = cp_r_intratar(f,"./","./a.tar","a/","c/");
   cp_r_intratar(f,"./","./a.tar","c/","a/c/");
 }
+**/
