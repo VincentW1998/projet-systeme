@@ -12,7 +12,23 @@ int isDirectory(char * lastToken){
 	else return lastToken[strlen(lastToken)-1] == '/';
 }
 
+//store Asbolute tarDestination if the redirection happened in a tar
+void storeTarDestination(char * lastToken){
+	char * pwd = getcwd(NULL, 0);
+	tarRedirectedDestination = malloc(strlen(pwd) + strlen(TARPATH) + strlen(lastToken) + 3);
+	strcpy(tarRedirectedDestination, pwd);
+	strcat(tarRedirectedDestination, "/");
+	strcat(tarRedirectedDestination, TARPATH);
+	strcat(tarRedirectedDestination, "/");
+	strcat(tarRedirectedDestination, lastToken);
+}
+
+/*redirection tar : create a file outside tarball to receive the desired output
+ the do mv -> tar
+ */
 int redirectTar(char * lastToken){
+	storeTarDestination(lastToken);
+	redirect("fileToBeDeleted");
 	return 1;
 }
 
