@@ -12,6 +12,16 @@ int isDirectory(char * lastToken){
 	else return lastToken[strlen(lastToken)-1] == '/';
 }
 
+// empty tarRedirectedDestination
+void flush(){
+	fileToBeDeleted = malloc(1);
+	fileToBeDeleted[0] = '\0';
+	tarRedirectedDestination = malloc(1);
+	tarRedirectedDestination[0] = '\0';
+	filePipe[0] = -1;
+	filePipe[1] = -1;
+}
+
 //store Asbolute tarDestination if the redirection happened in a tar
 void storeTarDestination(char * lastToken){
 	char * pwd = getcwd(NULL, 0);
@@ -28,7 +38,10 @@ void storeTarDestination(char * lastToken){
  */
 int redirectTar(char * lastToken){
 	storeTarDestination(lastToken);
-	redirect("fileToBeDeleted");
+	if(redirect("fileToBeDeleted") == -1){
+		flush();
+		return -1;
+	}
 	return 1;
 }
 
@@ -45,6 +58,7 @@ int redirect(char * lastToken){
 }
 
 int redirection(char * path){
+	flush();
 	storePosition();
 	filePipe[0] = 1;
 	char * lastToken = getLastToken(path);
