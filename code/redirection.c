@@ -12,6 +12,9 @@ int isDirectory(char * lastToken){
 	else return lastToken[strlen(lastToken)-1] == '/';
 }
 
+int redirectTar(char * lastToken){
+	return 1;
+}
 
 //redirection dup2 si hors du tar
 int redirect(char * lastToken){

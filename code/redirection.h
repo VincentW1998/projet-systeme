@@ -3,8 +3,12 @@
 
 #include <stdio.h>
 int filePipe [2];
+char * tarRedirectedDestination;
+char * fileToBeDeleted;
 
 int isDirectory(char * lastToken);
+
+int redirectTar(char * lastToken);
 
 int redirect(char * lastToken);
 
