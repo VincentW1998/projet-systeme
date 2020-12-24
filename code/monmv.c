@@ -1,7 +1,12 @@
 #include "moncp.c"
 
+int mv2_intratar(int fichier,char *dosarc, char *arc, char *cible, char *dest){
+  int f = cp_r_intratar(fichier,dosarc,arc,cible,dest);
+  rm_r_tar(f,dosarc,arc,cible);
+}
+
 int mvintratar(int fichier, char *dosarc, char *arc, char *cible, char *dest){
-  int a = cpfichier_intratar(fichier,cible,dest);
+  int a = cpfichier_intratar(fichier,dosarc,arc,cible,dest);
   if(a!=2){
     rmfichier_tar(fichier,dosarc,arc,cible);
   }
