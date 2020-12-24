@@ -72,7 +72,7 @@ static int recherche(int fichier, int option, char *nom){
   switch(suivant(fichier)){
   case 2:
     printf("over\n");
-    return -1
+    return -1;
   case 0:
       return recherche(fichier,option,nom);
   default :
