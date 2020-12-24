@@ -193,6 +193,8 @@ int commandPersonnalisee(int nbOption , char ** command) {
     case 3 : return ls(nbOption, command);
 
     case 4 : return mkdirTar(nbOption, command);
+			
+		case 5 : return Test();
 
     case 5 : return rmdirTar(nbOption, command);
 
