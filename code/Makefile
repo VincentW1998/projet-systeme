@@ -3,11 +3,11 @@ CFLAGS=-Wall -g
 LDLIBS=-lm
 all : shell
 #all : shell mon_cp mon_rm mon_mv
-shell : shell.o gestionnaire.o myCd.o myCat.o myMkdir.o myLs.o check.o tar.o storeRestore.o
+shell : shell.o gestionnaire.o myCd.o myCat.o myMkdir.o myLs.o check.o tar.o storeRestore.o redirection.o
 
 shell.o : shell.c gestionnaire.h
 
-gestionnaire.o : gestionnaire.c gestionnaire.h myCd.h
+gestionnaire.o : gestionnaire.c gestionnaire.h myCd.h redirection.h
 
 myCd.o : myCd.c myCd.h gestionnaire.h check.h storeRestore.h
 
@@ -21,6 +21,7 @@ tar.o : tar.c tar.h
 
 myMkdir.o : myMkdir.c myMkdir.h check.h tar.h myCd.h storeRestore.h
 
+redirection.o : redirection.c redirection.h myCd.h gestionnaire.h storeRestore.h check.h
 
 myLs.o : myLs.c myLs.h tar.h check.h storeRestore.h
 #mon_cp : mon_cp.c

@@ -3,7 +3,7 @@
 #include "myCat.h"
 #include "myMkdir.h"
 #include "myLs.h"
-
+#include "redirection.h"
 //#include "tar.h"
 
 int affichagePrompt() { // affichage du prompt
@@ -124,6 +124,8 @@ int separateurCommand(char * buff, char ** command){
   int nbOption = i;
   command[i] = NULL;
   command[i+1] = NULL;
+	nbOption = nbOptionRedirect(nbOption, command); //redirect
+	printf("nbOption : %d \n", nbOption);
   return nbOption;
 }
 
@@ -160,7 +162,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
     else if(commandPersonnalisee(nbOption, command) == -1) //command perso sans pipe
        execCommand(command); // command sans le pipe
   }
-
+	stopRedirection(); // redirect
   return; // 0 if has no pipe, and 1 if has pipe
 }
 
