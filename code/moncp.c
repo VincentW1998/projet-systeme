@@ -26,12 +26,27 @@ int clear(int fichier, char *dos, char *archive ,char *c){
     
 }
 
-int cpfichier_intratar(int fichier,char *fic,char *c){
-  //Copie à la fin du tar un fichier déjà présent.
+int cpfichier_intratar(int fichier,char *dos, char *arc,char *fic,char *c){
+    //Copie à la fin du tar un fichier déjà présent.
+  
   if(fic==c){
-    perror("Copie inutile.");
-    return 2;
+   perror("Copie inutile.");
+   return 2;
   }
+
+  rechercher(fichier,1,c);
+  int test = fichier;
+  fichier = clear(fichier,dos, arc,c);
+  
+  if(test == fichier){
+    rechercher(fichier,1,c);
+    struct posix_header tete;
+    ssize_t lect = read(fichier,&tete,512);
+    if(tete.typeflag == '5'){
+      return fichier;
+    }
+  }
+     
   fin(fichier);
   off_t decalage = lseek(fichier,0,SEEK_CUR);
   
@@ -62,7 +77,7 @@ int cpfichier_intratar(int fichier,char *fic,char *c){
   //correspond aux deux blocs finaux de taille 512 de l'archive tar.
   memset(tnull,(int)'\0',1024);
   pwrite(fichier,tnull,1024,decalage);
-  return 0;
+  return fichier;
 }
 
 
@@ -168,20 +183,30 @@ int cp_r_intertar(int fichier1, int fichier2, char *dosarc2, char *arc2, char *f
 }
 
 int cp_r_intratar(int fichier, char *dosarc, char *arc, char *fic, char *c){
-  if(rechercher(fichier,0,c)==1){
+  if(fic==c){
+    perror("fichier identique");
+    return fichier;
+  }
+  if(rechercher(fichier,0,fic)==1){
     struct posix_header entete;
     char tab1[100];
     char tab2[100];
     int chm = strlen(fic);
     fin(fichier);
     int finfichier = lseek(fichier,0,SEEK_CUR);
-    debut(fichier);
-    
-   
-    while(lseek(fichier,0,SEEK_CUR)<fichier){
+    int tfichier;
+    int t2;
+    debut(fichier);   
+    while(lseek(fichier,0,SEEK_CUR)<finfichier){
+      printf("BOUCLE %d < %d!\n",lseek(fichier,0,SEEK_CUR),finfichier);
       memset(&entete,'\0',512);
       read(fichier,&entete,512);
       lseek(fichier,-512,SEEK_CUR);
+      char *ctaille = entete.size;
+      int taille;
+      int sc = sscanf(ctaille,"%o",&taille);
+      int nb = ((taille+512-1)/512);
+      
       if(strncmp(entete.name,fic,chm)==0){
 	memset(tab1,'\0',100);
 	memset(tab2,'\0',100);
@@ -202,15 +227,35 @@ int cp_r_intratar(int fichier, char *dosarc, char *arc, char *fic, char *c){
 	  tab1[y+z]=tab2[y];
 	  y++;
 	}
+	tfichier = cpfichier_intratar(fichier,dosarc,arc,entete.name,tab1);
+	if(tfichier!=2 && tfichier != fichier){
+	  fichier=tfichier;
+	  
+	  t2 = lseek(fichier,0,SEEK_CUR);
+	  fin(fichier);
+	  finfichier = lseek(fichier,0,SEEK_CUR);
+	  lseek(fichier,t2,SEEK_SET);
+	}
 	
-	cpfichier_intratar(fichier,entete.name,tab1);
+      }
+      
+      else {
+	lseek(fichier,512,SEEK_CUR);
+	ctaille= entete.size;
+	sc = sscanf(ctaille,"%o",&taille);
+	nb = ((taille+512-1)/512);
+	lseek(fichier,nb*512,SEEK_CUR);
       }
     }
-    
-  }
-  else return -1;
-}
 
+    return fichier;
+  }
+  
+  else {
+    //printf("Echec\n");
+    return fichier;
+  }
+}
 
 
 /**int main(){
@@ -227,3 +272,13 @@ int cp_r_intratar(int fichier, char *dosarc, char *arc, char *fic, char *c){
   cp_r_intertar(g,f,"./","./a.tar","b/","a/");
 }
 **/
+
+
+int main(){
+  int f = open("a.tar",O_RDWR);
+  if(f<=0){
+    perror("( f )");
+  }
+  f = cp_r_intratar(f,"./","./a.tar","a/","c/");
+  cp_r_intratar(f,"./","./a.tar","c/","a/c/");
+}
