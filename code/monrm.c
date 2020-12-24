@@ -1,14 +1,11 @@
-#include "util_tar.h"
-#include "tar.c"
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/syscall.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <sys/random.h>
+#include "gestionnaire.h"
+//#include "util_tar.h"
+#include "tar.h"
+#include "monrm.h"
+#include "storeRestore.h"
+#include "check.h"
+#include "myCd.h"
+
 
 int contient(char *dossier,char *nom){
   DIR *d = opendir(dossier);
@@ -20,7 +17,7 @@ int contient(char *dossier,char *nom){
   return 0;
 }
 
-int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
+/*int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
   if(rechercher(fichier,1,c)==1){
     off_t decalage = lseek(fichier,0,SEEK_CUR);
     
@@ -62,7 +59,7 @@ int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
      
     int j = 0;
     while(chemindossier[j] != '\0'
-	  && j < 500  && j < strlen(chemindossier)){
+    && j < 500  && j < strlen(chemindossier)){
       b[j]=chemindossier[j];
       j++;
     }
@@ -104,9 +101,46 @@ int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c){
     //return 1;
   }
   else return fichier;
+} */
+
+int rmfichier_tar(char * path){
+  int fd, n;
+  storePosition(); //store sa position
+  char * pathCd = subWithoutRepo(path); // path cd
+
+  if(whichCd(pathCd) == -1)
+    return -1;
+
+  char *pathRm = subWithRepo(path); // file a supprimer
+
+  if(TARPATH[0] == '\0') { // si t'es pas dans un tar alors tu appelles exec
+    commandNoTar("rm", pathRm); // appel fonctions avec exec
+    restorePosition(); // restorePosition
+    return 1;
+  }
+
+  char * tarName = substringTar(); // recupere le nom du tar file
+  fd = open(tarName, O_RDWR);
+  if(fd < 0) {
+    perror("open fichier tar");
+    return -1;
+  }
+
+// getcwd + tarpath + fichier a supprimer
+  char * pathWithFile = createPathFile(pathRm); 
+  rmOn = 1;
+  if((n = checkEntete(tarName, pathWithFile)) == -1) { //check si le fichier existe
+    rmOn = 0;
+    restorePosition();
+    return -1;
+  }
+  rmOn = 0;
+  restorePosition();
+  return 1;
 }
 
-int rm_r_tar
+
+/*int rm_r_tar
 (int fichier,char *chemindossier,char *cheminarchive,char *c){
   if(rechercher(fichier,1,c)==1){
     int chm = strlen(c);
@@ -138,7 +172,7 @@ int rm_r_tar
      
     int j = 0;
     while(chemindossier[j] != '\0'
-	  && j < 500  && j < strlen(chemindossier)){
+    && j < 500  && j < strlen(chemindossier)){
       b[j]=chemindossier[j];
       j++;
     }
@@ -161,23 +195,23 @@ int rm_r_tar
       //printf("While ");
        
       if(strncmp(entete.name,c,chm)==0){
-	//printf("supprime\n");
-	ctaille=entete.size;
-	sscanf(ctaille,"%o",&taille);
-	nb = (taille+512-1)/512;
-	lseek(fichier,nb*512,SEEK_CUR);
+  //printf("supprime\n");
+  ctaille=entete.size;
+  sscanf(ctaille,"%o",&taille);
+  nb = (taille+512-1)/512;
+  lseek(fichier,nb*512,SEEK_CUR);
       }
 
       else {
-	//printf("ajoute\n");
-	write(ft,&entete,512);
-	ctaille=entete.size;
-	sscanf(ctaille,"%o",&taille);
-	nb = (taille+512-1)/512;
-	for (int i =0 ; i < nb; i++){
-	  read(fichier,&tampon,512);
-	  write(ft,tampon,512);
-	}
+  //printf("ajoute\n");
+  write(ft,&entete,512);
+  ctaille=entete.size;
+  sscanf(ctaille,"%o",&taille);
+  nb = (taille+512-1)/512;
+  for (int i =0 ; i < nb; i++){
+    read(fichier,&tampon,512);
+    write(ft,tampon,512);
+  }
       }
     }
     //printf("Je suis à la fin\n");
@@ -190,6 +224,17 @@ int rm_r_tar
     //return 1;
   }
   else return fichier;
+}*/
+
+int rmTar(int nbOption, char ** command) {
+  int i = 1;
+  if(strcmp(command[1], "-r") == 0)
+    i = 2;
+  for(; i < nbOption; i++) {
+    rmfichier_tar(command[i]);
+//   rm_r_tar(f, cheminDossier, cheminArchive, c);
+  }
+  return 1;
 }
 
 /**void main(){

@@ -11,6 +11,7 @@
 #include "tar.h"
 
 struct posix_header newHd;
+int rmOn; // si tu utilises rm -> 1 sinon 0
 int rmdirOn; // if we are using rmdir command -> 1 else 0
 int found;
 char buf[512];
@@ -26,4 +27,6 @@ int decalage(int fd, int pos);
 int hasPosixHeader(int fd);
 
 int hasRmdirOn(int fd);
+
+int hasRmOn(int fd, int filesize);
 #endif

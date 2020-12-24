@@ -21,6 +21,7 @@ int read_header(int fd, char *path) {
     return -1;
   }
   found = 0;
+  sscanf(hd.size, "%o", &filesize);
   if(hd.name[0] == '\0') {
     hasPosixHeader(fd); // for mkdir
     return -1;
@@ -29,8 +30,10 @@ int read_header(int fd, char *path) {
     found = 1;
     if(rmdirOn)
       hasRmdirOn(fd); // for rmdir
+    if(rmOn)
+      hasRmOn(fd, filesize);
   }
-  sscanf(hd.size, "%o", &filesize);
+  //sscanf(hd.size, "%o", &filesize);
   return filesize;
 }
 
@@ -60,6 +63,13 @@ int decalage(int fd, int pos) {
   return taille;
 }
 
+int fin (int fd, int pos) {
+  int fin = lseek(fd, 0, SEEK_END);
+  int taille = fin - pos;
+  lseek(fd, pos, SEEK_SET);
+  return fin;
+}
+
 // check if we have a posixHeader created by mkdir command
 int hasPosixHeader(int fd){
   if(newHd.name[0] != '\0') {
@@ -81,5 +91,22 @@ int hasRmdirOn(int fd) {
   lseek(fd, n - 512, SEEK_SET); // go to initial position minus 512
   found = 1;
   write(fd, buf, taille); // write over 
+  return 0;
+}
+
+// si tu utilises rm 
+int hasRmOn(int fd, int filesize) {
+  char tampon[BLOCKSIZE];
+  int n = lseek(fd, 0, SEEK_CUR);
+  int fin2 = fin(fd, n);
+  int accu = -512;
+  int nb = (filesize + 512 -1)/512;
+  lseek(fd, n + (nb * 512), SEEK_SET);
+  
+  while( lseek(fd, 0, SEEK_CUR)<fin2) {
+    read(fd, &tampon, BLOCKSIZE);
+    pwrite(fd, &tampon, BLOCKSIZE, n + accu);
+    accu +=512;
+  }
   return 0;
 }

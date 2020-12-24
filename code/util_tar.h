@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/sysmacros.h>
-#include "parcours.h"
+//#include "parcours.h"
 
 /* Programme modifiant les entêtes contenus
  * dans les «tar». Il s'applique en fonction
