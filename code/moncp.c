@@ -58,21 +58,27 @@ int clear(int fichier, char *dos, char *archive ,char *c){
 int cpfichier_intertar
 (int fichier1, int fichier2, char *dossierarchive,char *cheminarchive, char *cible, char * dest){
   rechercher(fichier1,1,cible);
+  int test = fichier2;
   fichier2 = clear(fichier2,dossierarchive, cheminarchive,dest);
   //clear va supprimer le fichier qui va être écrasé.
+  if(test==fichier2){
+    return fichier2;
+  }
   fin(fichier2);
   
   struct posix_header entete;
   ssize_t lect = read(fichier1,&entete,512);
-  
   write(fichier2,&entete,512);
   if(check_checksum(&entete)==0){
-    printf("Test");
+    //printf("Test");
+    perror("erreur sur le checksum");
   }
+  
   lseek(fichier2,-512,SEEK_CUR);
-  printf("Nom : %s\n", dest);
+  //printf("Nom avant : %s\n", entete.name);
+  renommer(fichier2,dest);
+  //printf("Nom après : %s\n", entete.name);
   check_checksum(&entete);
-  // Problème ici, le checksum se forme mal pour une raison inconnue.
   
   lseek(fichier2,512,SEEK_CUR);
   char *tampon [512];
@@ -83,7 +89,7 @@ int cpfichier_intertar
 
   for (int i = 0; i<nb;i++){
     read(fichier1,tampon,512);
-    printf("TAMPON CONTENU %s\n",tampon);
+    //printf("TAMPON CONTENU %s\n",tampon);
     write(fichier2,tampon,512);
   }
   char *tnull[1024];
@@ -129,7 +135,7 @@ int cp_r_intertar(int fichier1, int fichier2, char *dosarc2, char *arc2, char *f
 	  k++;
 	}
 	int parcours = lseek(fichier1,0,SEEK_CUR);
-	printf("PARCOURS : %d\n",parcours);
+	//printf("PARCOURS : %d\n",parcours);
 	fichier2 = cpfichier_intertar(fichier1, fichier2, dosarc2, arc2,entete.name, tab);
 	lseek(fichier1,parcours,SEEK_SET);   
 	lseek(fichier1,nb*512,SEEK_CUR);
@@ -152,7 +158,7 @@ int cp_r_intratar(){
 
 int main(){
   int f = open("a.tar",O_RDWR);
-  int g = open("b.tar",O_RDWR);
+  int g = open("b.tar",O_RDONLY);
   if(f<=0){
     perror("( f )");
   }
@@ -161,5 +167,5 @@ int main(){
     perror("( g )");
   }
   
-  cp_r_intertar(g,f,"./","./b.tar","b/","a/");
+  cp_r_intertar(g,f,"./","./a.tar","b/","a/");
 }
