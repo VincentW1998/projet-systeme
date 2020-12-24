@@ -49,7 +49,7 @@ int renommer (int fichier, char *s){
     return -1;
   
   if(lect<0){
-    perror("Echec de la lecture");
+    perror("Echec de la lecture dans renommer");
     return -1;
   }
   
