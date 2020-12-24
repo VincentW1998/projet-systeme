@@ -168,12 +168,50 @@ int cp_r_intertar(int fichier1, int fichier2, char *dosarc2, char *arc2, char *f
 }
 
 int cp_r_intratar(int fichier, char *dosarc, char *arc, char *fic, char *c){
-  /** if(rechercher(fichier,0,cible)==1){
+  if(rechercher(fichier,0,c)==1){
+    struct posix_header entete;
+    char tab1[100];
+    char tab2[100];
+    int chm = strlen(fic);
+    fin(fichier);
+    int finfichier = lseek(fichier,0,SEEK_CUR);
+    debut(fichier);
     
-  } else {
-    return fichier;
-    }**/
+   
+    while(lseek(fichier,0,SEEK_CUR)<fichier){
+      memset(&entete,'\0',512);
+      read(fichier,&entete,512);
+      lseek(fichier,-512,SEEK_CUR);
+      if(strncmp(entete.name,fic,chm)==0){
+	memset(tab1,'\0',100);
+	memset(tab2,'\0',100);
+	
+	int j = strlen(fic);
+	for(int i = 0; i < 100 && j+i < 100  ;i++){
+	  tab2[i]=entete.name[j+i];
+	}
+	
+	int z=0;
+	while(z<100 && z<strlen(c)){
+	  tab1[z]=c[z];
+	  z++;
+	}
+	
+	int y = 0;
+	while((y+z)<100 && y<100){
+	  tab1[y+z]=tab2[y];
+	  y++;
+	}
+	
+	cpfichier_intratar(fichier,entete.name,tab1);
+      }
+    }
+    
+  }
+  else return -1;
 }
+
+
 
 /**int main(){
   int f = open("a.tar",O_RDWR);
