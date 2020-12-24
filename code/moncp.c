@@ -28,6 +28,10 @@ int clear(int fichier, char *dos, char *archive ,char *c){
 
 int cpfichier_intratar(int fichier,char *fic,char *c){
   //Copie à la fin du tar un fichier déjà présent.
+  if(fic==c){
+    perror("Copie inutile.");
+    return 2;
+  }
   fin(fichier);
   off_t decalage = lseek(fichier,0,SEEK_CUR);
   
@@ -163,11 +167,15 @@ int cp_r_intertar(int fichier1, int fichier2, char *dosarc2, char *arc2, char *f
   return 0;
 }
 
-int cp_r_intratar(){
-  return 0;
+int cp_r_intratar(int fichier, char *dosarc, char *arc, char *fic, char *c){
+  /** if(rechercher(fichier,0,cible)==1){
+    
+  } else {
+    return fichier;
+    }**/
 }
 
-int main(){
+/**int main(){
   int f = open("a.tar",O_RDWR);
   int g = open("b.tar",O_RDONLY);
   if(f<=0){
@@ -180,3 +188,4 @@ int main(){
   
   cp_r_intertar(g,f,"./","./a.tar","b/","a/");
 }
+**/
