@@ -4,6 +4,7 @@
 #include "myMkdir.h"
 #include "myLs.h"
 #include "myRmdir.h"
+#include "UnitTest.h"
 
 //#include "tar.h"
 
@@ -166,7 +167,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
-  int nbCommand = 6;
+  int nbCommand = 7;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
   commandPerso[0] = "exit";
@@ -175,7 +176,8 @@ int commandPersonnalisee(int nbOption , char ** command) {
   commandPerso[3] = "ls";
   commandPerso[4] = "mkdir";
   commandPerso[5] = "rmdir";
-  
+	commandPerso[6] = "test";
+	
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
       numeroCommand = i;
@@ -193,10 +195,10 @@ int commandPersonnalisee(int nbOption , char ** command) {
     case 3 : return ls(nbOption, command);
 
     case 4 : return mkdirTar(nbOption, command);
+		
+		case 5 : return rmdirTar(nbOption, command);
 			
-		case 5 : return Test();
-
-    case 5 : return rmdirTar(nbOption, command);
+		case 6 : return Test();
 
   }
   return 0;
