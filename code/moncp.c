@@ -7,6 +7,25 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
+int clear(int fichier, char *dos, char *archive ,char *c){
+  /*La fonction clear sert à supprimer 
+   *le fichier qui doit être écrasé 
+   *par la copie du nouveau fichier, si il est présent 
+   *et retourne le nouveau descripteur de fichier.
+   *Sinon, retourne l'ancien descripteur de fichier.
+   */
+  if(rechercher(fichier,1,c)){
+    struct posix_header entete;
+    ssize_t lect =read(fichier,&entete,512);
+    if(entete.typeflag != '5'){
+      return rmfichier_tar(fichier,dos,archive,c);
+    }
+    else return fichier;
+  }
+  else return fichier;
+    
+}
+
 int cpfichier_intratar(int fichier,char *fic,char *c){
   //Copie à la fin du tar un fichier déjà présent.
   fin(fichier);
@@ -42,42 +61,33 @@ int cpfichier_intratar(int fichier,char *fic,char *c){
   return 0;
 }
 
-int clear(int fichier, char *dos, char *archive ,char *c){
-  if(rechercher(fichier,1,c)){
-    struct posix_header entete;
-    ssize_t lect =read(fichier,&entete,512);
-    if(entete.typeflag != '5'){
-      return rmfichier_tar(fichier,dos,archive,c);
-    }
-    return fichier;
-  }
-  else return fichier;
-    
-}
 
 int cpfichier_intertar
 (int fichier1, int fichier2, char *dossierarchive,char *cheminarchive, char *cible, char * dest){
   rechercher(fichier1,1,cible);
   int test = fichier2;
   fichier2 = clear(fichier2,dossierarchive, cheminarchive,dest);
-  //clear va supprimer le fichier qui va être écrasé.
-  if(test==fichier2){
-    return fichier2;
+  
+  if(test == fichier2){
+    rechercher(fichier2,1,dest);
+    struct posix_header tete;
+    ssize_t lect = read(fichier2,&tete,512);
+    if(tete.typeflag == '5'){
+      return fichier2;
+    }
   }
+  
   fin(fichier2);
   
   struct posix_header entete;
   ssize_t lect = read(fichier1,&entete,512);
   write(fichier2,&entete,512);
   if(check_checksum(&entete)==0){
-    //printf("Test");
     perror("erreur sur le checksum");
   }
   
   lseek(fichier2,-512,SEEK_CUR);
-  //printf("Nom avant : %s\n", entete.name);
   renommer(fichier2,dest);
-  //printf("Nom après : %s\n", entete.name);
   check_checksum(&entete);
   
   lseek(fichier2,512,SEEK_CUR);
@@ -89,7 +99,6 @@ int cpfichier_intertar
 
   for (int i = 0; i<nb;i++){
     read(fichier1,tampon,512);
-    //printf("TAMPON CONTENU %s\n",tampon);
     write(fichier2,tampon,512);
   }
   char *tnull[1024];
@@ -100,7 +109,7 @@ int cpfichier_intertar
 }
 
 int cp_r_intertar(int fichier1, int fichier2, char *dosarc2, char *arc2, char *fic, char *c){
-  //copie récursive dossier
+  //copie récursive dossier (cp -r)
   struct posix_header entete;
   if(rechercher(fichier1,0,fic)==1){
     int chm = strlen(fic);
@@ -109,14 +118,14 @@ int cp_r_intertar(int fichier1, int fichier2, char *dosarc2, char *arc2, char *f
     int sc = sscanf(ctaille,"%o",&taille);
     int nb = ((taille+512-1)/512);
     char tab[100];
-    
+    memset(tab,'\0',100);
     int i=0;
     while(i<100 && i<strlen(c)){
       tab[i]=c[i];
       i++;
     }
-    int j=i;
-    int k;
+    int c2;
+    int r1;
     debut(fichier1);
     debut(fichier2);
     while(read(fichier1,&entete,512)>0){
@@ -124,27 +133,29 @@ int cp_r_intertar(int fichier1, int fichier2, char *dosarc2, char *arc2, char *f
       taille;
       sc = sscanf(ctaille,"%o",&taille);
       nb = ((taille+512-1)/512);
-
       if(strncmp(entete.name,fic,chm)!=0){
 	lseek(fichier1,nb*512,SEEK_CUR);
       }
       else {
-	k=0;
-	while((k+j)<100 && k<strlen(entete.name)){
-	  tab[k+j]=entete.name[k];
-	  k++;
+	r1=i;
+	c2=0;
+	while((i+c2)<100 && c2<strlen(entete.name)){
+	  tab[r1]=entete.name[c2];
+	  c2++;
+	  r1++;
 	}
 	int parcours = lseek(fichier1,0,SEEK_CUR);
-	//printf("PARCOURS : %d\n",parcours);
 	fichier2 = cpfichier_intertar(fichier1, fichier2, dosarc2, arc2,entete.name, tab);
 	lseek(fichier1,parcours,SEEK_SET);   
 	lseek(fichier1,nb*512,SEEK_CUR);
 	memset(tab,'\0',100);
+	memset(&entete,'\0',512);
 	i=0;
 	while(i<100 && i<strlen(c)){
 	  tab[i]=c[i];
 	  i++;
 	}
+	
       }
     }
     return 0;
