@@ -10,6 +10,10 @@ int isDirectory(char * lastToken);
 
 void flush(void);
 
+void stopRedirection(void);
+
+int nbOptionRedirect(int nbOption, char ** cmd);
+
 void storeTarDestination(char * lastToken);
 
 void moveToTarDest(void);

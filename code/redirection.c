@@ -23,6 +23,27 @@ void flush(){
 	filePipe[1] = -1;
 }
 
+
+//stop the redirection to file[1] and flushes
+void stopRedirection(){
+	if(filePipe[1] != -1)
+		dup2(filePipe[0],filePipe[0]);
+	if(tarRedirectedDestination[0] != '\0')
+		//		moveToTarDest();
+		flush();
+}
+
+//returns the position where the first > is encountered
+int nbOptionRedirect(int nbOption, char ** cmd){
+	for(int i=0;i<nbOption;i++){
+		if(strcmp(cmd[i],">")==0){
+			redirection(cmd[i+1]);
+			return i-1;
+		}
+	}
+	return nbOption;
+}
+
 //store Asbolute tarDestination if the redirection happened in a tar
 void storeTarDestination(char * lastToken){
 	char * pwd = getcwd(NULL, 0);
@@ -90,6 +111,5 @@ int redirection(char * path){
 		return -1;
 	}
 	if(TARPATH[0] == '\0') redirect(lastToken);
-
-	return 0;
+	return redirectTar(lastToken);
 }
