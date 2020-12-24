@@ -2,6 +2,7 @@
 #include "gestionnaire.h"
 #include "storeRestore.h"
 #include "myCd.h"
+#include "check.h"
 
 /* check if the path(last token) is a directory
  should be used with cd to get to path without last token */
@@ -33,6 +34,21 @@ void storeTarDestination(char * lastToken){
 	strcat(tarRedirectedDestination, lastToken);
 }
 
+//move the file containing the redirection content to the desired destination in tar
+/*
+ void moveToTarDest(){
+ storePosition();
+ char * cmdRmTar [3] = {"rm", tarRedirectedDestination};
+ char * cmdMv [4] = {"mv",fileToBeDeleted,tarRedirectedDestination};
+ cdAbs(getPathBeforeTar(tarRedirectedDestination));
+ char * tar = findTar(tarRedirectedDestination);
+ char * path = pathFromTar(tarRedirectedDestination);
+ if(checkEntete(tar,path + strlen(tar) + 1) == 1) rm(2,cmdRmTar);
+ mv(3,cmdMv);
+ restorePosition();
+ }
+ */
+
 /*redirection tar : create a file outside tarball to receive the desired output
  the do mv -> tar
  */
@@ -57,6 +73,8 @@ int redirect(char * lastToken){
 	return 1;
 }
 
+
+//Main function : the function to be called in Gestionnaire
 int redirection(char * path){
 	flush();
 	storePosition();

@@ -8,9 +8,11 @@ char * fileToBeDeleted;
 
 int isDirectory(char * lastToken);
 
-void flush();
+void flush(void);
 
 void storeTarDestination(char * lastToken);
+
+void moveToTarDest(void);
 
 int redirectTar(char * lastToken);
 
