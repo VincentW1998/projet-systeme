@@ -38,10 +38,63 @@ int read_header(int fd, char *path) {
 }
 
 
+int read_header_r(int fd, char *path){
+  struct posix_header hd;
+  unsigned int filesize = 0;
+  size_t nb = read(fd, &hd, BLOCKSIZE);
+  if(nb == -1) {
+    perror("read");
+    return -1;
+  }
+  found = 0;
+  sscanf(hd.size, "%o", &filesize);
+  if(hd.name[0] == '\0') {
+    hasPosixHeader(fd); // for mkdir
+    return -1;
+  }
+  int chm = strlen(path);
+  if(strncmp(hd.name, path, chm) == 0) {
+    found = 1;
+    if(rmdirOn)
+      hasRmdirOn(fd); // for rmdir
+    if(rmOn)
+      hasRmOn(fd, filesize);
+  }
+  //sscanf(hd.size, "%o", &filesize);
+  return filesize;
+}
+
+int checkEntete_r(char * tarName, char * path) {
+  int fd;
+  int filesize = 0;
+  fd = open(tarName, O_RDWR);
+  int i = 0;
+  while(1) {
+    int courant = lseek(fd,0,SEEK_CUR);
+    // Utile en cas de suppression
+    filesize = read_header_r(fd, path);
+    if (filesize == -1) break;
+    if (found) {
+      i++;
+      lseek(fd,courant,SEEK_SET);
+      // On retourne à l'ancienne position
+    } 
+    if(!found) next_header(fd, filesize);
+  }
+  close (fd);
+  return (i>0);// Retourne s'il y a eu suppression
+}
+
 int checkEntete(char * tarName, char * path) {
   int fd;
   int filesize = 0;
   fd = open(tarName, O_RDWR);
+
+  if(fd<0){
+    perror("Erreur ouverture fichier tar");
+    return -1;
+  }
+  
   while(1) {
     filesize = read_header(fd, path);
     if (filesize == -1) break;
@@ -65,7 +118,7 @@ int decalage(int fd, int pos) {
 
 int fin (int fd, int pos) {
   int fin = lseek(fd, 0, SEEK_END);
-  int taille = fin - pos;
+  //int taille = fin - pos; inutilisée pour le moment
   lseek(fd, pos, SEEK_SET);
   return fin;
 }
