@@ -26,6 +26,12 @@ int lsRep(char * path, int withL){
 		return -1;
 	}
 	// fin deplacement
+	//a decommenter
+	//	if(whichCd(path) == -1) return -1;
+	//	if(TARPATH[0] == '\0'){
+	//		if(withL) return commandNoTar("ls","-l");
+	//		commandNoTar("ls","");
+	//	}
 	
 	if(*TARPATH == '\0') simpleLs(withL);
 	else printOccurences(withL);
@@ -71,9 +77,10 @@ void printOccurences(int withL){ //si withL = 1 on affiche ls -l
 
 // check si target est visible depuis path 1
 int validPath(char * path, char * target){
-	char * tmp = malloc(strlen(path)+2);
+//	char * tmp = malloc(strlen(path)+2);
+  char * tmp = malloc(strlen(path) + 1);
 	strcpy(tmp,path);
-	if(strlen(path) != 0) strcat(tmp, "/"); // le path ne se trouve pas a la racine du tarball on rajoute / pour etre sur le que le fichier correspond bien
+//	if(strlen(path) != 0) strcat(tmp, "/"); // le path ne se trouve pas a la racine du tarball on rajoute / pour etre sur le que le fichier correspond bien
 	char * targ, * token;
 	if(strncmp(tmp,target, strlen(tmp)) == 0){
 		targ = malloc(strlen(target) - strlen(tmp) + 1);
@@ -136,7 +143,7 @@ void nbrlink(struct posix_header * p, int file){
 		strcat(tmp,"/");
 		strcat(tmp,p->name);
 	}
-	if(tmp[strlen(tmp) - 1] == '/') tmp[strlen(tmp) - 1] = '\0';
+//	if(tmp[strlen(tmp) - 1] == '/') tmp[strlen(tmp) - 1] = '\0';
 	int c = countLinks(tmp , file);
 	lseek(file, current, SEEK_SET);
 	tmp = malloc(10);
@@ -194,13 +201,14 @@ int countLinks(char * name ,int file){
 	size_t n;
 	int count = 2;
 	struct posix_header * p = malloc(sizeof(struct posix_header));
-	while((n = read(file,p,BLOCKSIZE)) > 0)
+	while((n = read(file,p,BLOCKSIZE)) > 0 && p->name[0] != '\0')
 		if(validPath(name, p->name) == 0) count++;
 	return count;
 }
 
 int ls(int nbOptions, char ** path){
 	storePosition();
+	printf("nbOpt = %d \n",nbOptions);
 	int i = 1, withL = 0;
 	if(nbOptions < 2) return LsWithoutPath(0);
 	if(strcmp(path[1],"-l") == 0){

@@ -1,5 +1,6 @@
 #include "tar.h"
 #include "check.h"
+#include "myLs.h"
 
 // saut vers le prochain header
 void next_header(int fd, unsigned int filesize) {
@@ -10,6 +11,8 @@ void next_header(int fd, unsigned int filesize) {
       perror("read");
     }
   }
+  if(filesize > BLOCKSIZE)
+    lseek(fd, -512, SEEK_CUR);
 }
 
 int read_header(int fd, char *path) {
@@ -28,12 +31,18 @@ int read_header(int fd, char *path) {
   }
   if(strcmp(hd.name, path) == 0) {
     found = 1;
-    if(rmdirOn)
-      hasRmdirOn(fd); // for rmdir
-    if(rmOn)
-      hasRmOn(fd, filesize);
+
+    int pos = lseek(fd, 0, SEEK_CUR);
+    lseek(fd, 0, SEEK_SET);
+    if (countLinks(hd.name, fd) == 2 && rmdirOn) {
+      lseek(fd, pos, SEEK_SET);
+      hasRmdirOn(fd, filesize);
+    }
+
+//    if(rmdirOn)
+ //     hasRmdirOn(fd, filesize); // for rmdir
   }
-  //sscanf(hd.size, "%o", &filesize);
+//  sscanf(hd.size, "%o", &filesize);
   return filesize;
 }
 
@@ -109,11 +118,17 @@ int checkEntete(char * tarName, char * path) {
 }
 
 
-int decalage(int fd, int pos) {
+/*int decalage(int fd, int pos) {
   int fin = lseek(fd, 0, SEEK_END);
   int taille = fin - pos;
   lseek(fd, pos, SEEK_SET);
   return taille;
+}*/
+
+int fin (int fd, int pos) {
+  int fin = lseek(fd, 0, SEEK_END);
+  lseek(fd, pos, SEEK_SET);
+  return fin;
 }
 
 int fin (int fd, int pos) {
@@ -136,14 +151,18 @@ int hasPosixHeader(int fd){
   return -1;
 }
 
-int hasRmdirOn(int fd) {
-  int n = lseek(fd, 0, SEEK_CUR); // position actuelle
-  int taille = decalage(fd, n); // trouve le decalage
-  char buf[taille];
-  read(fd, &buf, taille); // lecture du reste du fichier
-  lseek(fd, n - 512, SEEK_SET); // go to initial position minus 512
-  found = 1;
-  write(fd, buf, taille); // write over 
+int hasRmdirOn(int fd, int filesize) {
+  char tampon[BLOCKSIZE];
+  int n = lseek(fd, 0, SEEK_CUR);
+  int fin2 = fin(fd, n);
+  int accu = -512; // accumulateur add 512 each read/write
+  int nb = (filesize + 512 -1)/512; // nb of blocks of the file
+  lseek(fd, n + (nb * 512), SEEK_SET); // go to the end of the file
+  while( lseek(fd, 0, SEEK_CUR)<fin2) { // while we are not at the end
+    read(fd, &tampon, BLOCKSIZE); // read
+    pwrite(fd, &tampon, BLOCKSIZE, n + accu); // write
+    accu +=512; 
+  }
   return 0;
 }
 
