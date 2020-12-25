@@ -202,8 +202,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
 
 //    case 6 : return cpJulien
 
-    case 7 : return rmTar(nbOption, command);
-
+  case 7 : return rmTar(nbOption, command);
   //  case 8 : return mvJulien
 
 
@@ -406,5 +405,7 @@ int commandNoTar(char * cmd, char * path) {
   strcpy(command[0], cmd);
   strcpy(command[1], path);
   execCommand(command);
+  free(command[0]);
+  free(command[1]);
   return 1;
 }
