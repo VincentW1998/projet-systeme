@@ -13,7 +13,7 @@ myCd.o : myCd.c myCd.h gestionnaire.h check.h storeRestore.h
 
 myCat.o : myCat.c myCat.h tar.h storeRestore.h
 
-check.o : check.c check.h tar.h
+check.o : check.c check.h tar.h myLs.h
 
 myRmdir.o : myRmdir.c myRmdir.h check.h tar.h myCd.h storeRestore.h
 
