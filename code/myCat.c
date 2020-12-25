@@ -41,8 +41,7 @@ int readFile(char * path, char * tar){
 	size_t n;
 	if((f = open(tar, O_RDONLY)) == -1) perror("open tar:");
 	struct posix_header * p = malloc(sizeof(struct posix_header));
-	while((n = read(f,p,BLOCKSIZE)) > 0){
-		if(p->name[0] == '\0') break;
+	while( ((n = read(f,p,BLOCKSIZE)) > 0) && (p->name[0] != '\0') ){
 		if(strcmp(p->name, path) == 0) return showContent(f,p);
 		next_header(f, atoi(p->size));
 	}
