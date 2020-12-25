@@ -1,0 +1,17 @@
+#!/bin/bash
+
+mkdir -p Test/lvl2-A  Test/lvl2-B Test/lvl2-C
+touch Test lvl2-A/matin Test/lvl2-B/midi Test/lvl2-C/soir Test/hello
+echo "bon matin \n" > Test/lvl2-A/matin
+echo "bon appetit \n" > Test/lvl2-B/midi
+echo "bonsoir \n" > Test/lvl2-C/soir
+echo "HELLO HELLO \n" > Test/hello
+cd Test
+tar cf lvl1-A.tar lvl2-A lvl2-B lvl2-C hello
+mkdir lvl1-B
+mv lvl2-A lvl2-B lvl2-C hello lvl1-B
+cd ..
+make cleanall
+make shell
+./shell
+rm -rdf Test

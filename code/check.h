@@ -22,11 +22,11 @@ int read_header(int fd, char *path);
 
 int checkEntete(char * tarName, char * path);
 
-int decalage(int fd, int pos);
+//int decalage(int fd, int pos);
+
+int fin(int fd, int pos);
 
 int hasPosixHeader(int fd);
 
-int hasRmdirOn(int fd);
-
-int hasRmOn(int fd, int filesize);
+int hasRmdirOn(int fd, int filesize);
 #endif
