@@ -41,9 +41,9 @@ int nbOptionRedirect(int nbOption, char ** cmd){
 	for(int i=0;i<nbOption;i++){
 		if(strcmp(cmd[i],">")==0){
 //			printf("REDIRECTION %s \n",cmd[i-1]);
-			printf("Redirections %d\n",i-1);
+			printf("Redirections %d\n",i);
 			redirection(cmd[i+1]);
-			return i-1;
+			return i;
 		}
 	}
 	return nbOption;
@@ -89,7 +89,7 @@ int redirectTar(char * lastToken){
 
 //redirection dup2 si hors du tar
 int redirect(char * lastToken){
-	if((fpipe[1] = open(lastToken, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR)) == -1){
+	if((fpipe[1] = open(lastToken, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR)) == -1){
 		perror("redirect");
 		restorePosition();
 		return -1;
