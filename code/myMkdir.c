@@ -39,49 +39,35 @@ struct posix_header newHeader(const char * path) {
   return hd;
 }
 
-char * createPathForMkdir(const char * path) {
-
-  char * suiteName = subWithoutTar();
-
-/* +3 car on rajoute 2 slash et il y a le caractere zero qui termine une
- * chaine de caracteres. */
-  int length = strlen(suiteName) + strlen(path) + 3;
-  char * pathWithFolder = malloc(length);
-  pathWithFolder[0] = '\0';
-  strncat(pathWithFolder, suiteName, strlen(suiteName));
-  if (suiteName[0] != '\0') {
-    strcat(pathWithFolder, "/");
-  }
-  strncat(pathWithFolder, path, strlen(path));
-  strcat(pathWithFolder, "/");
-  return pathWithFolder;
-}
-
 int mkdirTar(int nbOption,char ** command) {
+  storePosition();
 
   for (int i = 1; i < nbOption; i++) {
-    if(createRepo(command[i]) == -1)
-      return -1;
+    if(createRepo(command[i]) == -1) {
+      write(2,"erreur : mkdir\n",strlen("erreur : mkdir\n"));
+    }
+    restorePosition();
+      //return -1;
   }
-
- return 1;
-}
+ return 1;}
 
 int createRepo(char * path){
-  storePosition(); // store position
+  //storePosition(); // store position
   //path for  Cd
   char * pathCd= subWithoutRepo(path);
 
-  if(whichCd(pathCd) == -1)
+  if(whichCd(pathCd) == -1) {
+    //restorePosition();
     return -1;
+  }
 
   //path for mkdir
   char * pathMkdir = subWithRepo(path);
 
   // after Cd function if we are not in tar file
   if (TARPATH[0] == '\0') {
-    mkdirNoTar(pathMkdir);
-    restorePosition();
+    commandNoTar("mkdir", pathMkdir);
+    //restorePosition();
     return 1;
   }
 
@@ -91,39 +77,22 @@ int createRepo(char * path){
 
   fd = open(tarName, O_RDWR); // on ouvre le fichier tar
   if (fd < 0){
+    //restorePosition();
     perror("open fichier Tar");
     return -1;
   }
   // concatene path et TARPATH et rajoute un slash a la fin
-  char * pathWithFolder = createPathForMkdir(pathMkdir);
+  char * pathWithFolder = createPath(pathMkdir);
 
-  // create new posix_header of emply repository
-  struct posix_header hd = newHeader(pathWithFolder);
+  // create new posix_header of emply repository and put in global variable
+  newHd = newHeader(pathWithFolder);
 
-  if((n = checkEntete2(tarName, pathWithFolder, &hd)) == 1) {
+  if((n = checkEntete(tarName, pathWithFolder)) == 1) {
+    //restorePosition();
     return -1;
   }
-  restorePosition();
+  //restorePosition();
  return 1;
 }
 
-/* use the exec mkdir */
-int mkdirNoTar(char * path){
-  char * command[2];
-  command[0] = malloc(strlen("mkdir") + 1);
-  command[1] = malloc(strlen(path) + 1);
-  strcpy(command[0], "mkdir");
-  strcpy(command[1], path);
-  execCommand(command);
-  return 1;
-}
 
-int whichCd(char * pathCd) {
-  //if tarpath vide -> cdPerso because we are not in tar file
-  if (TARPATH[0] == '\0') {
-    if(cdPerso(pathCd) == -1) return -1;
-  }
-  else
-    if(navigate(pathCd) == -1) return -1;
-  return 1;
-}

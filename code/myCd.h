@@ -18,4 +18,5 @@ void setTarpath(char * tarp);
 
 int cdAbs(char * path);
 
+int whichCd(char * pathCd);
 #endif
