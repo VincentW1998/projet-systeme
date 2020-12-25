@@ -1,5 +1,6 @@
 #include "tar.h"
 #include "check.h"
+#include "myLs.h"
 
 // saut vers le prochain header
 void next_header(int fd, unsigned int filesize) {
@@ -10,6 +11,8 @@ void next_header(int fd, unsigned int filesize) {
       perror("read");
     }
   }
+  if(filesize > BLOCKSIZE)
+    lseek(fd, -512, SEEK_CUR);
 }
 
 int read_header(int fd, char *path) {
@@ -28,8 +31,15 @@ int read_header(int fd, char *path) {
   }
   if(strcmp(hd.name, path) == 0) {
     found = 1;
-    if(rmdirOn)
-      hasRmdirOn(fd, filesize); // for rmdir
+    int pos = lseek(fd, 0, SEEK_CUR);
+    lseek(fd, 0, SEEK_SET);
+    if (countLinks(hd.name, fd) == 2 && rmdirOn) {
+      lseek(fd, pos, SEEK_SET);
+      hasRmdirOn(fd, filesize);
+    }
+
+//    if(rmdirOn)
+ //     hasRmdirOn(fd, filesize); // for rmdir
   }
 //  sscanf(hd.size, "%o", &filesize);
   return filesize;
