@@ -2,9 +2,9 @@
 #define redirection_h
 
 #include <stdio.h>
-int filePipe [2];
-char * tarRedirectedDestination;
-char * fileToBeDeleted;
+int fpipe [2];
+int saveDup;
+
 
 int isDirectory(char * lastToken);
 

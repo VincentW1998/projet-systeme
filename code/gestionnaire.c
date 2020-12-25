@@ -46,6 +46,7 @@ int execCommand(char ** command) {
     if(strcmp(command[0], "cat") == 0)
     signal(SIGINT, SIG_IGN);
       wait(&w);
+			signal(SIGINT, SIG_DFL);
   }
   return 0;
 }
@@ -125,7 +126,6 @@ int separateurCommand(char * buff, char ** command){
   command[i] = NULL;
   command[i+1] = NULL;
 	nbOption = nbOptionRedirect(nbOption, command); //redirect
-	printf("nbOption : %d \n", nbOption);
   return nbOption;
 }
 

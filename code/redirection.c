@@ -4,6 +4,9 @@
 #include "myCd.h"
 #include "check.h"
 
+char * tarRedirectedDestination = "";
+char * fileToBeDeleted = "";
+
 /* check if the path(last token) is a directory
  should be used with cd to get to path without last token */
 int isDirectory(char * lastToken){
@@ -19,15 +22,15 @@ void flush(){
 	fileToBeDeleted[0] = '\0';
 	tarRedirectedDestination = malloc(1);
 	tarRedirectedDestination[0] = '\0';
-	filePipe[0] = -1;
-	filePipe[1] = -1;
+	fpipe[0] = -1;
+	fpipe[1] = -1;
 }
 
 
 //stop the redirection to file[1] and flushes
 void stopRedirection(){
-	if(filePipe[1] != -1)
-		dup2(filePipe[0],filePipe[0]);
+	if(fpipe[1] != -1)
+		dup2(saveDup,fpipe[0]); //redirect the flow back to it's origin
 	if(tarRedirectedDestination[0] != '\0')
 		//		moveToTarDest();
 		flush();
@@ -37,6 +40,8 @@ void stopRedirection(){
 int nbOptionRedirect(int nbOption, char ** cmd){
 	for(int i=0;i<nbOption;i++){
 		if(strcmp(cmd[i],">")==0){
+//			printf("REDIRECTION %s \n",cmd[i-1]);
+			printf("Redirections %d\n",i-1);
 			redirection(cmd[i+1]);
 			return i-1;
 		}
@@ -84,12 +89,14 @@ int redirectTar(char * lastToken){
 
 //redirection dup2 si hors du tar
 int redirect(char * lastToken){
-	if((filePipe[1] = open(lastToken, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR)) == -1){
+	if((fpipe[1] = open(lastToken, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR)) == -1){
 		perror("redirect");
 		restorePosition();
 		return -1;
 	}
-	dup2(filePipe[0], filePipe[1]);
+	dup2(fpipe[1], fpipe[0]); //filePipe[0] -> filePipe[1]
+	close(fpipe[1]);
+	printf("%d ",fpipe[0]);
 	restorePosition();
 	return 1;
 }
@@ -99,7 +106,8 @@ int redirect(char * lastToken){
 int redirection(char * path){
 	flush();
 	storePosition();
-	filePipe[0] = 1;
+	fpipe[0] = 1;
+	saveDup = dup(fpipe[0]);
 	char * lastToken = getLastToken(path);
 	if(*TARPATH == '\0') // move to path before last token
 		cdPerso(pathWithoutLastToken(path,lastToken)); //suposed to exit if directory does not exist
@@ -110,6 +118,6 @@ int redirection(char * path){
 		restorePosition();
 		return -1;
 	}
-	if(TARPATH[0] == '\0') redirect(lastToken);
+	if(TARPATH[0] == '\0') return redirect(lastToken);
 	return redirectTar(lastToken);
 }
