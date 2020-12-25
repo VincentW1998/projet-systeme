@@ -75,11 +75,19 @@ void storeTarDestination(char * lastToken){
  }
  */
 
+void setFileToBeDeleted(){
+	char * pos = getcwd(NULL, 0);
+	fileToBeDeleted = malloc(strlen(pos) + strlen("fileToBeDeleted") + 1);
+	strcpy(fileToBeDeleted,pos);
+	strcat(fileToBeDeleted,"/fileToBeDeleted");
+}
+
 /*redirection tar : create a file outside tarball to receive the desired output
  the do mv -> tar
  */
 int redirectTar(char * lastToken){
 	storeTarDestination(lastToken);
+	setFileToBeDeleted();
 	if(redirect("fileToBeDeleted") == -1){
 		flush();
 		return -1;

@@ -16,7 +16,9 @@ int nbOptionRedirect(int nbOption, char ** cmd);
 
 void storeTarDestination(char * lastToken);
 
-void moveToTarDest(void);
+//void moveToTarDest(void);
+
+void setFileToBeDeleted(void);
 
 int redirectTar(char * lastToken);
 
