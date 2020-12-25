@@ -6,6 +6,7 @@
 #include "myRmdir.h"
 #include "UnitTest.h"
 #include "redirection.h"
+#include "myCp.h"
 
 //#include "tar.h"
 
@@ -170,7 +171,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
-  int nbCommand = 7;
+  int nbCommand = 8;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
   commandPerso[0] = "exit";
@@ -180,6 +181,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
   commandPerso[4] = "mkdir";
   commandPerso[5] = "rmdir";
 	commandPerso[6] = "test";
+  commandPerso[7] = "cp";
 	
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
@@ -202,6 +204,8 @@ int commandPersonnalisee(int nbOption , char ** command) {
 		case 5 : return rmdirTar(nbOption, command);
 			
 		case 6 : return Test();
+
+    case 7 : return cpTar(nbOption, command);
 
   }
   return 0;
@@ -243,6 +247,8 @@ int commandTar(int nbOption, char ** command) {
   case 4 : return rmdirTar(nbOption, command);
       
   case 6:  return cat(nbOption,command);
+
+  case 7 : return cpTar(nbOption, command);
       
   case 8 : exit(0);
   }
@@ -408,6 +414,23 @@ char * createPath(const char * path) {
   strncat(pathWithFolder, path, strlen(path));
   strcat(pathWithFolder, "/");
   return pathWithFolder;
+}
+
+char * createPathFile(const char * path) {
+
+  char * suiteName = subWithoutTar();
+
+/* +3 car on rajoute 2 slash et il y a le caractere zero qui termine une
+ * chaine de caracteres. */
+  int length = strlen(suiteName) + strlen(path) + 2;
+  char * pathWithFile = malloc(length);
+  pathWithFile[0] = '\0';
+  strncat(pathWithFile, suiteName, strlen(suiteName));
+  if (suiteName[0] != '\0') {
+    strcat(pathWithFile, "/");
+  }
+  strncat(pathWithFile, path, strlen(path));
+  return pathWithFile;
 }
 
 int commandNoTar(char * cmd, char * path) {

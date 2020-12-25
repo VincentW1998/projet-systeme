@@ -32,16 +32,20 @@ int read_header(int fd, char *path) {
   if(strcmp(hd.name, path) == 0) {
     found = 1;
     int pos = lseek(fd, 0, SEEK_CUR);
-    lseek(fd, 0, SEEK_SET);
-    if (countLinks(hd.name, fd) == 2 && rmdirOn) {
-      lseek(fd, pos, SEEK_SET);
-      hasRmdirOn(fd, filesize);
+    if(rmdirOn) {
+      lseek(fd, 0, SEEK_SET);
+      // if we use rm/rmdir and the file is empty
+      if (countLinks(hd.name, fd) == 2) {
+        lseek(fd, pos, SEEK_SET);
+        hasRmdirOn(fd, filesize);
+      }
+    }
+    if(cpOn) {
+      lseek(fd, -512, SEEK_CUR);
+      read(fd, &newHd, BLOCKSIZE);
     }
 
-//    if(rmdirOn)
- //     hasRmdirOn(fd, filesize); // for rmdir
   }
-//  sscanf(hd.size, "%o", &filesize);
   return filesize;
 }
 
@@ -63,13 +67,6 @@ int checkEntete(char * tarName, char * path) {
   return -1;
 }
 
-
-/*int decalage(int fd, int pos) {
-  int fin = lseek(fd, 0, SEEK_END);
-  int taille = fin - pos;
-  lseek(fd, pos, SEEK_SET);
-  return taille;
-}*/
 
 int fin (int fd, int pos) {
   int fin = lseek(fd, 0, SEEK_END);
