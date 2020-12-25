@@ -26,6 +26,12 @@ int lsRep(char * path, int withL){
 		return -1;
 	}
 	// fin deplacement
+	//a decommenter
+	//	if(whichCd(path) == -1) return -1;
+	//	if(TARPATH[0] == '\0'){
+	//		if(withL) return commandNoTar("ls","-l");
+	//		commandNoTar("ls","");
+	//	}
 	
 	if(*TARPATH == '\0') simpleLs(withL);
 	else printOccurences(withL);
@@ -201,6 +207,7 @@ int countLinks(char * name ,int file){
 
 int ls(int nbOptions, char ** path){
 	storePosition();
+	printf("nbOpt = %d \n",nbOptions);
 	int i = 1, withL = 0;
 	if(nbOptions < 2) return LsWithoutPath(0);
 	if(strcmp(path[1],"-l") == 0){

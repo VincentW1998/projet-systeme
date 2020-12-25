@@ -48,6 +48,7 @@ int execCommand(char ** command) {
     if(strcmp(command[0], "cat") == 0)
     signal(SIGINT, SIG_IGN);
       wait(&w);
+			signal(SIGINT, SIG_DFL);
   }
   return 0;
 }
@@ -126,6 +127,7 @@ int separateurCommand(char * buff, char ** command){
   int nbOption = i;
   command[i] = NULL;
   command[i+1] = NULL;
+	nbOption = nbOptionRedirect(nbOption, command); //redirect
   return nbOption;
 }
 
@@ -162,7 +164,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
     else if(commandPersonnalisee(nbOption, command) == -1) //command perso sans pipe
        execCommand(command); // command sans le pipe
   }
-
+	stopRedirection(); // redirect
   return; // 0 if has no pipe, and 1 if has pipe
 }
 
@@ -285,13 +287,53 @@ int hasTar(char * path){
   return -1;
 }
 
-void * findTar(char * path){
-  char * tmp = malloc(strlen(path)+1);
-  memcpy(tmp,path,strlen(path));
-  char * token;
-  while((token = strtok_r(tmp, "/\n", &tmp)) != NULL)
-    if(!estTar(token)) return token;
-  return NULL;
+char * findTar(char * path){ // return the .tar filename
+	if(hasTar(path) == -1) return NULL;
+	char * tarp = pathFromTar(path);
+	char * tmp = malloc(strlen(tarp) + 1);
+	strcpy(tmp,tarp);
+	char * tar;
+	tar = strtok_r(tmp,"/",&tmp);
+	return tar;
+}
+char * pathFromTar(char * path){ // return the path from the .tar
+	if(hasTar(path) == -1) return NULL;
+	char * tmp = malloc(strlen(path) + 1), *token;
+	strcpy(tmp,path);
+	size_t l = 0;
+	if(path[0] == '/') l++;
+	while((token = strtok_r(tmp, "/", &tmp)) != NULL){
+		if(estTar(token) == 1) return path+l;
+		l += 1 + strlen(token);
+	}
+	return NULL;
+}
+
+char * getPathBeforeTar(char * path){ // return the path before TARPATH
+	if(hasTar(path) == -1) return NULL;
+	char * fromTar = pathFromTar(path);
+	char * beforeTar = malloc(strlen(path) - strlen(fromTar));
+	strncpy(beforeTar,path,strlen(path) - strlen(fromTar)-1);
+	return beforeTar;
+}
+
+char * getLastToken(char * path){ // return lastToken in path
+	char * lastToken = malloc(1), * token;
+	char * tmp = malloc( strlen(path) + 1); // copy of the path
+	strcpy(tmp, path);
+	while((token = strtok_r(tmp, "/",&tmp) )!= NULL){ //retrieve the next token that contains /
+		lastToken = realloc(lastToken,strlen(token) + 1);
+		strcpy(lastToken, token);
+	}
+	return lastToken;
+}
+
+//return the path without the last Token
+char * pathWithoutLastToken(char * path, char * lastToken){
+	// copy path - size of the last token
+	char * deplacement = malloc(strlen(path) - strlen(lastToken) + 1);
+	strncpy(deplacement, path, strlen(path) - strlen(lastToken));
+	return deplacement;
 }
 
 /* return the tar repository from TARPATH */

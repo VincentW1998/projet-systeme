@@ -44,7 +44,15 @@ int existTar(char * token);
 
 int hasTar(char * pathError);
 
-void * findTar(char * path);
+char * findTar(char * path);
+
+char * pathFromTar(char * path);
+
+char * getPathBeforeTar(char * path);
+
+char * getLastToken(char * path);
+
+char * pathWithoutLastToken(char * path, char * lastToken);
 
 char * substringTar(void);
 

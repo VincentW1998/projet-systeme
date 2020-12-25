@@ -52,7 +52,11 @@ int CatFile (char * path){
 		}
 	}
 	free(deplacement);
+	//a decommenter
 	// fin deplacement
+	//	if(whichCd(deplacement) == -1) return -1;
+	// free(deplacement);
+	//	if(TARPATH[0] == '\0') return commandNoTar("cat",path);
 	if(*TARPATH == '\0') return simpleCat(lastToken);
 	tmp = malloc(strlen(TARPATH) + 1);
 	strcpy(tmp, TARPATH);

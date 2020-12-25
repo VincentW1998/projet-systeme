@@ -7,7 +7,7 @@ shell : shell.o gestionnaire.o myCd.o myCat.o myMkdir.o myLs.o check.o tar.o sto
 
 shell.o : shell.c gestionnaire.h
 
-gestionnaire.o : gestionnaire.c gestionnaire.h myCd.h
+gestionnaire.o : gestionnaire.c gestionnaire.h myCd.h redirection.h
 
 myCd.o : myCd.c myCd.h gestionnaire.h check.h storeRestore.h
 
@@ -22,6 +22,8 @@ storeRestore.o : storeRestore.c storeRestore.h gestionnaire.h
 tar.o : tar.c tar.h
 
 myMkdir.o : myMkdir.c myMkdir.h check.h tar.h myCd.h storeRestore.h
+
+redirection.o : redirection.c redirection.h myCd.h gestionnaire.h storeRestore.h check.h
 
 myLs.o : myLs.c myLs.h tar.h check.h storeRestore.h
 
