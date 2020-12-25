@@ -16,12 +16,6 @@ int showContent(int file, struct posix_header * p){
 	return 0;
 }
 
-int simpleCat(char * path){
-	char * cmd[3] = { "cat", path }; // on ajoute 1 a la taille pour que le                                    cat s'arrete apres un null
-	return execCommand(cmd);
-
-}
-
 int CatFile (char * path){
 	char * lastToken = getLastToken(path);
 	char * deplacement = pathWithoutLastToken(path, lastToken);
@@ -30,7 +24,7 @@ int CatFile (char * path){
 		return -1;
 	}
 	free(deplacement);
-	if(TARPATH[0] == '\0') return simpleCat(lastToken); //si hors du tarball exec
+	if(TARPATH[0] == '\0') return commandNoTar("cat", lastToken); //si hors du tarball exec
 	char * tar = findTar(TARPATH);
 	char * pathAfterTar = pathFromTar(path) + strlen(tar) + 1; // recup le path apres tar
 	return readFile(pathAfterTar, tar); //readfile sur le path apres le TAR
