@@ -31,11 +31,6 @@ redirection.o : redirection.c redirection.h myCd.h gestionnaire.h storeRestore.h
 myLs.o : myLs.c myLs.h tar.h check.h storeRestore.h
 
 UnitTest.o : UnitTest.c UnitTest.h MyCd.h storeRestore.h
-#mon_cp : mon_cp.c
-#
-#mon_rm : mon_rm.c
-#
-#mon_mv : mon_mv.c
 
 clean :
 	rm -rf *.o
