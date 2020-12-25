@@ -12,36 +12,25 @@ int LsWithoutPath(int withL){
 	return 0;
 }
 
+int lsNoL(){
+	char * command[2] = {"ls"};
+	return execCommand(command);
+}
+
 // Ls sans options avec un path
 int lsRep(char * path, int withL){
-	//je me deplace dans le dossier a lister
-	if(*TARPATH == '\0'){
-		if(cdPerso(path) == -1){
-			perror("bad address");
-			return -1;
-		}
-	}
-	else if(navigate(path) == -1){
-		perror("bad address");
-		return -1;
-	}
-	// fin deplacement
 	//a decommenter
-	//	if(whichCd(path) == -1) return -1;
-	//	if(TARPATH[0] == '\0'){
-	//		if(withL) return commandNoTar("ls","-l");
-	//		commandNoTar("ls","");
-	//	}
-	
-	if(*TARPATH == '\0') simpleLs(withL);
+	if(whichCd(path) == -1) return -1; //deplacement vers le dossier a afficher
+	if(TARPATH[0] == '\0')
+		simpleLs(withL);
 	else printOccurences(withL);
 	return 0;
 }
-
+//
 void simpleLs(int withL){
-	char * cmd[3] = {"ls"};
 	if(withL == 1)
-		cmd[1] = "-l";
+		commandNoTar("ls", "-l");
+	char * cmd[2] = {"ls"};
 	execCommand(cmd);
 	return;
 }

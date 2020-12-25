@@ -399,7 +399,7 @@ char * createPath(const char * path) {
 
 /* +3 car on rajoute 2 slash et il y a le caractere zero qui termine une
  * chaine de caracteres. */
-  int length = strlen(suiteName) + strlen(path) + 3;
+  size_t length = strlen(suiteName) + strlen(path) + 3;
   char * pathWithFolder = malloc(length);
   pathWithFolder[0] = '\0';
   strncat(pathWithFolder, suiteName, strlen(suiteName));
@@ -412,11 +412,6 @@ char * createPath(const char * path) {
 }
 
 int commandNoTar(char * cmd, char * path) {
-//  char * command[2];
-//  command[0] = malloc(strlen(cmd) + 1);
-//  command[1] = malloc(strlen(path) + 1);
-//  strcpy(command[0], cmd);
-//  strcpy(command[1], path);
 	char * command[3] = {cmd, path};
   execCommand(command);
   return 1;
