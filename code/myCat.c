@@ -23,54 +23,17 @@ int simpleCat(char * path){
 }
 
 int CatFile (char * path){
-	char * deplacement;
-	char * lastToken = malloc (1);
-	char * token;
-	
-	//je me deplace jusqu'a ce que je puisse voir le fichier a afficher
-	char * tmp = malloc( strlen(path) + 1); // copie de path
-	strcpy(tmp, path);
-	
-	while((token = strtok_r(tmp, "/",&tmp) )!= NULL){
-		lastToken = realloc(lastToken,strlen(token) + 1); //recuperation du dernier token
-		strcpy(lastToken, token);
-	}
-	
-	deplacement = malloc(strlen(path) - strlen(lastToken) + 1); // on copie path - la taille du dernier token
-	strncpy(deplacement, path, strlen(path) - strlen(lastToken));
-	
-	if(*TARPATH == '\0'){
-		if(cdPerso(deplacement) == -1){
-			perror("bad address");
-			return -1;
-		}
-	}
-	else {
-		if(navigate(deplacement) == -1){
-			perror("bad address");
-			return -1;
-		}
+	char * lastToken = getLastToken(path);
+	char * deplacement = pathWithoutLastToken(path, lastToken);
+	if(whichCd(deplacement) == -1){
+		free(deplacement);
+		return -1;
 	}
 	free(deplacement);
-	//a decommenter
-	// fin deplacement
-	//	if(whichCd(deplacement) == -1) return -1;
-	// free(deplacement);
-	//	if(TARPATH[0] == '\0') return commandNoTar("cat",path);
-	if(*TARPATH == '\0') return simpleCat(lastToken);
-	tmp = malloc(strlen(TARPATH) + 1);
-	strcpy(tmp, TARPATH);
-	char * tar = strtok_r(tmp, "/\0",&tmp);
-	long charToSkip = strlen(tar);
-	if(strlen(tar)<strlen(TARPATH)) charToSkip++;
-	char * npath = malloc(strlen(TARPATH + charToSkip) + strlen(lastToken) + 2);
-	if(charToSkip<strlen(TARPATH)){
-		strcpy(npath,TARPATH+charToSkip);
-		strcat(npath, "/");
-		strcat(npath,lastToken);
-	}
-	else strcpy(npath,lastToken);
-	return readFile(npath, tar);
+	if(TARPATH[0] == '\0') return simpleCat(lastToken); //si hors du tarball exec
+	char * tar = findTar(TARPATH);
+	char * pathAfterTar = pathFromTar(path) + strlen(tar) + 1; // recup le path apres tar
+	return readFile(pathAfterTar, tar); //readfile sur le path apres le TAR
 }
 
 int readFile(char * path, char * tar){
