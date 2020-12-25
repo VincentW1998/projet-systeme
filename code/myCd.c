@@ -14,7 +14,7 @@ int cdNoOptions(){
 int cdPerso(char * path){
   memset(TARPATH,0, strlen(TARPATH));
   if(path[0] == '/')return cdAbs(path);
-  if(hasTar(path) == 0) return cd(path); // si dans le path il y un tar
+  if(hasTar(path) == 1) return cd(path); // si dans le path il y un tar
   chdir(path);
   return 0;
 }
@@ -24,7 +24,7 @@ int cd(char * path ){
   strcpy(tmp, path);
   int l = 0;
   while((token = strtok_r(tmp, "/", &tmp)) != NULL){
-    if(estTar(token) == 0) break;
+    if(estTar(token) == 1) break;
     l += 1 + strlen(token);
   }
   if(l > 0){ // si il y un path avant le tar
@@ -94,7 +94,7 @@ int navigate(char * path){
       i -= 2;
     }
     else{
-      if(estTar(token) != 0){
+      if(estTar(token) != 1){
   //strcpy(TARPATH, posTar);
   //strcpy(TARPATH, posTar);
         fullpath[i] = malloc(strlen(token) + 1);
@@ -140,7 +140,7 @@ int cdAbs(char * path){
   strcpy(tmp, path);
   char * token;
   for(int n = 0;(token = strtok_r(tmp, "/\n", &tmp)) != NULL; n += strlen(token) +1){
-    if(estTar(token)==0){
+    if(estTar(token) == 1){
       if(n == 0)cdNoOptions();
       else{
         tmp = malloc( n + 1);
