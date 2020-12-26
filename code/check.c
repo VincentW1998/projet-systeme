@@ -23,6 +23,7 @@ static int contient2(char *dossier,char *nom){
     if(readdir(d)<=0) break;
     if(strcmp(ds->d_name,nom)==0) return 1;
   }
+  closedir(d);
   return 0;
 }
 
