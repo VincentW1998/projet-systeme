@@ -36,7 +36,7 @@ int read_header(int fd, char *path) {
   if(strcmp(hd.name, path) == 0) {
     found = 1;
     int pos = lseek(fd, 0, SEEK_CUR);
-    if(rmdirOn) {
+    if(rmdirOn && hd.typeflag == '5') {
       lseek(fd, 0, SEEK_SET);
       // if we use rm/rmdir and the file is empty
       if (countLinks(hd.name, fd) == 2) {
