@@ -16,7 +16,6 @@ void next_header(int fd, unsigned int filesize) {
 }
 
 int read_header(int fd, char *path) {
-  struct posix_header hd;
   unsigned int filesize = 0;
   size_t nb = read(fd, &hd, BLOCKSIZE);
   if(nb == -1) {
