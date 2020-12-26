@@ -33,7 +33,7 @@ myLs.o : myLs.c myLs.h tar.h check.h storeRestore.h
 
 myCp.o : myCp.c myCp.h check.h tar.h myCd.h storeRestore.h
 
-UnitTest.o : UnitTest.c UnitTest.h MyCd.h storeRestore.h
+UnitTest.o : UnitTest.c UnitTest.h myCd.h storeRestore.h
 
 clean :
 	rm -rf *.o
