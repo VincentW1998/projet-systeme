@@ -109,26 +109,26 @@ void *lectureLigne(char * str, char * buff){
   if(token!=NULL){
     buff = malloc(strlen(token) + 1);
     strcpy(buff,token);
-    strcat(buff,"\n");
+//    strcat(buff,"\n");
   }
   return buff;
 }
 
 // separe la ligne en tableau de char
 int separateurCommand(char * buff, char ** command){
-  char * token = strtok(buff, " \n");
-  command[0] = malloc(strlen(token) + 1);
-  strcpy(command[0], token);
-  int i = 1;
+//  char * token = strtok_r(buff, " \n", &buff);
+ // command[0] = malloc(strlen(token) + 1);
+  //strcpy(command[0], token);
+//  int i = 1;
+  char * token = NULL;
+  int i = 0;
 
-  while((token = strtok(NULL, " \n")) != NULL) {
+  while((token = strtok_r(buff, " \n", &buff)) != NULL) {
     command[i] = malloc(strlen(token) + 1);
     strcpy(command[i], token);
     i ++;
   }
   int nbOption = i;
-  command[i] = NULL;
-  command[i+1] = NULL;
 	nbOption = nbOptionRedirect(nbOption, command); //redirect
   return nbOption;
 }

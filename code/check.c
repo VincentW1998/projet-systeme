@@ -26,6 +26,10 @@ int read_header(int fd, char *path) {
   found = 0;
   sscanf(hd.size, "%o", &filesize);
   if(hd.name[0] == '\0') {
+    if(cpOn) {
+      endFile = lseek(fd, -512, SEEK_CUR);
+      return -1;
+    }
     hasPosixHeader(fd); // for mkdir
     return -1;
   }
@@ -41,8 +45,9 @@ int read_header(int fd, char *path) {
       }
     }
     if(cpOn) {
-      lseek(fd, -512, SEEK_CUR);
-      read(fd, &newHd, BLOCKSIZE);
+//      lseek(fd, -512, SEEK_CUR);
+ //     read(fd, &newHd, BLOCKSIZE);
+      hasCpOn(fd, filesize);
     }
 
   }
@@ -97,7 +102,27 @@ int hasRmdirOn(int fd, int filesize) {
   while( lseek(fd, 0, SEEK_CUR)<fin2) { // while we are not at the end
     read(fd, &tampon, BLOCKSIZE); // read
     pwrite(fd, &tampon, BLOCKSIZE, n + accu); // write
-    accu +=512; 
+    accu +=512;
   }
+  return 0;
+}
+
+int hasCpOn(int fd, int filesize) {
+  char tampon[BLOCKSIZE]; // tampon pour recuper le contenu
+  char blockEnd[BLOCKSIZE]; // block vide
+  lseek(fd, -512, SEEK_CUR); 
+  read(fd, &newHd, BLOCKSIZE); // read file source
+  memset(newHd.name, '\0', 100);
+  strncpy(newHd.name, pathFileTarget, 100);
+  int nb = (filesize + 512 -1) / 512;
+  pwrite(fd, &newHd, BLOCKSIZE, endFile);
+  int accu = 512;
+  for (int i = 0; i < nb; i++) {
+    read(fd, &tampon, BLOCKSIZE);
+    pwrite(fd, &tampon, BLOCKSIZE, endFile + accu);
+    accu += 512;
+  }
+  memset(blockEnd, '\0', BLOCKSIZE);
+  pwrite(fd, blockEnd, BLOCKSIZE, endFile + accu);
   return 0;
 }

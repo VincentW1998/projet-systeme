@@ -11,6 +11,8 @@
 #include "tar.h"
 
 struct posix_header newHd;
+char * pathFileTarget;
+int endFile;
 int cpOn;
 int rmdirOn; // if we are using rmdir command -> 1 else 0
 int found;
@@ -27,4 +29,6 @@ int fin(int fd, int pos);
 int hasPosixHeader(int fd);
 
 int hasRmdirOn(int fd, int filesize);
+
+int hasCpOn(int fd, int filesize);
 #endif

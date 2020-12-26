@@ -31,7 +31,8 @@ int cpRepo(char * path, char * target) {
   }
 
   char * pathCpTarget = subWithRepo(target);
-  char * pathFileTarget = createPathFile(pathCpTarget);
+ // char * pathFileTarget = createPathFile(pathCpTarget);
+  pathFileTarget = createPathFile(pathCpTarget);
 
 /*  if(TARPATH[0] == '\0') {
     commandNoTar("cp", pathCp);
@@ -47,15 +48,19 @@ int cpRepo(char * path, char * target) {
   }
 
   cpOn = 1;
+  if((n = checkEntete(tarName, pathFileTarget)) == 1) {
+    cpOn = 0;
+    return -1;
+  }
 
   if((n = checkEntete(tarName, pathWithFile)) == -1) {
     cpOn = 0;
     return -1;
   }
-  if (newHd.name[0] != '\0') {
-    memset(newHd.name, '\0', 100);
-    strncpy(newHd.name, pathFileTarget, 100);
-  }
+//  if (newHd.name[0] != '\0') {
+//    memset(newHd.name, '\0', 100);
+ //   strncpy(newHd.name, pathFileTarget, 100);
+ // }
   cpOn = 0;
   return 1;
 }
