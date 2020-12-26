@@ -43,7 +43,7 @@ int rmfichier_tar(char * path){
 // getcwd + tarpath + fichier a supprimer
   char * pathWithFile = createPathFile(pathRm); 
   rmOn = 1;
-  if((n = checkEntete(tarName, pathWithFile)) == -1) { //check si le fichier existe
+  if((n = rmftar(tarName, pathWithFile)) == -1) { //check si le fichier existe
     rmOn = 0;
     restorePosition();
     return -1;
@@ -62,13 +62,21 @@ int rm_r_tar (char * path){
     return -1;
 
   char *pathRm = subWithRepo(path); // file a supprimer
-  printf("pathRm : %s\n",pathRm);
+  
   if(TARPATH[0] == '\0') { // si t'es pas dans un tar alors tu appelles exec
     commandNoTar_option("rm","-r", pathRm); // appel fonctions avec exec
     restorePosition(); // restorePosition
     return 1;
   }
-
+  
+  int x = (strlen(pathRm)+1);
+  char pathRm2[x];
+  memset(pathRm2,'\0',x);
+  for(int i = 0; i < strlen(pathRm);i++){
+    pathRm2[i]=pathRm[i];
+  }
+  pathRm2[strlen(pathRm)]='/';
+  
   char * tarName = substringTar(); // recupere le nom du tar file
 
   // getcwd + tarpath + fichier a supprimer

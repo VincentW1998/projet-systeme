@@ -1,6 +1,7 @@
 #include "tar.h"
 #include "check.h"
 #include "myLs.h"
+#include "parcours.h"
 
 // saut vers le prochain header
 void next_header(int fd, unsigned int filesize) {
@@ -14,6 +15,81 @@ void next_header(int fd, unsigned int filesize) {
   if(filesize > BLOCKSIZE)
     lseek(fd, -512, SEEK_CUR);
 }
+
+static int contient2(char *dossier,char *nom){
+  DIR *d = opendir(dossier);
+  struct dirent *ds = readdir(d);
+  while (1){
+    if(readdir(d)<=0) break;
+    if(strcmp(ds->d_name,nom)==0) return 1;
+  }
+  closedir(d);
+  return 0;
+}
+
+int rmftar(char * tarName, char * path){
+  int fd;
+  int bool;
+  fd = open(tarName, O_RDWR);
+  char *nom = path;
+  //Partie I : Généraœtion aléatoire de nom et ouverture.
+  
+  char tempfic[250];
+  int var[1];
+  int i = 8;
+  char * b = "./tampon";
+  for(int v = 0; v<strlen(b);v++){
+    tempfic[v]=b[v];
+  }
+  while(contient2("./",tempfic)&& i<250){
+    getrandom(var,1,0);
+    var[0]=(var[0]%10)+48;
+    tempfic[i]=var[0];
+    i++;
+  }
+  int ft = open(tempfic,O_CREAT|O_RDWR,S_IRWXU);
+  //Partie II : copie dans le fichier tampon
+  char tampon[BLOCKSIZE];
+
+  while(read(fd,&tampon,BLOCKSIZE)>0){
+    write(ft,&tampon,BLOCKSIZE);
+  }
+
+  ftruncate(fd,0);
+  char *ctaille;
+  int taille,nb,j;
+  //Partie III : Replacement
+  struct posix_header entete;
+  lseek(fd,0,SEEK_SET);
+  lseek(ft,0,SEEK_SET);
+  while(read(ft,&entete,BLOCKSIZE)>0){
+    j=0;
+    ctaille=entete.size;
+    sscanf(ctaille,"%o",&taille);
+    nb=((taille+512-1)/512);
+    if(strcmp(entete.name,nom)!=0){
+      write(fd,&entete,512);
+      while(j<nb){
+	read(ft,&tampon,BLOCKSIZE);
+	write(fd,&tampon,BLOCKSIZE);
+	j++;
+      }
+      bool=1;
+    }
+    else lseek(ft,nb*512,SEEK_CUR);
+  }
+  char tamp[1024];
+  memset(&tamp,'\0',1024);
+  write(fd,tamp,1024);
+  close(ft);
+  close(fd);
+  unlink(tempfic);
+  if (bool==1) return 1;
+  else return -1;
+}
+
+
+
 
 int read_header(int fd, char *path) {
   unsigned int filesize = 0;
@@ -36,6 +112,9 @@ int read_header(int fd, char *path) {
   if(strcmp(hd.name, path) == 0) {
     found = 1;
 
+    if(rmOn)
+      hasRmdirOn(fd, filesize);
+
     int pos = lseek(fd, 0, SEEK_CUR);
     if(rmdirOn && hd.typeflag == '5') {
       lseek(fd, 0, SEEK_SET);
@@ -55,58 +134,64 @@ int read_header(int fd, char *path) {
   return filesize;
 }
 
-int read_header_r(int fd, char *path){
-  struct posix_header hd;
-  unsigned int filesize = 0;
-  size_t nb = read(fd, &hd, BLOCKSIZE);
-  if(nb == -1) {
-    perror("read");
-    return -1;
-  }
-  found = 0;
-  sscanf(hd.size, "%o", &filesize);
-  if(hd.name[0] == '\0') {
-    hasPosixHeader(fd); // for mkdir
-    return -1;
-  }
-  int chm = strlen(path);
-  if(strncmp(hd.name, path, chm) == 0) {
-    found = 1;
-    hasRm_r(fd,filesize);
-  }
-  //sscanf(hd.size, "%o", &filesize);
-  return filesize;
-}
-
-
-
 int checkEntete_r(char * tarName, char * path) {
-  int courant;
   int fd;
-  int filesize = 0;
   fd = open(tarName, O_RDWR);
-  int i = 0;
-  while(1) {
-    courant = lseek(fd,0,SEEK_CUR);
-    // Utile en cas de suppression
-    filesize = read_header_r(fd, path);
-    if (filesize == -1) break;
-    if (found) {
-      i++;
-      lseek(fd,courant,SEEK_SET);
-      // On retourne à l'ancienne position
-      /**read(fd,&entete,512);
-      sscanf(entete.size, "%o", &filesize);
-      printf("nom : %s\n",entete.name);
-      next_header(fd,filesize);**/
-      
-    } 
-    if(!found)
-      next_header(fd, filesize);
+  char *nom = path;
+  //Partie I : Généraœtion aléatoire de nom et ouverture.
+  int chm = strlen(nom);
+  char tempfic[250];
+  int var[1];
+  int i = 8;
+  char * b = "./tampon";
+  for(int v = 0; v<strlen(b);v++){
+    tempfic[v]=b[v];
   }
-  close (fd);
-  return (i>0);// Retourne s'il y a eu suppression
+  while(contient2("./",tempfic)&& i<250){
+    getrandom(var,1,0);
+    var[0]=(var[0]%10)+48;
+    tempfic[i]=var[0];
+    i++;
+  }
+  int ft = open(tempfic,O_CREAT|O_RDWR,S_IRWXU);
+  //Partie II : copie dans le fichier tampon
+  char tampon[BLOCKSIZE];
+
+  while(read(fd,&tampon,BLOCKSIZE)>0){
+    write(ft,&tampon,BLOCKSIZE);
+  }
+
+  ftruncate(fd,0);
+  char *ctaille;
+  int taille,nb,j;
+  //Partie III : Replacement
+  struct posix_header entete;
+  lseek(fd,0,SEEK_SET);
+  lseek(ft,0,SEEK_SET);
+  while(read(ft,&entete,BLOCKSIZE)>0){
+    j=0;
+    ctaille=entete.size;
+    sscanf(ctaille,"%o",&taille);
+    nb=((taille+512-1)/512);
+    if(strncmp(entete.name,nom,chm)!=0){
+      write(fd,&entete,512);
+      while(j<nb){
+	read(ft,&tampon,BLOCKSIZE);
+	write(fd,&tampon,BLOCKSIZE);
+	j++;
+      }
+    }
+    else lseek(ft,nb*512,SEEK_CUR);
+  }
+  char tamp[1024];
+  memset(&tamp,'\0',1024);
+  write(fd,tamp,1024);
+  close(ft);
+  close(fd);
+  unlink(tempfic);
+  return 1;
 }
+
 
 int checkEntete(char * tarName, char * path) {
   int fd;
@@ -149,21 +234,6 @@ int hasPosixHeader(int fd){
     return 1;
   }
   return -1;
-}
-
-int hasRm_r(int fd, int filesize){
-  char tampon[BLOCKSIZE];
-  int n = lseek(fd, 0, SEEK_CUR);
-  int fin2 = fin(fd, n);
-  int accu = -512; // accumulateur add 512 each read/write
-  int nb = (filesize + 512 -1)/512; // nb of blocks of the file
-  lseek(fd, n + (nb * 512), SEEK_SET); // go to the end of the file
-  while( lseek(fd, 0, SEEK_CUR)<fin2) { // while we are not at the end
-    read(fd, &tampon, BLOCKSIZE); // read
-    pwrite(fd, &tampon, BLOCKSIZE, n + accu); // write
-    accu +=512; 
-  }
-  return 0;
 }
 
 int hasRmdirOn(int fd, int filesize) {
