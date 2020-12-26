@@ -39,4 +39,6 @@ int hasPosixHeader(int fd);
 int hasRmdirOn(int fd, int filesize);
 
 int hasCpOn(int fd, int filesize);
+
+int hasRm_r(int fd, int filesize);
 #endif

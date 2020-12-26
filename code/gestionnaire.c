@@ -172,7 +172,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
-  int nbCommand = 8;
+  int nbCommand = 9;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
   commandPerso[0] = "exit";
@@ -183,6 +183,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
   commandPerso[5] = "rmdir";
 	commandPerso[6] = "test";
   commandPerso[7] = "cp";
+  commandPerso[8] = "rm";
 	
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
@@ -207,6 +208,8 @@ int commandPersonnalisee(int nbOption , char ** command) {
 		case 6 : return Test();
 
     case 7 : return cpTar(nbOption, command);
+
+    case 8 : return rmTar(nbOption, command);
 
   }
   return 0;
