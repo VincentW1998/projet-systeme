@@ -1,7 +1,9 @@
 #!/bin/bash
 
 rm dos.tar
+rm dos2.tar
 make cleanall
 tar cf dos.tar DossierA
+tar cf dos2.tar DossierB
 make shell
 gdb shell

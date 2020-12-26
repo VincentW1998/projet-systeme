@@ -115,14 +115,15 @@ int hasCpOn(int fd, int filesize) {
   memset(newHd.name, '\0', 100);
   strncpy(newHd.name, pathFileTarget, 100);
   int nb = (filesize + 512 -1) / 512;
-  pwrite(fd, &newHd, BLOCKSIZE, endFile);
+  int fd2 = open(tarTarget, O_RDWR);
+  pwrite(fd2, &newHd, BLOCKSIZE, endFile);
   int accu = 512;
   for (int i = 0; i < nb; i++) {
     read(fd, &tampon, BLOCKSIZE);
-    pwrite(fd, &tampon, BLOCKSIZE, endFile + accu);
+    pwrite(fd2, &tampon, BLOCKSIZE, endFile + accu);
     accu += 512;
   }
   memset(blockEnd, '\0', BLOCKSIZE);
-  pwrite(fd, blockEnd, BLOCKSIZE, endFile + accu);
+  pwrite(fd2, blockEnd, BLOCKSIZE, endFile + accu);
   return 0;
 }
