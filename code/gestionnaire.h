@@ -26,8 +26,6 @@ int afficheMessageErreur(char ** command);
 
 int execCommand(char ** command);
 
-int execCommandPipe(char ** command, char ** commandPipe);
-
 void *lectureLigne(char * str, char * buff);
 
 int separateurCommand(char * buff, char ** command);
