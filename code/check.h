@@ -9,6 +9,15 @@
 #include <pwd.h>
 #include <fcntl.h>
 #include "tar.h"
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <sys/random.h>
 
 struct posix_header newHd;
 int rmOn; // si tu utilises rm -> 1 sinon 0
@@ -34,5 +43,5 @@ int hasPosixHeader(int fd);
 
 int hasRmdirOn(int fd, int filesize);
 
-int hasRm_r(int fd, int filesize);
+int hasRm_r(int fd, char *nom);
 #endif

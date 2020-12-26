@@ -32,7 +32,7 @@ int suivant(int fichier){
   
   char *ctaille = entete.size;
   int taille;
-  int sc = sscanf(ctaille,"%o",&taille);
+  sscanf(ctaille,"%o",&taille);
   int nb = (taille+512-1)/512;
   
   lseek(fichier,nb*512,SEEK_CUR);
@@ -82,10 +82,10 @@ static int recherche(int fichier, int option, char *nom){
 
 int rechercher (int fichier, int option, char *nom){
   debut(fichier);
-  recherche(fichier, option, nom);
+  return recherche(fichier, option, nom);
 }
 
-int fin(int fichier){
+int fin_fic(int fichier){
   debut(fichier);
   while(1){
     int x = suivant(fichier);
