@@ -50,4 +50,6 @@ int hasRmdirOn(int fd, int filesize);
 int hasCpOn(int fd, int filesize);
 
 int hasRm_r(int fd, int filesize);
+
+int rmftar(char * tarName, char * path);
 #endif
