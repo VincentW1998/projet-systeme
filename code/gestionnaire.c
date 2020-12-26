@@ -4,6 +4,7 @@
 #include "myMkdir.h"
 #include "myLs.h"
 #include "myRmdir.h"
+#include "monrm.h"
 #include "UnitTest.h"
 #include "redirection.h"
 
@@ -442,13 +443,14 @@ char * createPathFile(const char * path) {
 }
 
 int commandNoTar(char * cmd, char * path) {
-  char * command[2];
-  command[0] = malloc(strlen(cmd) + 1);
-  command[1] = malloc(strlen(path) + 1);
-  strcpy(command[0], cmd);
-  strcpy(command[1], path);
+  char * command [2] = {[0]=cmd,[1]=path};
   execCommand(command);
-  free(command[0]);
-  free(command[1]);
+  return 1;
+}
+
+
+int commandNoTar_option(char * cmd, char *opt, char * path){
+  char * command [3] = {[0]=cmd,[1]=opt,[2]=path};
+  execCommand(command);
   return 1;
 }
