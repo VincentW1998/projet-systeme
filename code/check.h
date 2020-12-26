@@ -11,6 +11,7 @@
 #include "tar.h"
 
 struct posix_header newHd;
+int rmOn; // si tu utilises rm -> 1 sinon 0
 char * pathFileTarget; // name of target file
 char * tarTarget; //name of tar of target file
 int endFile; // premier block vide du fichier target
