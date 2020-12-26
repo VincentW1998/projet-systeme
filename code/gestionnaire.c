@@ -4,6 +4,7 @@
 #include "myMkdir.h"
 #include "myLs.h"
 #include "myRmdir.h"
+#include "monrm.h"
 #include "UnitTest.h"
 #include "redirection.h"
 
@@ -170,6 +171,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
+
   int nbCommand = 7;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
@@ -180,7 +182,6 @@ int commandPersonnalisee(int nbOption , char ** command) {
   commandPerso[4] = "mkdir";
   commandPerso[5] = "rmdir";
 	commandPerso[6] = "test";
-	
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
       numeroCommand = i;
@@ -203,12 +204,19 @@ int commandPersonnalisee(int nbOption , char ** command) {
 			
 		case 6 : return Test();
 
+//    case 6 : return cpJulien
+
+  case 7 : return rmTar(nbOption, command);
+  //  case 8 : return mvJulien
+
+
+
   }
   return 0;
 }
 
 int commandTar(int nbOption, char ** command) {
-  int nbCommand = 9;
+  int nbCommand = 10;
   char *cmdTar[nbCommand];
   int numeroCommand = -1;
   cmdTar[0] = "pwd";
@@ -220,6 +228,7 @@ int commandTar(int nbOption, char ** command) {
   cmdTar[6] = "cat";
   cmdTar[7] = "cp";
   cmdTar[8] = "exit";
+  cmdTar[9] = "rm";
 
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(cmdTar[i], command[0]))
@@ -242,9 +251,15 @@ int commandTar(int nbOption, char ** command) {
 
   case 4 : return rmdirTar(nbOption, command);
       
+//  case 5 : return mvJulien
+
   case 6:  return cat(nbOption,command);
+
+//  case 7 : return cpJulien
       
   case 8 : exit(0);
+
+  case 9 : return rmTar(nbOption, command);
   }
   return -1;
 
@@ -410,12 +425,32 @@ char * createPath(const char * path) {
   return pathWithFolder;
 }
 
+char * createPathFile(const char * path) {
+
+  char * suiteName = subWithoutTar();
+
+/* +3 car on rajoute 2 slash et il y a le caractere zero qui termine une
+ * chaine de caracteres. */
+  int length = strlen(suiteName) + strlen(path) + 2;
+  char * pathWithFile = malloc(length);
+  pathWithFile[0] = '\0';
+  strncat(pathWithFile, suiteName, strlen(suiteName));
+  if (suiteName[0] != '\0') {
+    strcat(pathWithFile, "/");
+  }
+  strncat(pathWithFile, path, strlen(path));
+  return pathWithFile;
+}
+
 int commandNoTar(char * cmd, char * path) {
-  char * command[2];
-  command[0] = malloc(strlen(cmd) + 1);
-  command[1] = malloc(strlen(path) + 1);
-  strcpy(command[0], cmd);
-  strcpy(command[1], path);
+  char * command [2] = {[0]=cmd,[1]=path};
+  execCommand(command);
+  return 1;
+}
+
+
+int commandNoTar_option(char * cmd, char *opt, char * path){
+  char * command [4] = {[0]=cmd,[1]=opt,[2]=path};
   execCommand(command);
   return 1;
 }
