@@ -26,6 +26,12 @@ int read_header(int fd, char *path);
 
 int checkEntete(char * tarName, char * path);
 
+int read_header_r(int fd, char *path);
+
+int checkEntete_r(char * tarName, char * path);
+
+int decalage(int fd, int pos);
+
 int fin(int fd, int pos);
 
 int hasPosixHeader(int fd);

@@ -4,6 +4,7 @@
 #include "myMkdir.h"
 #include "myLs.h"
 #include "myRmdir.h"
+#include "monrm.h"
 #include "UnitTest.h"
 #include "redirection.h"
 #include "myCp.h"
@@ -212,7 +213,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
 }
 
 int commandTar(int nbOption, char ** command) {
-  int nbCommand = 9;
+  int nbCommand = 10;
   char *cmdTar[nbCommand];
   int numeroCommand = -1;
   cmdTar[0] = "pwd";
@@ -224,6 +225,7 @@ int commandTar(int nbOption, char ** command) {
   cmdTar[6] = "cat";
   cmdTar[7] = "cp";
   cmdTar[8] = "exit";
+  cmdTar[9] = "rm";
 
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(cmdTar[i], command[0]))
@@ -246,11 +248,15 @@ int commandTar(int nbOption, char ** command) {
 
   case 4 : return rmdirTar(nbOption, command);
       
+//  case 5 : return mvJulien
+
   case 6:  return cat(nbOption,command);
 
   case 7 : return cpTar(nbOption, command);
       
   case 8 : exit(0);
+
+  case 9 : return rmTar(nbOption, command);
   }
   return -1;
 
@@ -434,11 +440,14 @@ char * createPathFile(const char * path) {
 }
 
 int commandNoTar(char * cmd, char * path) {
-  char * command[2];
-  command[0] = malloc(strlen(cmd) + 1);
-  command[1] = malloc(strlen(path) + 1);
-  strcpy(command[0], cmd);
-  strcpy(command[1], path);
+  char * command [2] = {[0]=cmd,[1]=path};
+  execCommand(command);
+  return 1;
+}
+
+
+int commandNoTar_option(char * cmd, char *opt, char * path){
+  char * command [4] = {[0]=cmd,[1]=opt,[2]=path};
   execCommand(command);
   return 1;
 }
