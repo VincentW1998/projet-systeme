@@ -7,6 +7,7 @@
 #include "monrm.h"
 #include "UnitTest.h"
 #include "redirection.h"
+#include "myCp.h"
 
 //#include "tar.h"
 
@@ -109,26 +110,26 @@ void *lectureLigne(char * str, char * buff){
   if(token!=NULL){
     buff = malloc(strlen(token) + 1);
     strcpy(buff,token);
-    strcat(buff,"\n");
+//    strcat(buff,"\n");
   }
   return buff;
 }
 
 // separe la ligne en tableau de char
 int separateurCommand(char * buff, char ** command){
-  char * token = strtok(buff, " \n");
-  command[0] = malloc(strlen(token) + 1);
-  strcpy(command[0], token);
-  int i = 1;
+//  char * token = strtok_r(buff, " \n", &buff);
+ // command[0] = malloc(strlen(token) + 1);
+  //strcpy(command[0], token);
+//  int i = 1;
+  char * token = NULL;
+  int i = 0;
 
-  while((token = strtok(NULL, " \n")) != NULL) {
+  while((token = strtok_r(buff, " \n", &buff)) != NULL) {
     command[i] = malloc(strlen(token) + 1);
     strcpy(command[i], token);
     i ++;
   }
   int nbOption = i;
-  command[i] = NULL;
-  command[i+1] = NULL;
 	nbOption = nbOptionRedirect(nbOption, command); //redirect
   return nbOption;
 }
@@ -171,8 +172,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
-
-  int nbCommand = 7;
+  int nbCommand = 9;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
   commandPerso[0] = "exit";
@@ -182,6 +182,9 @@ int commandPersonnalisee(int nbOption , char ** command) {
   commandPerso[4] = "mkdir";
   commandPerso[5] = "rmdir";
 	commandPerso[6] = "test";
+  commandPerso[7] = "cp";
+  commandPerso[8] = "rm";
+	
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
       numeroCommand = i;
@@ -204,12 +207,9 @@ int commandPersonnalisee(int nbOption , char ** command) {
 			
 		case 6 : return Test();
 
-//    case 6 : return cpJulien
+    case 7 : return cpTar(nbOption, command);
 
-  case 7 : return rmTar(nbOption, command);
-  //  case 8 : return mvJulien
-
-
+    case 8 : return rmTar(nbOption, command);
 
   }
   return 0;
@@ -255,7 +255,7 @@ int commandTar(int nbOption, char ** command) {
 
   case 6:  return cat(nbOption,command);
 
-//  case 7 : return cpJulien
+  case 7 : return cpTar(nbOption, command);
       
   case 8 : exit(0);
 
