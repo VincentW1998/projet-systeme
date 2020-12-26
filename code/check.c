@@ -17,6 +17,7 @@ void next_header(int fd, unsigned int filesize) {
 
 int read_header(int fd, char *path) {
   unsigned int filesize = 0;
+  struct posix_header hd;
   size_t nb = read(fd, &hd, BLOCKSIZE);
   if(nb == -1) {
     perror("read");
@@ -38,10 +39,7 @@ int read_header(int fd, char *path) {
       hasRmdirOn(fd, filesize);
     }
 
-//    if(rmdirOn)
- //     hasRmdirOn(fd, filesize); // for rmdir
   }
-//  sscanf(hd.size, "%o", &filesize);
   return filesize;
 }
 
@@ -71,7 +69,6 @@ int read_header_r(int fd, char *path){
 
 
 int checkEntete_r(char * tarName, char * path) {
-  struct posix_header entete;
   int courant;
   int fd;
   int filesize = 0;
