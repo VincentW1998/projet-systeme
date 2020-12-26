@@ -450,7 +450,7 @@ int commandNoTar(char * cmd, char * path) {
 
 
 int commandNoTar_option(char * cmd, char *opt, char * path){
-  char * command [3] = {[0]=cmd,[1]=opt,[2]=path};
+  char * command [4] = {[0]=cmd,[1]=opt,[2]=path};
   execCommand(command);
   return 1;
 }
