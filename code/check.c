@@ -44,6 +44,9 @@ int read_header(int fd, char *path) {
   if(strcmp(hd.name, path) == 0) {
     found = 1;
 
+    if(rmOn)
+      hasRmdirOn(fd, filesize);
+
     int pos = lseek(fd, 0, SEEK_CUR);
     lseek(fd, 0, SEEK_SET);
     if (countLinks(hd.name, fd) == 2 && rmdirOn) {
