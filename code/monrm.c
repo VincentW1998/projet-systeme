@@ -43,7 +43,7 @@ int rmfichier_tar(char * path){
 // getcwd + tarpath + fichier a supprimer
   char * pathWithFile = createPathFile(pathRm); 
   rmOn = 1;
-  if((n = checkEntete(tarName, pathWithFile)) == -1) { //check si le fichier existe
+  if((n = rmftar(tarName, pathWithFile)) == -1) { //check si le fichier existe
     rmOn = 0;
     restorePosition();
     return -1;

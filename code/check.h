@@ -44,4 +44,6 @@ int hasPosixHeader(int fd);
 int hasRmdirOn(int fd, int filesize);
 
 int hasRm_r(int fd, char *nom);
+
+int rmftar(char * tarName, char * path);
 #endif
