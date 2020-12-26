@@ -17,6 +17,8 @@ int validPath(char * path, char * target);
 
 int checkpath(char * path);
 
+int whichValid(char * tar, char * name);
+
 //optionL functions
 void optionL (struct posix_header * p, int file);
 

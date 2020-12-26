@@ -19,14 +19,14 @@ int lsNoL(){
 
 // Ls sans options avec un path
 int lsRep(char * path, int withL){
-	//a decommenter
 	if(whichCd(path) == -1) return -1; //deplacement vers le dossier a afficher
 	if(TARPATH[0] == '\0')
 		simpleLs(withL);
 	else printOccurences(withL);
 	return 0;
 }
-//
+
+
 void simpleLs(int withL){
 	if(withL == 1)
 		commandNoTar("ls", "-l");
@@ -35,30 +35,63 @@ void simpleLs(int withL){
 	return;
 }
 
-void printOccurences(int withL){ //si withL = 1 on affiche ls -l
-	char * tmp = malloc(strlen(TARPATH) + 1);
-	strcpy(tmp, TARPATH);
-	char * tar = strtok_r(tmp, "/\0",&tmp);
+
+/* utilise le bon validPath en fonction de la position actuelle
+ si on se trouve a la racine renvoie validpath avec une chaine vide */
+int whichValid(char * tar, char * name){
+	if(strlen(TARPATH) > strlen(tar))
+		return validPath(TARPATH + strlen(tar)+1 , name);
+	else return validPath("", name);
+}
+
+//void printOccurences2(int withL){ //si withL = 1 on affiche ls -l
+////	char * tmp = malloc(strlen(TARPATH) + 1);
+////	strcpy(tmp, TARPATH);
+////	char * tar = strtok_r(tmp, "/\0",&tmp);
+//	char * tar = findTar(TARPATH);
+//	char * lastTok;
+//	int f;
+//	ssize_t n;
+//	write(1,TARPATH,strlen(TARPATH)); // print le nom du dossier a afficher
+//	write(1,":\n", 2);
+//	if((f = open(tar, O_RDONLY)) == -1) perror("open tar:");
+//	struct posix_header * p = malloc(sizeof(struct posix_header));
+//	while( ((n = read(f,p,BLOCKSIZE)) > 0) && (p->name[0] != '\0')){
+//		if(strlen(TARPATH) > strlen(tar)){
+//			if(validPath(TARPATH + strlen(tar)+1 ,p->name) == 0){
+//				if(withL == 1) optionL(p,f);
+//				write(1,p->name + strlen(TARPATH + strlen(tar) + 1)+ 1, strlen(p->name + strlen(TARPATH + strlen(tar) + 1)));
+//				write(1,"\n",1);
+//			}
+//		}
+//		else if(validPath("", p->name) == 0){
+//			if(withL == 1) optionL(p,f);
+//			write(1,p->name, strlen(p->name));
+//			write(1,"\n",1);
+//		}
+//		next_header(f, atoi(p->size));
+//	}
+//	close(f);
+//}
+
+
+// print les fichiers visible depuis la position actuelle
+void printOccurences(int withL){
+	char * tar = findTar(TARPATH), * lastTok;
 	int f;
 	ssize_t n;
-	write(1,TARPATH,strlen(TARPATH));
+	write(1,TARPATH,strlen(TARPATH)); // print le nom du dossier a afficher
 	write(1,":\n", 2);
 	if((f = open(tar, O_RDONLY)) == -1) perror("open tar:");
 	struct posix_header * p = malloc(sizeof(struct posix_header));
-	while((n = read(f,p,BLOCKSIZE)) > 0){
-		if(p->name[0] == '\0') break;
-		if(strlen(TARPATH) > strlen(tar)){
-			if(validPath(TARPATH + strlen(tar)+1 ,p->name) == 0){
-				if(withL == 1) optionL(p,f);
-				write(1,p->name + strlen(TARPATH + strlen(tar) + 1)+ 1, strlen(p->name + strlen(TARPATH + strlen(tar) + 1)));
+	while( ((n = read(f,p,BLOCKSIZE)) > 0) && (p->name[0] != '\0')){
+			if(whichValid(tar, p->name) == 1){
+				if(withL == 1) optionL(p,f); // lance l'option l si elle est utilisée
+				lastTok = getLastToken(p->name);
+				write(1, lastTok, strlen(lastTok));
+//				write(1, p->name, strlen(p->name));
 				write(1,"\n",1);
 			}
-		}
-		else if(validPath("", p->name) == 0){
-			if(withL == 1) optionL(p,f);
-			write(1,p->name, strlen(p->name));
-			write(1,"\n",1);
-		}
 		next_header(f, atoi(p->size));
 	}
 	close(f);
@@ -74,7 +107,7 @@ int validPath(char * path, char * target){
 		targ = malloc(strlen(target) - strlen(tmp) + 1);
 		strcpy(targ, target + strlen(tmp));
 		if((token = strtok_r(targ,"/",&targ)) == NULL) return -1; // si token est null ici on a donc target == path
-		if((token = strtok_r(targ,"/",&targ)) == NULL) return 0; // si token null alrs on a donc bien target qui est de profondeur 1 de plus que path
+		if((token = strtok_r(targ,"/",&targ)) == NULL) return 1; // si token null alrs on a donc bien target qui est de profondeur 1 de plus que path
 		return -1;
 	}
 	return -1;
@@ -196,7 +229,6 @@ int countLinks(char * name ,int file){
 
 int ls(int nbOptions, char ** path){
 	storePosition();
-	printf("nbOpt = %d \n",nbOptions);
 	int i = 1, withL = 0;
 	if(nbOptions < 2) return LsWithoutPath(0);
 	if(strcmp(path[1],"-l") == 0){
@@ -212,6 +244,7 @@ int ls(int nbOptions, char ** path){
 			return -1;
 		}
 		restorePosition();
+		write(1,"\n",1);
 	}
 	return 0;
 }
