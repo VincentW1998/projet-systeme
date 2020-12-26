@@ -16,7 +16,8 @@ int rmdirTar(int nbOption, char ** command) {
 
 // delete the repository
 int deleteRepo(char * path) {
-  int fd, n;
+  //int fd, n;
+  int n;
   storePosition();
   char * pathCd = subWithoutRepo(path); // path without the last repository
 
@@ -33,11 +34,11 @@ int deleteRepo(char * path) {
 
   char * tarName = substringTar(); // tar file name
 
-  fd = open(tarName, O_RDWR); // open the tar file
+  /*fd = open(tarName, O_RDWR); // open the tar file
   if(fd < 0) {
     perror("open fichier Tar");
     return -1;
-  }
+  }*/
 
   char * pathWithFolder = createPath(pathRmdir); // tarpath + pathRmdir
 

@@ -16,5 +16,4 @@ int mkdirTar(int nbOption, char **path);
 
 int createRepo(char * path);
 
-int whichCd(char * pathCd);
 #endif

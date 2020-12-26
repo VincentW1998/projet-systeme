@@ -71,16 +71,17 @@ int createRepo(char * path){
     return 1;
   }
 
-  int fd, n;
+//  int fd, n;
+  int n;
   // return tar file name for open function
   char * tarName = substringTar();
 
-  fd = open(tarName, O_RDWR); // on ouvre le fichier tar
+/*  fd = open(tarName, O_RDWR); // on ouvre le fichier tar
   if (fd < 0){
     //restorePosition();
     perror("open fichier Tar");
     return -1;
-  }
+  }*/
   // concatene path et TARPATH et rajoute un slash a la fin
   char * pathWithFolder = createPath(pathMkdir);
 

@@ -12,6 +12,10 @@
 
 struct posix_header newHd;
 int rmOn; // si tu utilises rm -> 1 sinon 0
+char * pathFileTarget; // name of target file
+char * tarTarget; //name of tar of target file
+int endFile; // premier block vide du fichier target
+int cpOn;
 int rmdirOn; // if we are using rmdir command -> 1 else 0
 int found;
 char buf[512];
@@ -34,5 +38,5 @@ int hasPosixHeader(int fd);
 
 int hasRmdirOn(int fd, int filesize);
 
-int hasRm_r(int fd, int filesize);
+int hasCpOn(int fd, int filesize);
 #endif
