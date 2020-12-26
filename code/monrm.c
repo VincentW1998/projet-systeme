@@ -62,9 +62,9 @@ int rm_r_tar (char * path){
     return -1;
 
   char *pathRm = subWithRepo(path); // file a supprimer
-
+  printf("pathRm : %s\n",pathRm);
   if(TARPATH[0] == '\0') { // si t'es pas dans un tar alors tu appelles exec
-    commandNoTar("rm -r", pathRm); // appel fonctions avec exec
+    commandNoTar_option("rm","-r", pathRm); // appel fonctions avec exec
     restorePosition(); // restorePosition
     return 1;
   }
