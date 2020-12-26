@@ -62,18 +62,21 @@ int rm_r_tar (char * path){
     return -1;
 
   char *pathRm = subWithRepo(path); // file a supprimer
-  char pathRm2[strlen(pathRm)];
+  
+  if(TARPATH[0] == '\0') { // si t'es pas dans un tar alors tu appelles exec
+    commandNoTar_option("rm","-r", pathRm); // appel fonctions avec exec
+    restorePosition(); // restorePosition
+    return 1;
+  }
+  
+  int x = (strlen(pathRm)+1);
+  char pathRm2[x];
+  memset(pathRm2,'\0',x);
   for(int i = 0; i < strlen(pathRm);i++){
     pathRm2[i]=pathRm[i];
   }
   pathRm2[strlen(pathRm)]='/';
   
-  if(TARPATH[0] == '\0') { // si t'es pas dans un tar alors tu appelles exec
-    commandNoTar_option("rm","-r", pathRm2); // appel fonctions avec exec
-    restorePosition(); // restorePosition
-    return 1;
-  }
-
   char * tarName = substringTar(); // recupere le nom du tar file
 
   // getcwd + tarpath + fichier a supprimer
