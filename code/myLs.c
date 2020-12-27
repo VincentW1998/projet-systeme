@@ -215,15 +215,15 @@ void mtime(struct posix_header * p){
 }
 
 //******** end -l ************
-long octalConverter (char * octal){ // convertit octal vers decimal : Char octal -> int decimal
-	long decimal = 0;
-	char * c = malloc(2);
-	for(size_t i = strlen(octal);i>0;i--){
-		c[0] = octal[i-1];
-		decimal += atoi(c) * pow(8,strlen(octal)-i);
-	}
-	return decimal;
-}
+//long octalConverter (char * octal){ // convertit octal vers decimal : Char octal -> int decimal
+//	long decimal = 0;
+//	char * c = malloc(2);
+//	for(size_t i = strlen(octal);i>0;i--){
+//		c[0] = octal[i-1];
+//		decimal += atoi(c) * pow(8,strlen(octal)-i);
+//	}
+//	return decimal;
+//}
 
 int countLinks(char * name ,int file){
 	size_t n;
@@ -253,25 +253,10 @@ int manageOption(int nbOptions, char ** path){
 int ls(int nbOptions, char ** path){
 	storePosition();
 	int i;
-//	int i = 1, withL = 0;
-//	if(nbOptions < 2) return LsWithoutPath(0);
-//	if(strcmp(path[1],"-l") == 0){
-//		if(nbOptions == 2) return LsWithoutPath(1);
-//		i = 2;
-//		withL = 1;
-//	}
-//	else i=1;
-//
 	if((i = manageOption(nbOptions, path)) == -1) return -1; //init i en fonction des options
-//	if(nbOption < 2) return LsWithoutPath();
 	if((nbOptions < 2) || (nbOptions == 2 && withL == 1)) return LsWithoutPath();
 	for(; i < nbOptions; i++){
 		lsRep(path[i]);
-//		if(lsRep(path[i]) == -1) {
-//			perror("no such file or directory");
-//			restorePosition();
-//			return -1;
-//		}
 		restorePosition();
 		write(1,"\n",1);
 	}

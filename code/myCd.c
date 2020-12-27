@@ -30,6 +30,7 @@ int cd(char * path ){
   if(l > 0){ // si il y un path avant le tar
     if(path[0] != '/') l--;
     stdPath = malloc(l + 1);
+		memset(stdPath, '\0', l+1);
     strncpy(stdPath, path, l);
     chdir(stdPath);
     free(stdPath);
