@@ -12,17 +12,23 @@ int LsWithoutPath(){
 	return 1;
 }
 
-int lsNoL(){
-	char * command[2] = {"ls"};
-	return execCommand(command);
+//print le dossier a lister
+void writeName(){
+	char * lastToken;
+	if(TARPATH[0] != '\0') lastToken = getLastToken(TARPATH);
+	else lastToken = getLastToken(getcwd(NULL, 0));
+	write(1,lastToken,strlen(lastToken));
+	write(1,":\n",2);
 }
 
 // Ls sans options avec un path
 int lsRep(char * path){
 	if(whichCd(path) == -1) return -1; //deplacement vers le dossier a afficher
+	writeName();
 	if(TARPATH[0] == '\0')
 		simpleLs();
 	else printOccurences();
+	write(1,"\n",1);
 	return 1;
 }
 
@@ -30,8 +36,10 @@ int lsRep(char * path){
 void simpleLs(){
 	if(withL == 1)
 		commandNoTar("ls", "-l");
-	char * cmd[2] = {"ls"};
-	execCommand(cmd);
+	else{
+		char * cmd[2] = {"ls"};
+		execCommand(cmd);
+	}
 	return;
 }
 
@@ -44,44 +52,11 @@ int whichValid(char * tar, char * name){
 	else return validPath("", name);
 }
 
-//void printOccurences2(int withL){ //si withL = 1 on affiche ls -l
-////	char * tmp = malloc(strlen(TARPATH) + 1);
-////	strcpy(tmp, TARPATH);
-////	char * tar = strtok_r(tmp, "/\0",&tmp);
-//	char * tar = findTar(TARPATH);
-//	char * lastTok;
-//	int f;
-//	ssize_t n;
-//	write(1,TARPATH,strlen(TARPATH)); // print le nom du dossier a afficher
-//	write(1,":\n", 2);
-//	if((f = open(tar, O_RDONLY)) == -1) perror("open tar:");
-//	struct posix_header * p = malloc(sizeof(struct posix_header));
-//	while( ((n = read(f,p,BLOCKSIZE)) > 0) && (p->name[0] != '\0')){
-//		if(strlen(TARPATH) > strlen(tar)){
-//			if(validPath(TARPATH + strlen(tar)+1 ,p->name) == 0){
-//				if(withL == 1) optionL(p,f);
-//				write(1,p->name + strlen(TARPATH + strlen(tar) + 1)+ 1, strlen(p->name + strlen(TARPATH + strlen(tar) + 1)));
-//				write(1,"\n",1);
-//			}
-//		}
-//		else if(validPath("", p->name) == 0){
-//			if(withL == 1) optionL(p,f);
-//			write(1,p->name, strlen(p->name));
-//			write(1,"\n",1);
-//		}
-//		next_header(f, atoi(p->size));
-//	}
-//	close(f);
-//}
-
-
 // print les fichiers visible depuis la position actuelle
 void printOccurences(){
 	char * tar = findTar(TARPATH), * lastTok;
 	int f, filesize = 0;
 	ssize_t n;
-	write(1,TARPATH,strlen(TARPATH)); // print le nom du dossier a afficher
-	write(1,":\n", 2);
 	if((f = open(tar, O_RDONLY)) == -1) perror("open tar:");
 	struct posix_header * p = malloc(sizeof(struct posix_header));
 	while( ((n = read(f,p,BLOCKSIZE)) > 0) && (p->name[0] != '\0')){
@@ -89,7 +64,6 @@ void printOccurences(){
 				if(withL == 1) optionL(p,f); // lance l'option l si elle est utilisée
 				lastTok = getLastToken(p->name);
 				write(1, lastTok, strlen(lastTok));
-//				write(1, p->name, strlen(p->name));
 				write(1,"\n",1);
 			}
 		sscanf(p->size, "%o", &filesize);
@@ -134,8 +108,6 @@ void typeFic(struct posix_header * p){
 
 void rights (struct posix_header * p){
 	char * perm[8] = {"---","--x","-w-","-wx","r--","r-x","rw-","rwx"};
-	int tst;
-	sscanf(p->mode, "%o", &tst);
 	char * mode = malloc(2);
 	char * str = malloc(strlen(perm[0]) * 3 + 1);
 	size_t modesize = strlen(p->mode); //les droits correspondent aux 3 derniers chiffres de p->mode
@@ -190,11 +162,6 @@ void usrAndGrp(struct posix_header * p){
 
 void psize(struct posix_header * p){
 	char * str = malloc(12);
-//	char * endptr;
-//	long size = strtol(p->size,&endptr,10); // equivalent de strtok -> atoi version long
-//	if(strcmp(p->size,endptr) == 0)perror("error psize"); // check si un long a bien ete lu
-//	snprintf(str, 11, "%ld", size); // convertit le long en string
-//	size = octalConverter(str);
 	int size;
 	sscanf(p->size, "%o", &size);
 	snprintf(str, 11 , "%d ", size);
@@ -204,7 +171,6 @@ void psize(struct posix_header * p){
 //
 void mtime(struct posix_header * p){
 	char * str = malloc(14);
-//	time_t t = (int) octalConverter(p->mtime);
 	int tmp;
 	sscanf(p->mtime, "%o", &tmp);
 	time_t t = (int) tmp;
@@ -215,15 +181,6 @@ void mtime(struct posix_header * p){
 }
 
 //******** end -l ************
-//long octalConverter (char * octal){ // convertit octal vers decimal : Char octal -> int decimal
-//	long decimal = 0;
-//	char * c = malloc(2);
-//	for(size_t i = strlen(octal);i>0;i--){
-//		c[0] = octal[i-1];
-//		decimal += atoi(c) * pow(8,strlen(octal)-i);
-//	}
-//	return decimal;
-//}
 
 int countLinks(char * name ,int file){
 	size_t n;
@@ -258,7 +215,6 @@ int ls(int nbOptions, char ** path){
 	for(; i < nbOptions; i++){
 		lsRep(path[i]);
 		restorePosition();
-		write(1,"\n",1);
 	}
 	return 1;
 }

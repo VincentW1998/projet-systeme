@@ -7,6 +7,8 @@ int withL;
 
 int manageOption(int nbOptions, char ** path);
 
+void writeName(void);
+
 int LsWithoutPath(void);
 
 int lsRep(char * path);

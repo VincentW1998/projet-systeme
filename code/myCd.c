@@ -15,7 +15,7 @@ int cdPerso(char * path){
   memset(TARPATH,0, strlen(TARPATH));
   if(path[0] == '/')return cdAbs(path);
   if(hasTar(path) == 1) return cd(path); // si dans le path il y un tar
-  chdir(path);
+  if(chdir(path) == -1) return -1;
   return 1;
 }
 
@@ -32,7 +32,7 @@ int cd(char * path ){
     stdPath = malloc(l + 1);
 		memset(stdPath, '\0', l+1);
     strncpy(stdPath, path, l);
-    chdir(stdPath);
+    if(chdir(stdPath) == -1) return -1;
     free(stdPath);
   }
   if(l < strlen(path)){
