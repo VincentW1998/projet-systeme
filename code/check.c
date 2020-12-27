@@ -270,5 +270,6 @@ int hasCpOn(int fd, int filesize) {
   }
   memset(blockEnd, '\0', BLOCKSIZE);
   pwrite(fd2, blockEnd, BLOCKSIZE, endFile + accu);
+  memset(&newHd, '\0', BLOCKSIZE); // vide le posix_header 
   return 0;
 }
