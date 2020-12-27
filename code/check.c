@@ -12,8 +12,6 @@ void next_header(int fd, unsigned int filesize) {
       perror("read");
     }
   }
-  if(filesize > BLOCKSIZE)
-    lseek(fd, -512, SEEK_CUR);
 }
 
 static int contient2(char *dossier,char *nom){

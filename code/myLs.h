@@ -3,19 +3,27 @@
 #define myLs_h
 #include "tar.h"
 
-int LsWithoutPath(int withL);
+int withL;
 
-int lsRep(char * path, int withL);
+int manageOption(int nbOptions, char ** path);
 
-void simpleLs(int withL);
+void writeName(void);
+
+int LsWithoutPath(void);
+
+int lsRep(char * path);
+
+void simpleLs(void);
 
 int ls(int nbOptions, char ** path);
 
-void printOccurences(int withL);
+void printOccurences(void);
 
 int validPath(char * path, char * target);
 
 int checkpath(char * path);
+
+int whichValid(char * tar, char * name);
 
 //optionL functions
 void optionL (struct posix_header * p, int file);

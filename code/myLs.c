@@ -5,72 +5,69 @@
 #include "storeRestore.h"
 
 // ls sans path en arguments
-int LsWithoutPath(int withL){
+int LsWithoutPath(){
 	if(*TARPATH == '\0')
-		simpleLs(withL);
-	else printOccurences(withL);
-	return 0;
+		simpleLs();
+	else printOccurences();
+	return 1;
+}
+
+//print le dossier a lister
+void writeName(){
+	char * lastToken;
+	if(TARPATH[0] != '\0') lastToken = getLastToken(TARPATH);
+	else lastToken = getLastToken(getcwd(NULL, 0));
+	write(1,lastToken,strlen(lastToken));
+	write(1,":\n",2);
 }
 
 // Ls sans options avec un path
-int lsRep(char * path, int withL){
-	//je me deplace dans le dossier a lister
-	if(*TARPATH == '\0'){
-		if(cdPerso(path) == -1){
-			perror("bad address");
-			return -1;
-		}
-	}
-	else if(navigate(path) == -1){
-		perror("bad address");
-		return -1;
-	}
-	// fin deplacement
-	//a decommenter
-	//	if(whichCd(path) == -1) return -1;
-	//	if(TARPATH[0] == '\0'){
-	//		if(withL) return commandNoTar("ls","-l");
-	//		commandNoTar("ls","");
-	//	}
-	
-	if(*TARPATH == '\0') simpleLs(withL);
-	else printOccurences(withL);
-	return 0;
+int lsRep(char * path){
+	if(whichCd(path) == -1) return -1; //deplacement vers le dossier a afficher
+	writeName();
+	if(TARPATH[0] == '\0')
+		simpleLs();
+	else printOccurences();
+	write(1,"\n",1);
+	return 1;
 }
 
-void simpleLs(int withL){
-	char * cmd[3] = {"ls"};
+
+void simpleLs(){
 	if(withL == 1)
-		cmd[1] = "-l";
-	execCommand(cmd);
+		commandNoTar("ls", "-l");
+	else{
+		char * cmd[2] = {"ls"};
+		execCommand(cmd);
+	}
 	return;
 }
 
-void printOccurences(int withL){ //si withL = 1 on affiche ls -l
-	char * tmp = malloc(strlen(TARPATH) + 1);
-	strcpy(tmp, TARPATH);
-	char * tar = strtok_r(tmp, "/\0",&tmp);
-	int f;
+
+/* utilise le bon validPath en fonction de la position actuelle
+ si on se trouve a la racine renvoie validpath avec une chaine vide */
+int whichValid(char * tar, char * name){
+	if(strlen(TARPATH) > strlen(tar))
+		return validPath(TARPATH + strlen(tar)+1 , name);
+	else return validPath("", name);
+}
+
+// print les fichiers visible depuis la position actuelle
+void printOccurences(){
+	char * tar = findTar(TARPATH), * lastTok;
+	int f, filesize = 0;
 	ssize_t n;
-	write(1,TARPATH,strlen(TARPATH));
-	write(1,":\n", 2);
 	if((f = open(tar, O_RDONLY)) == -1) perror("open tar:");
 	struct posix_header * p = malloc(sizeof(struct posix_header));
-	while((n = read(f,p,BLOCKSIZE)) > 0){
-		if(p->name[0] == '\0') break;
-		if(strlen(TARPATH) > strlen(tar)){
-			if(validPath(TARPATH + strlen(tar)+1 ,p->name) == 0){
-				if(withL == 1) optionL(p,f);
-				write(1,p->name + strlen(TARPATH + strlen(tar) + 1)+ 1, strlen(p->name + strlen(TARPATH + strlen(tar) + 1)));
+	while( ((n = read(f,p,BLOCKSIZE)) > 0) && (p->name[0] != '\0')){
+			if(whichValid(tar, p->name) == 1){
+				if(withL == 1) optionL(p,f); // lance l'option l si elle est utilisée
+				lastTok = getLastToken(p->name);
+				write(1, lastTok, strlen(lastTok));
 				write(1,"\n",1);
 			}
-		}
-		else if(validPath("", p->name) == 0){
-			if(withL == 1) optionL(p,f);
-			write(1,p->name, strlen(p->name));
-			write(1,"\n",1);
-		}
-		next_header(f, atoi(p->size));
+		sscanf(p->size, "%o", &filesize);
+		next_header(f, filesize);
 	}
 	close(f);
 }
@@ -86,7 +83,7 @@ int validPath(char * path, char * target){
 		targ = malloc(strlen(target) - strlen(tmp) + 1);
 		strcpy(targ, target + strlen(tmp));
 		if((token = strtok_r(targ,"/",&targ)) == NULL) return -1; // si token est null ici on a donc target == path
-		if((token = strtok_r(targ,"/",&targ)) == NULL) return 0; // si token null alrs on a donc bien target qui est de profondeur 1 de plus que path
+		if((token = strtok_r(targ,"/",&targ)) == NULL) return 1; // si token null alrs on a donc bien target qui est de profondeur 1 de plus que path
 		return -1;
 	}
 	return -1;
@@ -110,7 +107,7 @@ void typeFic(struct posix_header * p){
 	//	free(typeflag);
 }
 
-void rights(struct posix_header * p){
+void rights (struct posix_header * p){
 	char * perm[8] = {"---","--x","-w-","-wx","r--","r-x","rw-","rwx"};
 	char * mode = malloc(2);
 	char * str = malloc(strlen(perm[0]) * 3 + 1);
@@ -126,7 +123,7 @@ void rights(struct posix_header * p){
 	free(str);
 	free(mode);
 }
-//
+
 void nbrlink(struct posix_header * p, int file){
 	if(p->typeflag != '5'){
 		write(1,"1 ",2);
@@ -138,7 +135,7 @@ void nbrlink(struct posix_header * p, int file){
 	strcpy(tmp, TARPATH);
 	char * tar = strtok_r(tmp, "/",&tmp);
 	tmp = malloc(strlen(TARPATH) - strlen(tar) + strlen(p->name) + 3);
-	if(strlen(tar) == strlen(TARPATH)) strcpy(tmp,p->name);
+	if(strlen(tar) == strlen(TARPATH)) strcpy(tmp,p->name); //retourne TARPATH(SANSTAR)+p->name
 	else {
 		strcat(tmp,"/");
 		strcat(tmp,p->name);
@@ -153,7 +150,7 @@ void nbrlink(struct posix_header * p, int file){
 	
 }
 
-//
+
 void usrAndGrp(struct posix_header * p){
 	char * str = malloc(strlen(p->uname) + strlen(p->gname) + 3);
 	strcpy(str,p->uname);
@@ -165,21 +162,19 @@ void usrAndGrp(struct posix_header * p){
 }
 
 void psize(struct posix_header * p){
-	//	if(strcmp(p->name,"matin") == 0){ write(1,"\n",1);exit(EXIT_FAILURE);}
 	char * str = malloc(12);
-	char * endptr;
-	long size = strtol(p->size,&endptr,10); // equivalent de strtok -> atoi version long
-	if(strcmp(p->size,endptr) == 0)perror("error psize"); // check si un long a bien ete lu
-	snprintf(str, 11, "%ld", size); // convertit le long en string
-	size = octalConverter(str);
-	snprintf(str, 11 , "%ld ", size);
+	int size;
+	sscanf(p->size, "%o", &size);
+	snprintf(str, 11 , "%d ", size);
 	write(1, str, strlen(str));
 	free(str);
 }
 //
 void mtime(struct posix_header * p){
 	char * str = malloc(14);
-	time_t t = (int) octalConverter(p->mtime);
+	int tmp;
+	sscanf(p->mtime, "%o", &tmp);
+	time_t t = (int) tmp;
 	struct tm * time = localtime(&t);
 	strftime(str,14,"%b %d %R ",time);
 	write(1,str,strlen(str));
@@ -187,43 +182,41 @@ void mtime(struct posix_header * p){
 }
 
 //******** end -l ************
-long octalConverter (char * octal){ // convertit octal vers decimal : Char octal -> int decimal
-	long decimal = 0;
-	char * c = malloc(2);
-	for(size_t i = strlen(octal);i>0;i--){
-		c[0] = octal[i-1];
-		decimal += atoi(c) * pow(8,strlen(octal)-i);
-	}
-	return decimal;
-}
 
 int countLinks(char * name ,int file){
 	size_t n;
+	int filesize = 0;
 	int count = 2;
 	struct posix_header * p = malloc(sizeof(struct posix_header));
-	while((n = read(file,p,BLOCKSIZE)) > 0 && p->name[0] != '\0')
-		if(validPath(name, p->name) == 0) count++;
+	while( ((n = read(file,p,BLOCKSIZE)) > 0) && (p->name[0] != '\0') ){
+		if(validPath(name, p->name) == 1) count++;
+		sscanf(p->size, "%o", &filesize);
+		next_header(file, filesize);
+	}
 	return count;
+}
+
+//initialise i en fonction des options
+int manageOption(int nbOptions, char ** path){
+	withL = 0;
+	if(nbOptions < 2) return 0;
+	if(path[1][0] == '-'){
+		if(strcmp(path[1],"-l") == 0) withL = 1;
+		else return -1;
+	}
+	return 1 + withL;
+		
 }
 
 int ls(int nbOptions, char ** path){
 	storePosition();
-	int i = 1, withL = 0;
-	if(nbOptions < 2) return LsWithoutPath(0);
-	if(strcmp(path[1],"-l") == 0){
-		if(nbOptions == 2) return LsWithoutPath(1);
-		i = 2;
-		withL = 1;
-	}
-	else i=1;
+	int i;
+	if((i = manageOption(nbOptions, path)) == -1) return -1; //init i en fonction des options
+	if((nbOptions < 2) || (nbOptions == 2 && withL == 1)) return LsWithoutPath();
 	for(; i < nbOptions; i++){
-		if(lsRep(path[i],withL) == -1) {
-			perror("no such file or directory");
-			restorePosition();
-			return -1;
-		}
+		lsRep(path[i]);
 		restorePosition();
 	}
-	return 0;
+	return 1;
 }
 

@@ -122,7 +122,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
   else {
     if(*TARPATH != '\0')
       commandTar(nbOption, command);
-    else if(commandPersonnalisee(nbOption, command) == -2) //command perso sans pipe
+    else if(commandPersonnalisee(nbOption, command) == 0) //command perso sans pipe
        execCommand(command); // command sans le pipe
   }
   stopRedirection(); // redirect
@@ -149,7 +149,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
       numeroCommand = i;
   }
   switch (numeroCommand) {
-    case -1 : return -2;
+    case -1 : return 0; //renvoie 0 si la commande ne figure pas dans le tableau
       
     case 0 : exit(0);
       
@@ -173,7 +173,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
     case 9 : return 0;
 
   }
-  return 0;
+  return 1;
 }
 
 int commandTar(int nbOption, char ** command) {
@@ -229,16 +229,6 @@ int commandTar(int nbOption, char ** command) {
 
 }
 
-int estTar(char * token) { // verifie si un token est un .tar
-  char * tmp = malloc(strlen(token) +1 );
-
-  strcpy(tmp, token);
-  char * tok = strtok_r(tmp,"/",&tok);
-//	free(tmp);
-  if(hasTar(tok) == 0) return 0;
-  return -1;
-}
-
 int existTar(char * token){
   char * tar = malloc(strlen(token) + 1);
   strcpy(tar, token);
@@ -248,8 +238,7 @@ int existTar(char * token){
   while((cur = readdir(dir)) > 0){
     if(strcmp(cur->d_name,tar) == 0){
       closedir(dir);
-      return 0;
-
+      return 1;
     }
   }
   closedir(dir);
@@ -258,13 +247,23 @@ int existTar(char * token){
   return -1;
 }
 
+int estTar(char * token) { // verifie si un token est un .tar
+	char * tmp = malloc(strlen(token) +1 );
+	strcpy(tmp, token);
+	char * tok = strtok_r(tmp,"/",&tok);
+	//	free(tmp);
+	if(hasTar(tok) == 1) return 1;
+	return -1;
+}
+
+
 
 // prends un path et verifie si il y a un tar dans le path
 // fonction qui appelle hasTar = cdPerso
 int hasTar(char * path){
   char * token;
-  if( (token = strstr(path,".tar/")) !=NULL) return 0;
-  if( ((token = strstr(path,".tar"))!=NULL) && (strcmp(token,".tar") == 0) ) return 0;
+  if( (token = strstr(path,".tar/")) !=NULL) return 1;
+  if( ((token = strstr(path,".tar"))!=NULL) && (strcmp(token,".tar") == 0) ) return 1;
   return -1;
 }
 
@@ -277,6 +276,7 @@ char * findTar(char * path){ // return the .tar filename
   tar = strtok_r(tmp,"/",&tmp);
   return tar;
 }
+
 char * pathFromTar(char * path){ // return the path from the .tar
   if(hasTar(path) == -1) return NULL;
   char * tmp = malloc(strlen(path) + 1), *token;
@@ -347,7 +347,7 @@ char * createPath(const char * path) {
 
 /* +3 car on rajoute 2 slash et il y a le caractere zero qui termine une
  * chaine de caracteres. */
-  int length = strlen(suiteName) + strlen(path) + 3;
+  size_t length = strlen(suiteName) + strlen(path) + 3;
   char * pathWithFolder = malloc(length);
   pathWithFolder[0] = '\0';
   strncat(pathWithFolder, suiteName, strlen(suiteName));
