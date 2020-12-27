@@ -108,12 +108,9 @@ int rmfichier_tar(char * path){
   int fd, n;
   storePosition(); //store sa position
   char * pathCd = subWithoutRepo(path); // path cd
-
   if(whichCd(pathCd) == -1)
     return -1;
-
   char *pathRm = subWithRepo(path); // file a supprimer
-
   if(TARPATH[0] == '\0') { // si t'es pas dans un tar alors tu appelles exec
     commandNoTar("rm", pathRm); // appel fonctions avec exec
     restorePosition(); // restorePosition
@@ -126,7 +123,7 @@ int rmfichier_tar(char * path){
   char * pathWithFile = createPathFile(pathRm);
   
   fd = open(tarName, O_RDWR);
-  printf(" PATH WITH FILE : %s\n ",pathWithFile);
+
   if(fd < 0) {
     perror("open fichier tar");
     return -1;
@@ -154,13 +151,9 @@ int rm_r_tar (char * path){
   int fd,n;
   storePosition(); //store sa position
   char * pathCd = subWithoutRepo(path); // path cd
-
   if(whichCd(pathCd) == -1)
     return -1;
-
   char *pathRm = subWithRepo(path); // file a supprimer
-
-
   int x = (strlen(pathRm)+5);
   char pathRm2[x];
   memset(pathRm2,'\0',x);
@@ -170,16 +163,12 @@ int rm_r_tar (char * path){
     i++;
   }
   pathRm2[i]='/';
-
-  
   if(TARPATH[0] == '\0') { // si t'es pas dans un tar alors tu appelles exec
     commandNoTar_option("rm","-r", pathRm); // appel fonctions avec exec
     restorePosition(); // restorePosition
     return 1;
   }
-    
   char * tarName = substringTar(); // recupere le nom du tar file
-
   // getcwd + tarpath + fichier a supprimer
   char * pathWithFile = createPathFile(pathRm2); 
   rmOn = 1;
@@ -196,7 +185,8 @@ int rm_r_tar (char * path){
   }
   close(fd);
   
-  if((n = checkEntete_r(tarName, pathWithFile)) == -1) { //check si le fichier existe
+  if((n = checkEntete_r(tarName, pathWithFile)) == -1) {
+    //check si le fichier existe
     rmOn = 0;
     restorePosition();
     return -1;
@@ -204,11 +194,7 @@ int rm_r_tar (char * path){
   rmOn = 0;
   restorePosition();
   return 1;
-
-  /** **/
 }
-
-
 
 int rmTar(int nbOption, char ** command) {
   int i = 1;
@@ -223,17 +209,3 @@ int rmTar(int nbOption, char ** command) {
   }
   return 1;
 }
-
-
-/**void main(){
-   int f = open("t.tar",O_RDWR);
-  
-   if(f<=0){
-   perror("Erreur ouverture");
-   return;
-   }
-
-   //rm_r_tar(f,"./","./t.tar","a/");
-   //rmfichier_tar(f,"./","./t.tar","a/c");
-   close(f);
-   }**/
