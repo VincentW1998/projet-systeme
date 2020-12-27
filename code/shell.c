@@ -30,8 +30,7 @@ int main(int argc, char const *argv[]) {
       
       // on remet à null le tableau qui prenait les differentes commandes
       for (size_t j = 0; j < nbOption; j++) {
-        //command[j] = NULL;
-        free(command[j]);
+        command[j] = NULL;
       }
       
       

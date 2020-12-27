@@ -27,10 +27,12 @@ int affichagePrompt() { // affichage du prompt
 int afficheMessageErreur(char ** command) {
   char * erreur = "tsh : command not found: ";
   char * erreurBuf = malloc(strlen(erreur) + strlen(command[0]) + 2);
+  memset(erreurBuf, '\0', strlen(erreur) + strlen(command[0]) + 2);
   strcpy(erreurBuf, erreur);
   strcat(erreurBuf, command[0]);
   strcat(erreurBuf, "\n");
   write(2, erreurBuf, strlen(erreurBuf));
+  free(erreurBuf);
   return 0;
 }
 
@@ -50,10 +52,6 @@ void *lectureLigne(char * str, char * buff){
 
 // separe la ligne en tableau de char
 int separateurCommand(char * buff, char ** command){
-//  char * token = strtok_r(buff, " \n", &buff);
- // command[0] = malloc(strlen(token) + 1);
-  //strcpy(command[0], token);
-//  int i = 1;
   char * token = NULL;
   int i = 0;
 
@@ -233,6 +231,7 @@ int commandTar(int nbOption, char ** command) {
 
 int estTar(char * token) { // verifie si un token est un .tar
   char * tmp = malloc(strlen(token) +1 );
+
   strcpy(tmp, token);
   char * tok = strtok_r(tmp,"/",&tok);
 //	free(tmp);
@@ -311,6 +310,7 @@ char * pathWithoutLastToken(char * path, char * lastToken){
 /* return the tar repository from TARPATH */
 char * substringTar() {
   char *tmp = malloc(strlen(TARPATH) + 1);
+  memset(tmp, '\0', strlen(TARPATH));
   strcpy(tmp, TARPATH);
   char * token;
   token = strtok_r(tmp, "/\n", &tmp);
@@ -320,6 +320,7 @@ char * substringTar() {
 /* return string contains TARPATH without tar repository */
 char * subWithoutTar() {
   char * tmp = malloc(strlen(TARPATH) + 1);
+  memset(tmp, '\0', strlen(TARPATH));
   strcpy(tmp, TARPATH);
   strtok_r(tmp, "/\n", &tmp);
   return tmp;
@@ -328,6 +329,7 @@ char * subWithoutTar() {
 // return lastToken in path
 char * getLastToken(char * path) {
   char *tmp = malloc(strlen(path) + 1), * token;
+  memset(tmp, '\0', strlen(path));
   strcpy(tmp, path);
   char * result = malloc(strlen(path) + 1);
   memset(result, '\0', strlen(path) + 1);
@@ -375,7 +377,7 @@ char * createPathFile(const char * path) {
 }
 
 int commandNoTar(char * cmd, char * path) {
-  char * command [2] = {[0]=cmd,[1]=path};
+  char * command [3] = {[0]=cmd,[1]=path};
   execCommand(command);
   return 1;
 }
