@@ -47,41 +47,27 @@ int mkdirTar(int nbOption,char ** command) {
       write(2,"erreur : mkdir\n",strlen("erreur : mkdir\n"));
     }
     restorePosition();
-      //return -1;
   }
  return 1;}
 
 int createRepo(char * path){
-  //storePosition(); // store position
-  //path for  Cd
-  char * pathCd= subWithoutRepo(path);
-
+  char * pathMkdir = getLastToken(path);
+  char * pathCd = pathWithoutLastToken(path, pathMkdir);
   if(whichCd(pathCd) == -1) {
-    //restorePosition();
     return -1;
   }
 
-  //path for mkdir
-  char * pathMkdir = subWithRepo(path);
 
   // after Cd function if we are not in tar file
   if (TARPATH[0] == '\0') {
     commandNoTar("mkdir", pathMkdir);
-    //restorePosition();
     return 1;
   }
 
-//  int fd, n;
   int n;
   // return tar file name for open function
   char * tarName = substringTar();
 
-/*  fd = open(tarName, O_RDWR); // on ouvre le fichier tar
-  if (fd < 0){
-    //restorePosition();
-    perror("open fichier Tar");
-    return -1;
-  }*/
   // concatene path et TARPATH et rajoute un slash a la fin
   char * pathWithFolder = createPath(pathMkdir);
 
@@ -89,10 +75,8 @@ int createRepo(char * path){
   newHd = newHeader(pathWithFolder);
 
   if((n = checkEntete(tarName, pathWithFolder)) == 1) {
-    //restorePosition();
     return -1;
   }
-  //restorePosition();
  return 1;
 }
 

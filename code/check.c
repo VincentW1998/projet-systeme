@@ -229,6 +229,7 @@ int hasPosixHeader(int fd){
     memset(blockEnd, '\0', BLOCKSIZE);
     write(fd, &newHd, BLOCKSIZE);
     write(fd, blockEnd, BLOCKSIZE);
+    memset(&newHd, '\0', BLOCKSIZE);
     return 1;
   }
   return -1;
@@ -267,5 +268,6 @@ int hasCpOn(int fd, int filesize) {
   }
   memset(blockEnd, '\0', BLOCKSIZE);
   pwrite(fd2, blockEnd, BLOCKSIZE, endFile + accu);
+  memset(&newHd, '\0', BLOCKSIZE); // vide le posix_header 
   return 0;
 }
