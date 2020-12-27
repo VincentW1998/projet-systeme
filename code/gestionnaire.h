@@ -26,8 +26,6 @@ int afficheMessageErreur(char ** command);
 
 int execCommand(char ** command);
 
-int execCommandPipe(char ** command, char ** commandPipe);
-
 void *lectureLigne(char * str, char * buff);
 
 int separateurCommand(char * buff, char ** command);
@@ -57,10 +55,6 @@ char * pathWithoutLastToken(char * path, char * lastToken);
 char * substringTar(void);
 
 char * subWithoutTar(void);
-
-char * subWithoutRepo(char * path);
-
-char * subWithRepo(char * path);
 
 char * createPath(const char * path);
 
