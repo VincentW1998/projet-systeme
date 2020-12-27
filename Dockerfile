@@ -1,28 +1,15 @@
 FROM ubuntu:latest
 RUN apt update
+RUN apt upgrade -y
 RUN apt-get install -y vim
 RUN apt-get install -y libc-dev
 RUN apt-get install -y gcc
 RUN apt-get install -y make
 RUN apt-get install -y gdb
+RUN apt-get install -y tree
+RUN apt-get install -y emacs
 RUN mkdir /home/projet
+COPY code/*.h /home/projet/
+COPY code/*.c /home/projet/
+COPY code/essai.tar /home/projet/essai.tar
 COPY code/Makefile /home/projet/Makefile
-COPY code/shell.c /home/projet/shell.c
-COPY code/gestionnaire.c /home/projet/gestionnaire.c
-COPY code/gestionnaire.h /home/projet/gestionnaire.h
-COPY code/myCd.h /home/projet/myCd.h
-COPY code/myCd.c /home/projet/myCd.c
-COPY code/myCat.h /home/projet/myCat.h
-COPY code/myCat.c /home/projet/myCat.c
-COPY code/myLs.h /home/projet/myLs.h
-COPY code/myLs.c /home/projet/myLs.c
-COPY code/tar.h /home/projet/tar.h
-COPY code/tar.c /home/projet/tar.c
-
-COPY code/mon_cp.c /home/projet/mon_cp.c
-COPY code/mon_rm.c /home/projet/mon_rm.c
-COPY code/mon_mv.c /home/projet/mon_mv.c
-COPY code/myMkdir.c /home/projet/myMkdir.c
-COPY code/myMkdir.h /home/projet/myMkdir.h
-COPY code/check.c /home/projet/check.c
-COPY code/check.h /home/projet/check.h

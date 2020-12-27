@@ -4,8 +4,10 @@
 #include "myMkdir.h"
 #include "myLs.h"
 #include "myRmdir.h"
+#include "monrm.h"
 #include "UnitTest.h"
 #include "redirection.h"
+#include "myCp.h"
 
 //#include "tar.h"
 
@@ -109,26 +111,26 @@ void *lectureLigne(char * str, char * buff){
   if(token!=NULL){
     buff = malloc(strlen(token) + 1);
     strcpy(buff,token);
-    strcat(buff,"\n");
+//    strcat(buff,"\n");
   }
   return buff;
 }
 
 // separe la ligne en tableau de char
 int separateurCommand(char * buff, char ** command){
-  char * token = strtok(buff, " \n");
-  command[0] = malloc(strlen(token) + 1);
-  strcpy(command[0], token);
-  int i = 1;
+//  char * token = strtok_r(buff, " \n", &buff);
+ // command[0] = malloc(strlen(token) + 1);
+  //strcpy(command[0], token);
+//  int i = 1;
+  char * token = NULL;
+  int i = 0;
 
-  while((token = strtok(NULL, " \n")) != NULL) {
+  while((token = strtok_r(buff, " \n", &buff)) != NULL) {
     command[i] = malloc(strlen(token) + 1);
     strcpy(command[i], token);
     i ++;
   }
   int nbOption = i;
-  command[i] = NULL;
-  command[i+1] = NULL;
 	nbOption = nbOptionRedirect(nbOption, command); //redirect
   return nbOption;
 }
@@ -171,7 +173,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
-  int nbCommand = 7;
+  int nbCommand = 9;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
   commandPerso[0] = "exit";
@@ -181,6 +183,8 @@ int commandPersonnalisee(int nbOption , char ** command) {
   commandPerso[4] = "mkdir";
   commandPerso[5] = "rmdir";
 	commandPerso[6] = "test";
+  commandPerso[7] = "cp";
+  commandPerso[8] = "rm";
 	
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
@@ -204,12 +208,16 @@ int commandPersonnalisee(int nbOption , char ** command) {
 			
 		case 6 : return Test();
 
+    case 7 : return cpTar(nbOption, command);
+
+    case 8 : return rmTar(nbOption, command);
+
   }
   return 1;
 }
 
 int commandTar(int nbOption, char ** command) {
-  int nbCommand = 9;
+  int nbCommand = 10;
   char *cmdTar[nbCommand];
   int numeroCommand = -1;
   cmdTar[0] = "pwd";
@@ -221,6 +229,7 @@ int commandTar(int nbOption, char ** command) {
   cmdTar[6] = "cat";
   cmdTar[7] = "cp";
   cmdTar[8] = "exit";
+  cmdTar[9] = "rm";
 
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(cmdTar[i], command[0]))
@@ -243,9 +252,15 @@ int commandTar(int nbOption, char ** command) {
 
   case 4 : return rmdirTar(nbOption, command);
       
+//  case 5 : return mvJulien
+
   case 6:  return cat(nbOption,command);
+
+  case 7 : return cpTar(nbOption, command);
       
   case 8 : exit(0);
+
+  case 9 : return rmTar(nbOption, command);
   }
   return -1;
 
@@ -412,8 +427,32 @@ char * createPath(const char * path) {
   return pathWithFolder;
 }
 
+char * createPathFile(const char * path) {
+
+  char * suiteName = subWithoutTar();
+
+/* +3 car on rajoute 2 slash et il y a le caractere zero qui termine une
+ * chaine de caracteres. */
+  int length = strlen(suiteName) + strlen(path) + 2;
+  char * pathWithFile = malloc(length);
+  pathWithFile[0] = '\0';
+  strncat(pathWithFile, suiteName, strlen(suiteName));
+  if (suiteName[0] != '\0') {
+    strcat(pathWithFile, "/");
+  }
+  strncat(pathWithFile, path, strlen(path));
+  return pathWithFile;
+}
+
 int commandNoTar(char * cmd, char * path) {
-	char * command[3] = {cmd, path};
-//  if(execCommand(command) == -1) return -1;
-	return execCommand(command);
+  char * command [2] = {[0]=cmd,[1]=path};
+  execCommand(command);
+  return 1;
+}
+
+
+int commandNoTar_option(char * cmd, char *opt, char * path){
+  char * command [4] = {[0]=cmd,[1]=opt,[2]=path};
+  execCommand(command);
+  return 1;
 }

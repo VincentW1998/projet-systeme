@@ -75,7 +75,7 @@ int cpfichier_intratar(int fichier,char *dos, char *arc,char *fic,char *c){
   }
   char *tnull[1024];
   //correspond aux deux blocs finaux de taille 512 de l'archive tar.
-  memset(tnull,(int)'\0',1024);
+  memset(tnull,'\0',1024);
   pwrite(fichier,tnull,1024,decalage);
   return fichier;
 }
@@ -153,28 +153,28 @@ int cp_r_intertar(int fichier1, int fichier2, char *dosarc2, char *arc2, char *f
       sc = sscanf(ctaille,"%o",&taille);
       nb = ((taille+512-1)/512);
       if(strncmp(entete.name,fic,chm)!=0){
-	lseek(fichier1,nb*512,SEEK_CUR);
+  lseek(fichier1,nb*512,SEEK_CUR);
       }
       else {
-	r1=i;
-	c2=0;
-	while((i+c2)<100 && c2<strlen(entete.name)){
-	  tab[r1]=entete.name[c2];
-	  c2++;
-	  r1++;
-	}
-	int parcours = lseek(fichier1,0,SEEK_CUR);
-	fichier2 = cpfichier_intertar(fichier1, fichier2, dosarc2, arc2,entete.name, tab);
-	lseek(fichier1,parcours,SEEK_SET);   
-	lseek(fichier1,nb*512,SEEK_CUR);
-	memset(tab,'\0',100);
-	memset(&entete,'\0',512);
-	i=0;
-	while(i<100 && i<strlen(c)){
-	  tab[i]=c[i];
-	  i++;
-	}
-	
+  r1=i;
+  c2=0;
+  while((i+c2)<100 && c2<strlen(entete.name)){
+    tab[r1]=entete.name[c2];
+    c2++;
+    r1++;
+  }
+  int parcours = lseek(fichier1,0,SEEK_CUR);
+  fichier2 = cpfichier_intertar(fichier1, fichier2, dosarc2, arc2,entete.name, tab);
+  lseek(fichier1,parcours,SEEK_SET);   
+  lseek(fichier1,nb*512,SEEK_CUR);
+  memset(tab,'\0',100);
+  memset(&entete,'\0',512);
+  i=0;
+  while(i<100 && i<strlen(c)){
+    tab[i]=c[i];
+    i++;
+  }
+  
       }
     }
     return 0;
@@ -207,43 +207,43 @@ int cp_r_intratar(int fichier, char *dosarc, char *arc, char *fic, char *c){
       int nb = ((taille+512-1)/512);
       
       if(strncmp(entete.name,fic,chm)==0){
-	memset(tab1,'\0',100);
-	memset(tab2,'\0',100);
-	
-	int j = strlen(fic);
-	for(int i = 0; i < 100 && j+i < 100  ;i++){
-	  tab2[i]=entete.name[j+i];
-	}
-	
-	int z=0;
-	while(z<100 && z<strlen(c)){
-	  tab1[z]=c[z];
-	  z++;
-	}
-	
-	int y = 0;
-	while((y+z)<100 && y<100){
-	  tab1[y+z]=tab2[y];
-	  y++;
-	}
-	tfichier = cpfichier_intratar(fichier,dosarc,arc,entete.name,tab1);
-	if(tfichier!=2 && tfichier != fichier){
-	  fichier=tfichier;
-	  
-	  t2 = lseek(fichier,0,SEEK_CUR);
-	  fin(fichier);
-	  finfichier = lseek(fichier,0,SEEK_CUR);
-	  lseek(fichier,t2,SEEK_SET);
-	}
-	
+  memset(tab1,'\0',100);
+  memset(tab2,'\0',100);
+  
+  int j = strlen(fic);
+  for(int i = 0; i < 100 && j+i < 100  ;i++){
+    tab2[i]=entete.name[j+i];
+  }
+  
+  int z=0;
+  while(z<100 && z<strlen(c)){
+    tab1[z]=c[z];
+    z++;
+  }
+  
+  int y = 0;
+  while((y+z)<100 && y<100){
+    tab1[y+z]=tab2[y];
+    y++;
+  }
+  tfichier = cpfichier_intratar(fichier,dosarc,arc,entete.name,tab1);
+  if(tfichier!=2 && tfichier != fichier){
+    fichier=tfichier;
+    
+    t2 = lseek(fichier,0,SEEK_CUR);
+    fin(fichier);
+    finfichier = lseek(fichier,0,SEEK_CUR);
+    lseek(fichier,t2,SEEK_SET);
+  }
+  
       }
       
       else {
-	lseek(fichier,512,SEEK_CUR);
-	ctaille= entete.size;
-	sc = sscanf(ctaille,"%o",&taille);
-	nb = ((taille+512-1)/512);
-	lseek(fichier,nb*512,SEEK_CUR);
+  lseek(fichier,512,SEEK_CUR);
+  ctaille= entete.size;
+  sc = sscanf(ctaille,"%o",&taille);
+  nb = ((taille+512-1)/512);
+  lseek(fichier,nb*512,SEEK_CUR);
       }
     }
 
