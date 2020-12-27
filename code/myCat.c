@@ -26,8 +26,7 @@ int CatFile (char * path){
 	free(deplacement);
 	if(TARPATH[0] == '\0') return commandNoTar("cat", lastToken); //si hors du tarball exec
 	char * tar = findTar(TARPATH);
-	char * pathAfterTar = pathFromTar(path) + strlen(tar) + 1; // recup le path apres tar
-	return readFile(pathAfterTar, tar); //readfile sur le path apres le TAR
+	return readFile(lastToken, tar); //readfile sur le path apres le TAR
 }
 
 int readFile(char * path, char * tar){
