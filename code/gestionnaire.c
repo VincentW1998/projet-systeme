@@ -445,8 +445,8 @@ char * createPathFile(const char * path) {
 }
 
 int commandNoTar(char * cmd, char * path) {
-  char * command [2] = {[0]=cmd,[1]=path};
-  execCommand(command);
+	char * command[3] = {cmd, path};
+	return execCommand(command);
   return 1;
 }
 
