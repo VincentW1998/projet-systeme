@@ -22,6 +22,7 @@ int cpRepo(char * path, char * target) {
   if(whichCd(pathCd) == -1) {
     return -1;
   }
+  memset(pathCd, '\0',1);
   char * tarSource = substringTar();
 
   char * pathWithFile = createPathFile(pathCp); // path du fichier src
@@ -31,6 +32,7 @@ int cpRepo(char * path, char * target) {
   if(whichCd(pathCdTarget) == -1) {
     return -1;
   }
+  memset(pathCd, '\0', 1);
 
   tarTarget = substringTar();
 
