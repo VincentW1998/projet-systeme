@@ -24,8 +24,8 @@ int cd(char * path){
 	char * save = storeManually();
 	char * bfTar = getPathBeforeTar(path);
 	char * fromTar, * tar;
-	if (bfTar[0] != '\0')// pas sur //deplacement jusqu'au .tar
-		if(chdir(bfTar) == -1) return -1;
+	if( (bfTar[0] != '\0') && (chdir(bfTar) == -1))// deplacement jusqu'au .tar
+		return -1;
 	if(strlen(bfTar) < strlen(path)){
 		fromTar = pathFromTar(path);
 		tar = findTar(fromTar);
