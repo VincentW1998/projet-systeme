@@ -62,6 +62,7 @@ int separateurCommand(char * buff, char ** command){
     strcpy(command[i], token);
     i ++;
   }
+  command[i] = NULL;
   int nbOption = i;
   nbOption = nbOptionRedirect(nbOption, command); //redirect
   return nbOption;
