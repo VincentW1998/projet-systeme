@@ -7,16 +7,16 @@
 int cdNoOptions(){
   if(*TARPATH != '\0') setTarpath("\0");
   chdir(getenv("HOME"));
-  return 0;
+  return 1;
 }
 
 // fonction qui appelle cdPerso = commandPersonnalisee
 int cdPerso(char * path){
   memset(TARPATH,0, strlen(TARPATH));
   if(path[0] == '/')return cdAbs(path);
-  if(hasTar(path) == 0) return cd(path); // si dans le path il y un tar
-  chdir(path);
-  return 0;
+  if(hasTar(path) == 1) return cd(path); // si dans le path il y un tar
+  if(chdir(path) == -1) return -1;
+  return 1;
 }
 
 int cd(char * path ){
@@ -24,14 +24,15 @@ int cd(char * path ){
   strcpy(tmp, path);
   int l = 0;
   while((token = strtok_r(tmp, "/", &tmp)) != NULL){
-    if(estTar(token) == 0) break;
+    if(estTar(token) == 1) break;
     l += 1 + strlen(token);
   }
   if(l > 0){ // si il y un path avant le tar
     if(path[0] != '/') l--;
     stdPath = malloc(l + 1);
+		memset(stdPath, '\0', l+1);
     strncpy(stdPath, path, l);
-    chdir(stdPath);
+    if(chdir(stdPath) == -1) return -1;
     free(stdPath);
   }
   if(l < strlen(path)){
@@ -40,7 +41,7 @@ int cd(char * path ){
       return -1;
     }
     setTarpath(token);
-    if( (l + strlen(token)) == strlen(path) ) return 0;
+    if( (l + strlen(token)) == strlen(path) ) return 1;
     l += strlen(token) + 1; // on rajoute la taille du tar au nb de char a sauter + /
     tbPath = malloc(l + 1);
     strcpy(tbPath, path+l);
@@ -52,7 +53,7 @@ int cd(char * path ){
     free(tbPath);
   }
   else setTarpath("\0");
-  return 0;
+  return 1;
 }
 
 // se charge du path depuis un tarball
@@ -84,7 +85,7 @@ int navigate(char * path){
         l+= strlen(token);
         if(l == strlen(path)){ // si on atteint la fin du path
           setTarpath("\0");
-          return 0;
+          return 1;
         }
   //      return cdPerso(path + strlen(tmp));
           return cdPerso(tmp);
@@ -94,7 +95,7 @@ int navigate(char * path){
       i -= 2;
     }
     else{
-      if(estTar(token) != 0){
+      if(estTar(token) != 1){
   //strcpy(TARPATH, posTar);
   //strcpy(TARPATH, posTar);
         fullpath[i] = malloc(strlen(token) + 1);
@@ -107,7 +108,7 @@ int navigate(char * path){
   }
   if(i == 0){
     setTarpath(tar);
-    return 0;
+    return 1;
   }
   
   if(checkfp(tar, fullpath, i) == -1){ perror("cd :"); return -1; }//exit
@@ -126,7 +127,7 @@ int navigate(char * path){
   setTarpath(tmp);
   free(fullpath[0]);
   free(tmp); tmp = NULL;
-  return 0;
+  return 1;
   
 }
 
@@ -140,7 +141,7 @@ int cdAbs(char * path){
   strcpy(tmp, path);
   char * token;
   for(int n = 0;(token = strtok_r(tmp, "/\n", &tmp)) != NULL; n += strlen(token) +1){
-    if(estTar(token)==0){
+    if(estTar(token) == 1){
       if(n == 0)cdNoOptions();
       else{
         tmp = malloc( n + 1);
@@ -154,10 +155,11 @@ int cdAbs(char * path){
         restorePosition();
         return -1;
       }
-      return 0;
+      return 1;
     }
   }
-  return chdir(path);
+	if(chdir(path) == -1) return -1;
+	return 1;
 }
 
 
@@ -177,7 +179,7 @@ int checkfp(char *tar, char *fullpath[50], int i){
   if (checkEntete(tar, path) == -1) {free(path); return -1;}
 
   free(path);
-  return 0;
+  return 1;
 }
 
 void setTarpath(char * tarp){
