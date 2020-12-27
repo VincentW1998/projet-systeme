@@ -14,15 +14,16 @@ int cpTar(int noOption, char ** command) {
 }
 
 int cpRepo(char * path, char * target) {
-  char * pathCd = subWithoutRepo(path);
-  char * pathCdTarget = subWithoutRepo(target);
+  char * pathCp = getLastToken(path);
+  char * pathCpTarget = getLastToken(target);
+  char * pathCd = pathWithoutLastToken(path, pathCp);
+  char * pathCdTarget = pathWithoutLastToken(target, pathCpTarget);
 
   if(whichCd(pathCd) == -1) {
     return -1;
   }
   char * tarSource = substringTar();
 
-  char * pathCp = getLastToken(path);
   char * pathWithFile = createPathFile(pathCp); // path du fichier src
 
   restorePosition();
@@ -33,23 +34,9 @@ int cpRepo(char * path, char * target) {
 
   tarTarget = substringTar();
 
-  char * pathCpTarget = getLastToken(target);
- // char * pathFileTarget = createPathFile(pathCpTarget);
   pathFileTarget = createPathFile(pathCpTarget);
 
-/*  if(TARPATH[0] == '\0') {
-    commandNoTar("cp", pathCp);
-    return 1;
-  } */
-  //int fd, n;
   int n;
-//  char * tarName = substringTar();
-  
-  /*fd = open(tarName, O_RDWR);
-  if (fd < 0) {
-    perror("open fichier Tar");
-    return -1;
-  }*/
 
   cpOn = 1;
   if((n = checkEntete(tarTarget, pathFileTarget)) == 1) {

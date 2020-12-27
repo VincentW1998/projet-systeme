@@ -293,6 +293,7 @@ char * getPathBeforeTar(char * path){ // return the path before TARPATH
 char * pathWithoutLastToken(char * path, char * lastToken){
   // copy path - size of the last token
   char * deplacement = malloc(strlen(path) - strlen(lastToken) + 1);
+  memset(deplacement, '\0', 1);
   strncpy(deplacement, path, strlen(path) - strlen(lastToken));
   return deplacement;
 }
@@ -312,29 +313,6 @@ char * subWithoutTar() {
   strcpy(tmp, TARPATH);
   strtok_r(tmp, "/\n", &tmp);
   return tmp;
-}
-
-
-/* take a string path and return a substring of this path without the
- * last repository*/
-char * subWithoutRepo(char * path) {
-  char * token;
-  char * tmp = malloc(strlen(path) + 1);
-  strcpy(tmp, path);
-  char * result = malloc(strlen(path) + 1);
-  strcpy(result, "");
-  if (path[0] == '/')
-    strcat(result, "/");
-  token = strtok_r(tmp, "/", &tmp);
-  if(strlen(tmp) != 0)
-    strcat(result, token);
-  while((token = strtok_r(tmp, "/", &tmp)) != NULL ) {
-    if(strlen(tmp) != 0) {
-      strcat(result, "/");
-      strcat(result, token);
-    }
-      }
-  return result;
 }
 
 // return lastToken in path
