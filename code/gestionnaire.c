@@ -34,24 +34,25 @@ int afficheMessageErreur(char ** command) {
 
 //Utilisation de execvp pour les commandes externes du shell
 int execCommand(char ** command) {
-  pid_t pid = fork();
-  int n, w;
-  switch (pid) {
-    case -1:
-      perror("fork");
-      break;
-
-    case 0:
-      if((n = execvp(command[0], command)) == -1)
-          afficheMessageErreur(command);
-      break;
-    default :
-    if(strcmp(command[0], "cat") == 0)
-    signal(SIGINT, SIG_IGN);
-      wait(&w);
+	pid_t pid = fork();
+	int n, w;
+	switch (pid) {
+		case -1:
+			perror("fork");
+			break;
+			
+		case 0:
+			if((n = execvp(command[0], command)) == -1){
+				afficheMessageErreur(command);
+				exit(1);
+			}
+			break;
+		default :
+			if(strcmp(command[0], "cat") == 0) signal(SIGINT, SIG_IGN);
+			wait(&w);
 			signal(SIGINT, SIG_DFL);
-  }
-  return 0;
+	}
+	return 1;
 }
 
 // pour les commandes externes du shell avec un pipe
@@ -162,7 +163,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
   else {
     if(*TARPATH != '\0')
       commandTar(nbOption, command);
-    else if(commandPersonnalisee(nbOption, command) == -1) //command perso sans pipe
+    else if(commandPersonnalisee(nbOption, command) == 0) //command perso sans pipe
        execCommand(command); // command sans le pipe
   }
 	stopRedirection(); // redirect
@@ -186,7 +187,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
       numeroCommand = i;
   }
   switch (numeroCommand) {
-    case -1 : return -1;
+    case -1 : return 0; //renvoie 0 si la commande ne figure pas dans le tableau
       
     case 0 : exit(0);
       
@@ -204,7 +205,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
 		case 6 : return Test();
 
   }
-  return 0;
+  return 1;
 }
 
 int commandTar(int nbOption, char ** command) {
@@ -413,6 +414,6 @@ char * createPath(const char * path) {
 
 int commandNoTar(char * cmd, char * path) {
 	char * command[3] = {cmd, path};
-  execCommand(command);
-  return 1;
+//  if(execCommand(command) == -1) return -1;
+	return execCommand(command);
 }

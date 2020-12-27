@@ -5,11 +5,11 @@
 #include "storeRestore.h"
 
 // ls sans path en arguments
-int LsWithoutPath(int withL){
+int LsWithoutPath(){
 	if(*TARPATH == '\0')
-		simpleLs(withL);
-	else printOccurences(withL);
-	return 0;
+		simpleLs();
+	else printOccurences();
+	return 1;
 }
 
 int lsNoL(){
@@ -18,16 +18,16 @@ int lsNoL(){
 }
 
 // Ls sans options avec un path
-int lsRep(char * path, int withL){
+int lsRep(char * path){
 	if(whichCd(path) == -1) return -1; //deplacement vers le dossier a afficher
 	if(TARPATH[0] == '\0')
-		simpleLs(withL);
-	else printOccurences(withL);
-	return 0;
+		simpleLs();
+	else printOccurences();
+	return 1;
 }
 
 
-void simpleLs(int withL){
+void simpleLs(){
 	if(withL == 1)
 		commandNoTar("ls", "-l");
 	char * cmd[2] = {"ls"};
@@ -76,9 +76,9 @@ int whichValid(char * tar, char * name){
 
 
 // print les fichiers visible depuis la position actuelle
-void printOccurences(int withL){
+void printOccurences(){
 	char * tar = findTar(TARPATH), * lastTok;
-	int f;
+	int f, filesize = 0;
 	ssize_t n;
 	write(1,TARPATH,strlen(TARPATH)); // print le nom du dossier a afficher
 	write(1,":\n", 2);
@@ -92,7 +92,8 @@ void printOccurences(int withL){
 //				write(1, p->name, strlen(p->name));
 				write(1,"\n",1);
 			}
-		next_header(f, atoi(p->size));
+		sscanf(p->size, "%o", &filesize);
+		next_header(f, filesize);
 	}
 	close(f);
 }
@@ -131,8 +132,10 @@ void typeFic(struct posix_header * p){
 	//	free(typeflag);
 }
 
-void rights(struct posix_header * p){
+void rights (struct posix_header * p){
 	char * perm[8] = {"---","--x","-w-","-wx","r--","r-x","rw-","rwx"};
+	int tst;
+	sscanf(p->mode, "%o", &tst);
 	char * mode = malloc(2);
 	char * str = malloc(strlen(perm[0]) * 3 + 1);
 	size_t modesize = strlen(p->mode); //les droits correspondent aux 3 derniers chiffres de p->mode
@@ -147,7 +150,7 @@ void rights(struct posix_header * p){
 	free(str);
 	free(mode);
 }
-//
+
 void nbrlink(struct posix_header * p, int file){
 	if(p->typeflag != '5'){
 		write(1,"1 ",2);
@@ -159,7 +162,7 @@ void nbrlink(struct posix_header * p, int file){
 	strcpy(tmp, TARPATH);
 	char * tar = strtok_r(tmp, "/",&tmp);
 	tmp = malloc(strlen(TARPATH) - strlen(tar) + strlen(p->name) + 3);
-	if(strlen(tar) == strlen(TARPATH)) strcpy(tmp,p->name);
+	if(strlen(tar) == strlen(TARPATH)) strcpy(tmp,p->name); //retourne TARPATH(SANSTAR)+p->name
 	else {
 		strcat(tmp,"/");
 		strcat(tmp,p->name);
@@ -174,7 +177,7 @@ void nbrlink(struct posix_header * p, int file){
 	
 }
 
-//
+
 void usrAndGrp(struct posix_header * p){
 	char * str = malloc(strlen(p->uname) + strlen(p->gname) + 3);
 	strcpy(str,p->uname);
@@ -186,21 +189,25 @@ void usrAndGrp(struct posix_header * p){
 }
 
 void psize(struct posix_header * p){
-	//	if(strcmp(p->name,"matin") == 0){ write(1,"\n",1);exit(EXIT_FAILURE);}
 	char * str = malloc(12);
-	char * endptr;
-	long size = strtol(p->size,&endptr,10); // equivalent de strtok -> atoi version long
-	if(strcmp(p->size,endptr) == 0)perror("error psize"); // check si un long a bien ete lu
-	snprintf(str, 11, "%ld", size); // convertit le long en string
-	size = octalConverter(str);
-	snprintf(str, 11 , "%ld ", size);
+//	char * endptr;
+//	long size = strtol(p->size,&endptr,10); // equivalent de strtok -> atoi version long
+//	if(strcmp(p->size,endptr) == 0)perror("error psize"); // check si un long a bien ete lu
+//	snprintf(str, 11, "%ld", size); // convertit le long en string
+//	size = octalConverter(str);
+	int size;
+	sscanf(p->size, "%o", &size);
+	snprintf(str, 11 , "%d ", size);
 	write(1, str, strlen(str));
 	free(str);
 }
 //
 void mtime(struct posix_header * p){
 	char * str = malloc(14);
-	time_t t = (int) octalConverter(p->mtime);
+//	time_t t = (int) octalConverter(p->mtime);
+	int tmp;
+	sscanf(p->mtime, "%o", &tmp);
+	time_t t = (int) tmp;
 	struct tm * time = localtime(&t);
 	strftime(str,14,"%b %d %R ",time);
 	write(1,str,strlen(str));
@@ -220,32 +227,54 @@ long octalConverter (char * octal){ // convertit octal vers decimal : Char octal
 
 int countLinks(char * name ,int file){
 	size_t n;
+	int filesize = 0;
 	int count = 2;
 	struct posix_header * p = malloc(sizeof(struct posix_header));
-	while((n = read(file,p,BLOCKSIZE)) > 0)
-		if(validPath(name, p->name) == 0) count++;
+	while( ((n = read(file,p,BLOCKSIZE)) > 0) && (p->name[0] != '\0') ){
+		if(validPath(name, p->name) == 1) count++;
+		sscanf(p->size, "%o", &filesize);
+		next_header(file, filesize);
+	}
 	return count;
+}
+
+//initialise i en fonction des options
+int manageOption(int nbOptions, char ** path){
+	withL = 0;
+	if(nbOptions < 2) return 0;
+	if(path[1][0] == '-'){
+		if(strcmp(path[1],"-l") == 0) withL = 1;
+		else return -1;
+	}
+	return 1 + withL;
+		
 }
 
 int ls(int nbOptions, char ** path){
 	storePosition();
-	int i = 1, withL = 0;
-	if(nbOptions < 2) return LsWithoutPath(0);
-	if(strcmp(path[1],"-l") == 0){
-		if(nbOptions == 2) return LsWithoutPath(1);
-		i = 2;
-		withL = 1;
-	}
-	else i=1;
+	int i;
+//	int i = 1, withL = 0;
+//	if(nbOptions < 2) return LsWithoutPath(0);
+//	if(strcmp(path[1],"-l") == 0){
+//		if(nbOptions == 2) return LsWithoutPath(1);
+//		i = 2;
+//		withL = 1;
+//	}
+//	else i=1;
+//
+	if((i = manageOption(nbOptions, path)) == -1) return -1; //init i en fonction des options
+//	if(nbOption < 2) return LsWithoutPath();
+	if((nbOptions < 2) || (nbOptions == 2 && withL == 1)) return LsWithoutPath();
 	for(; i < nbOptions; i++){
-		if(lsRep(path[i],withL) == -1) {
-			perror("no such file or directory");
-			restorePosition();
-			return -1;
-		}
+		lsRep(path[i]);
+//		if(lsRep(path[i]) == -1) {
+//			perror("no such file or directory");
+//			restorePosition();
+//			return -1;
+//		}
 		restorePosition();
 		write(1,"\n",1);
 	}
-	return 0;
+	return 1;
 }
 

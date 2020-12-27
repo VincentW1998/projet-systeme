@@ -3,14 +3,15 @@
 
 // saut vers le prochain header
 void next_header(int fd, unsigned int filesize) {
-  unsigned int nblocks = (filesize + BLOCKSIZE - 1) >> BLOCKBITS;
-  for(int i = 0; i < nblocks; i++) {
-    size_t nb = read(fd, buf, BLOCKSIZE);
-    if(nb == -1) {
-      perror("read");
-    }
-  }
+	unsigned int nblocks = (filesize + BLOCKSIZE - 1) >> BLOCKBITS;
+	for(int i = 0; i < nblocks; i++) {
+		size_t nb = read(fd, buf, BLOCKSIZE);
+		if(nb == -1) {
+			perror("read");
+		}
+	}
 }
+
 
 int read_header(int fd, char *path) {
   struct posix_header hd;

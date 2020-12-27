@@ -13,7 +13,7 @@ int showContent(int file, struct posix_header * p){
 		}
 	}
 	close(file);
-	return 0;
+	return 1;
 }
 
 int CatFile (char * path){
@@ -55,6 +55,6 @@ int cat(int nbOption, char ** path){
 		}
 		restorePosition();
 	}
-	return 0;
+	return 1;
 }
 
