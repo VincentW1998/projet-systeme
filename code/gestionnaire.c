@@ -44,6 +44,7 @@ void *lectureLigne(char * str, char * buff){
     strcpy(buff,token);
 //    strcat(buff,"\n");
   }
+  memset(str, '\0', strlen(str));
   return buff;
 }
 

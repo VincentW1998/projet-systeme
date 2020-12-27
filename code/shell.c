@@ -24,6 +24,7 @@ int main(int argc, char const *argv[]) {
       
       // separe buff en command, option, path dans une variable command[]
       nbOption = separateurCommand(buff, command);
+      memset(buff, '\0', strlen(buff) + 1);
       
       findPipeAndExec(nbOption, command, commandPipe);
       
@@ -32,6 +33,7 @@ int main(int argc, char const *argv[]) {
         //command[j] = NULL;
         free(command[j]);
       }
+      
       
     }
   }
