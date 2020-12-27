@@ -24,7 +24,7 @@ int deleteRepo(char * path) {
   if(whichCd(pathCd) == -1) // use cd function 
     return -1;
 
-  char *pathRmdir = subWithRepo(path); // path just with the last repository
+  char *pathRmdir = getLastToken(path); // path just with the last repository
 
   if (TARPATH[0] == '\0') { // if we are not in tar file
     commandNoTar("rmdir", pathRmdir); // use exec rmdir 

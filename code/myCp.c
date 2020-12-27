@@ -22,7 +22,7 @@ int cpRepo(char * path, char * target) {
   }
   char * tarSource = substringTar();
 
-  char * pathCp = subWithRepo(path);
+  char * pathCp = getLastToken(path);
   char * pathWithFile = createPathFile(pathCp); // path du fichier src
 
   restorePosition();
@@ -33,7 +33,7 @@ int cpRepo(char * path, char * target) {
 
   tarTarget = substringTar();
 
-  char * pathCpTarget = subWithRepo(target);
+  char * pathCpTarget = getLastToken(target);
  // char * pathFileTarget = createPathFile(pathCpTarget);
   pathFileTarget = createPathFile(pathCpTarget);
 

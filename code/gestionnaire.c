@@ -10,8 +10,7 @@
 #include "myCp.h"
 #include "pipe.h"
 
-//#include "tar.h"
-
+/**************************** AFFICHAGE ****************************/
 int affichagePrompt() { // affichage du prompt
   write(1, KBLU, strlen(KBLU));
   write(1, getcwd(NULL, 0), strlen(getcwd(NULL, 0)));
@@ -35,27 +34,8 @@ int afficheMessageErreur(char ** command) {
   return 0;
 }
 
-//Utilisation de execvp pour les commandes externes du shell
-int execCommand(char ** command) {
-  pid_t pid = fork();
-  int n, w;
-  switch (pid) {
-    case -1:
-      perror("fork");
-      break;
 
-    case 0:
-      if((n = execvp(command[0], command)) == -1)
-          afficheMessageErreur(command);
-      break;
-    default :
-    if(strcmp(command[0], "cat") == 0)
-    signal(SIGINT, SIG_IGN);
-      wait(&w);
-			signal(SIGINT, SIG_DFL);
-  }
-  return 0;
-}
+/**************************** LECTURE LIGNE ****************************/
 //fonction qui se comporte comme readLine
 void *lectureLigne(char * str, char * buff){
   char * token = strtok(str,"\n");
@@ -82,8 +62,32 @@ int separateurCommand(char * buff, char ** command){
     i ++;
   }
   int nbOption = i;
-	nbOption = nbOptionRedirect(nbOption, command); //redirect
+  nbOption = nbOptionRedirect(nbOption, command); //redirect
   return nbOption;
+}
+
+/*********************** APPEL DES COMMANDES ***********************/
+
+//Utilisation de execvp pour les commandes externes du shell
+int execCommand(char ** command) {
+  pid_t pid = fork();
+  int n, w;
+  switch (pid) {
+    case -1:
+      perror("fork");
+      break;
+
+    case 0:
+      if((n = execvp(command[0], command)) == -1)
+          afficheMessageErreur(command);
+      break;
+    default :
+    if(strcmp(command[0], "cat") == 0)
+    signal(SIGINT, SIG_IGN);
+      wait(&w);
+      signal(SIGINT, SIG_DFL);
+  }
+  return 0;
 }
 
 // si la ligne de commande contient un pipe
@@ -119,7 +123,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
     else if(commandPersonnalisee(nbOption, command) == -1) //command perso sans pipe
        execCommand(command); // command sans le pipe
   }
-	stopRedirection(); // redirect
+  stopRedirection(); // redirect
   return; // 0 if has no pipe, and 1 if has pipe
 }
 
@@ -133,10 +137,10 @@ int commandPersonnalisee(int nbOption , char ** command) {
   commandPerso[3] = "ls";
   commandPerso[4] = "mkdir";
   commandPerso[5] = "rmdir";
-	commandPerso[6] = "test";
+  commandPerso[6] = "test";
   commandPerso[7] = "cp";
   commandPerso[8] = "rm";
-	
+  
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
       numeroCommand = i;
@@ -154,10 +158,10 @@ int commandPersonnalisee(int nbOption , char ** command) {
     case 3 : return ls(nbOption, command);
 
     case 4 : return mkdirTar(nbOption, command);
-		
-		case 5 : return rmdirTar(nbOption, command);
-			
-		case 6 : return Test();
+    
+    case 5 : return rmdirTar(nbOption, command);
+      
+    case 6 : return Test();
 
     case 7 : return cpTar(nbOption, command);
 
@@ -256,52 +260,41 @@ int hasTar(char * path){
 }
 
 char * findTar(char * path){ // return the .tar filename
-	if(hasTar(path) == -1) return NULL;
-	char * tarp = pathFromTar(path);
-	char * tmp = malloc(strlen(tarp) + 1);
-	strcpy(tmp,tarp);
-	char * tar;
-	tar = strtok_r(tmp,"/",&tmp);
-	return tar;
+  if(hasTar(path) == -1) return NULL;
+  char * tarp = pathFromTar(path);
+  char * tmp = malloc(strlen(tarp) + 1);
+  strcpy(tmp,tarp);
+  char * tar;
+  tar = strtok_r(tmp,"/",&tmp);
+  return tar;
 }
 char * pathFromTar(char * path){ // return the path from the .tar
-	if(hasTar(path) == -1) return NULL;
-	char * tmp = malloc(strlen(path) + 1), *token;
-	strcpy(tmp,path);
-	size_t l = 0;
-	if(path[0] == '/') l++;
-	while((token = strtok_r(tmp, "/", &tmp)) != NULL){
-		if(estTar(token) == 1) return path+l;
-		l += 1 + strlen(token);
-	}
-	return NULL;
+  if(hasTar(path) == -1) return NULL;
+  char * tmp = malloc(strlen(path) + 1), *token;
+  strcpy(tmp,path);
+  size_t l = 0;
+  if(path[0] == '/') l++;
+  while((token = strtok_r(tmp, "/", &tmp)) != NULL){
+    if(estTar(token) == 1) return path+l;
+    l += 1 + strlen(token);
+  }
+  return NULL;
 }
 
 char * getPathBeforeTar(char * path){ // return the path before TARPATH
-	if(hasTar(path) == -1) return NULL;
-	char * fromTar = pathFromTar(path);
-	char * beforeTar = malloc(strlen(path) - strlen(fromTar));
-	strncpy(beforeTar,path,strlen(path) - strlen(fromTar)-1);
-	return beforeTar;
-}
-
-char * getLastToken(char * path){ // return lastToken in path
-	char * lastToken = malloc(1), * token;
-	char * tmp = malloc( strlen(path) + 1); // copy of the path
-	strcpy(tmp, path);
-	while((token = strtok_r(tmp, "/",&tmp) )!= NULL){ //retrieve the next token that contains /
-		lastToken = realloc(lastToken,strlen(token) + 1);
-		strcpy(lastToken, token);
-	}
-	return lastToken;
+  if(hasTar(path) == -1) return NULL;
+  char * fromTar = pathFromTar(path);
+  char * beforeTar = malloc(strlen(path) - strlen(fromTar));
+  strncpy(beforeTar,path,strlen(path) - strlen(fromTar)-1);
+  return beforeTar;
 }
 
 //return the path without the last Token
 char * pathWithoutLastToken(char * path, char * lastToken){
-	// copy path - size of the last token
-	char * deplacement = malloc(strlen(path) - strlen(lastToken) + 1);
-	strncpy(deplacement, path, strlen(path) - strlen(lastToken));
-	return deplacement;
+  // copy path - size of the last token
+  char * deplacement = malloc(strlen(path) - strlen(lastToken) + 1);
+  strncpy(deplacement, path, strlen(path) - strlen(lastToken));
+  return deplacement;
 }
 
 /* return the tar repository from TARPATH */
@@ -344,13 +337,12 @@ char * subWithoutRepo(char * path) {
   return result;
 }
 
-/* take a string path and return the last repository of this path*/
-char * subWithRepo(char * path) {
-  char *tmp = malloc(strlen(path) + 1);
-  char * token;
+// return lastToken in path
+char * getLastToken(char * path) {
+  char *tmp = malloc(strlen(path) + 1), * token;
   strcpy(tmp, path);
   char * result = malloc(strlen(path) + 1);
-  strcpy(result, "");
+  memset(result, '\0', strlen(path) + 1);
   while((token = strtok_r(tmp, "/", &tmp)) != NULL) {
     if(strlen(tmp) == 0)
       strcat(result, token);

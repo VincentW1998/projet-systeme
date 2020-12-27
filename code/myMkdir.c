@@ -62,7 +62,7 @@ int createRepo(char * path){
   }
 
   //path for mkdir
-  char * pathMkdir = subWithRepo(path);
+  char * pathMkdir = getLastToken(path);
 
   // after Cd function if we are not in tar file
   if (TARPATH[0] == '\0') {
