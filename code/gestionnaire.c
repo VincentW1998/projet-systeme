@@ -79,8 +79,10 @@ int execCommand(char ** command) {
       break;
 
     case 0:
-      if((n = execvp(command[0], command)) == -1)
+      if((n = execvp(command[0], command)) == -1) {
           afficheMessageErreur(command);
+          exit(1);
+      }
       break;
     default :
     if(strcmp(command[0], "cat") == 0)
@@ -121,7 +123,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
   else {
     if(*TARPATH != '\0')
       commandTar(nbOption, command);
-    else if(commandPersonnalisee(nbOption, command) == -1) //command perso sans pipe
+    else if(commandPersonnalisee(nbOption, command) == -2) //command perso sans pipe
        execCommand(command); // command sans le pipe
   }
   stopRedirection(); // redirect
@@ -129,7 +131,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
-  int nbCommand = 9;
+  int nbCommand = 10;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
   commandPerso[0] = "exit";
@@ -141,13 +143,14 @@ int commandPersonnalisee(int nbOption , char ** command) {
   commandPerso[6] = "test";
   commandPerso[7] = "cp";
   commandPerso[8] = "rm";
+  commandPerso[9] = "";
   
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
       numeroCommand = i;
   }
   switch (numeroCommand) {
-    case -1 : return -1;
+    case -1 : return -2;
       
     case 0 : exit(0);
       
@@ -168,12 +171,14 @@ int commandPersonnalisee(int nbOption , char ** command) {
 
     case 8 : return rmTar(nbOption, command);
 
+    case 9 : return 0;
+
   }
   return 0;
 }
 
 int commandTar(int nbOption, char ** command) {
-  int nbCommand = 10;
+  int nbCommand = 11;
   char *cmdTar[nbCommand];
   int numeroCommand = -1;
   cmdTar[0] = "pwd";
@@ -186,6 +191,7 @@ int commandTar(int nbOption, char ** command) {
   cmdTar[7] = "cp";
   cmdTar[8] = "exit";
   cmdTar[9] = "rm";
+  cmdTar[10] = "";
 
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(cmdTar[i], command[0]))
@@ -217,6 +223,8 @@ int commandTar(int nbOption, char ** command) {
   case 8 : exit(0);
 
   case 9 : return rmTar(nbOption, command);
+
+  case 10 : return 1;
   }
   return -1;
 
