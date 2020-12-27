@@ -231,6 +231,7 @@ int hasPosixHeader(int fd){
     memset(blockEnd, '\0', BLOCKSIZE);
     write(fd, &newHd, BLOCKSIZE);
     write(fd, blockEnd, BLOCKSIZE);
+    memset(&newHd, '\0', BLOCKSIZE);
     return 1;
   }
   return -1;
