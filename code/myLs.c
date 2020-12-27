@@ -208,7 +208,6 @@ int countLinks(char * name ,int file){
 
 int ls(int nbOptions, char ** path){
 	storePosition();
-	printf("nbOpt = %d \n",nbOptions);
 	int i = 1, withL = 0;
 	if(nbOptions < 2) return LsWithoutPath(0);
 	if(strcmp(path[1],"-l") == 0){
