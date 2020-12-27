@@ -14,46 +14,29 @@ int cdNoOptions(){
 int cdPerso(char * path){
   memset(TARPATH,0, strlen(TARPATH));
   if(path[0] == '/')return cdAbs(path);
-  if(hasTar(path) == 1) return cd(path); // si dans le path il y un tar
-  if(chdir(path) == -1) return -1;
+	else return cd(path);
+//  if(hasTar(path) == 1) return cd(path); // si dans le path il y un tar
+//  if(chdir(path) == -1) return -1;
   return 1;
 }
 
-int cd(char * path ){
-  char * tmp = malloc(strlen(path) + 1), *stdPath, *tbPath, *token;
-  strcpy(tmp, path);
-  int l = 0;
-  while((token = strtok_r(tmp, "/", &tmp)) != NULL){
-    if(estTar(token) == 1) break;
-    l += 1 + strlen(token);
-  }
-  if(l > 0){ // si il y un path avant le tar
-    if(path[0] != '/') l--;
-    stdPath = malloc(l + 1);
-		memset(stdPath, '\0', l+1);
-    strncpy(stdPath, path, l);
-    if(chdir(stdPath) == -1) return -1;
-    free(stdPath);
-  }
-  if(l < strlen(path)){
-    if(existTar(token) == -1){
-      perror("le fichier n'existe pas");
-      return -1;
-    }
-    setTarpath(token);
-    if( (l + strlen(token)) == strlen(path) ) return 1;
-    l += strlen(token) + 1; // on rajoute la taille du tar au nb de char a sauter + /
-    tbPath = malloc(l + 1);
-    strcpy(tbPath, path+l);
-    if((tbPath[0] == '/' && navigate(tbPath+1) == -1 )|| (tbPath[0] != '/' && navigate(tbPath) == -1)){
-      setTarpath("\0");
-      free(tbPath);
-      return -1;
-    }
-    free(tbPath);
-  }
-  else setTarpath("\0");
-  return 1;
+int cd(char * path){
+	char * save = storeManually();
+	char * bfTar = getPathBeforeTar(path);
+	char * fromTar, * tar;
+	if (bfTar[0] != '\0')// pas sur //deplacement jusqu'au .tar
+		if(chdir(bfTar) == -1) return -1;
+	if(strlen(bfTar) < strlen(path)){
+		fromTar = pathFromTar(path);
+		tar = findTar(fromTar);
+		if(existTar(tar) == -1) return -1;
+		setTarpath(tar);
+		if(navigate(fromTar + strlen(tar) + 1) == -1){
+			restoreManually(save); // restore
+			return -1;
+		}
+	}
+	return 1;
 }
 
 // se charge du path depuis un tarball
