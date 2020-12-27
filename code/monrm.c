@@ -53,11 +53,11 @@ static int recherche3(int fichier, int option, char *nom){
     return -1;
   }
   
-  if(check_checksum(&entete)==0){
+  /**if(check_checksum(&entete)==0){
     //printf("entete.name : %s\n",entete.name); 
     perror("Mauvaise entête. Je suis bloqué dans recherche !\n");
     return -1;
-  }
+    }**/
 
   if(strcmp(entete.name,nom)==0){
     if(option == 1) lseek(fichier,-512,SEEK_CUR);
