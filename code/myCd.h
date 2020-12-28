@@ -11,7 +11,11 @@ int cd (char * path);
 
 int checkPath(char * path, char * token);
 
-int checkfp(char *tar, char *fullpath[50], int i);
+//int checkfp(char *tar, char *fullpath[50], int i);
+
+char * tabToString(int l, char ** fp);
+
+int checkfp (char * tar, char * fp);
 
 void setTarpath(char * tarp);
 
