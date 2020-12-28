@@ -32,7 +32,10 @@ int CatFile (char * path){
 int readFile(char * path, char * tar){
 	int f;
 	size_t n;
-	if((f = open(tar, O_RDONLY)) == -1) perror("open tar:");
+	if((f = open(tar, O_RDONLY)) == -1){
+		perror("open tar:");
+		return -1;
+	}
 	struct posix_header * p = malloc(sizeof(struct posix_header));
 	while( ((n = read(f,p,BLOCKSIZE)) > 0) && (p->name[0] != '\0') ){
 		if(strcmp(p->name, path) == 0) return showContent(f,p);
