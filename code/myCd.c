@@ -144,7 +144,7 @@ void setTarpath(char * tarp){
 }
 
 int whichCd(char * pathCd) {
-	if(pathCd[0] == '\0') return 1;
+//	if(pathCd[0] == '\0') return 1;
   //if tarpath vide -> cdPerso because we are not in tar file
   if (TARPATH[0] == '\0') {
     if(cdPerso(pathCd) == -1) return -1;
