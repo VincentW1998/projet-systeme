@@ -46,12 +46,12 @@ int navigate(char * path){
 	if(path[0] == '\0') return 1;
   if(path[0] == '/') return cdAbs(path);
 	char * save = storeManually();
-  char *fullpath[50], *tmp, *token, *tar;
-  tmp = malloc(strlen(TARPATH) + 1);
+	char *fullpath[50], *token;
+  char * tmp = malloc(strlen(TARPATH) + 1);
   strcpy(tmp, TARPATH);
-  tar = strtok_r(tmp, "/\0",&tmp); // on stock le .tar
+  char * tar = strtok_r(tmp, "/\0",&tmp); // on stock le .tar
   int i = 0; // nb d'elements dans TARPATH;
-  int l = 0; //nb de char parcourus dans path
+	
   if(strlen(tar) < strlen(TARPATH)){ //on stock le tarpath dans FP
     for(;(token = strtok_r(tmp,"/\n",&tmp)) != NULL; i++){
       fullpath[i] = malloc(strlen(token) + 1);
@@ -61,7 +61,8 @@ int navigate(char * path){
   // on passe au path
   tmp = malloc(strlen(path) + 1);
   strcpy(tmp, path); // on copie le path
-  for(;(token = strtok_r(tmp,"/\n",&tmp)) != NULL; i++, l+= strlen(token) + 1){
+	// l = au nombres de char parcourus
+  for(int l = 0;(token = strtok_r(tmp,"/\n",&tmp)) != NULL; i++, l+= strlen(token) + 1){
     if(strcmp(token, "..") == 0){
       if(i == 0){
 				setTarpath("\0");
@@ -71,7 +72,8 @@ int navigate(char * path){
 				}
 				return 1;
       }
-			if(checkfp(tar, tabToString(i, fullpath)) == -1){perror("cd"); return -1; } // on verifie que le path est bon
+			if(checkfp(tar, tabToString(i, fullpath)) == -1) // on verifie que le path est bon
+				return displayError("cd", "No such file or directory");
       free(fullpath[i-1]); // on vide la derniere case du tableau fullpath
       i -= 2;
     }
@@ -85,7 +87,8 @@ int navigate(char * path){
     return 1;
   }
 	char * fp = tabToString(i, fullpath);
-	if(checkfp(tar, fp) == -1){perror("cd"); return -1; }//exit
+	if(checkfp(tar, fp) == -1)
+		return displayError("cd", "No such file or directory");
   tmp = malloc(strlen(tar) + strlen(fp) + 2);
   strcpy(tmp, tar);
   strcat(tmp, "/");
@@ -151,7 +154,8 @@ int navigate(char * path){
 // s'occupe des path commançant par / (path absolu)
 // fait appel a cd dès qu'il trouve un .tar
 int cdAbs(char * path){
-  storePosition();
+//  storePosition();
+	char * save = storeManually();
   TARPATH[0] = '\0'; // vide le TARPATH
   char  * tmp = malloc(strlen(path) + 1);
   strcpy(tmp, path);
@@ -168,7 +172,8 @@ int cdAbs(char * path){
         }
       }
       if(n < strlen(path) && cd(path+n+1) == -1){
-        restorePosition();
+//        restorePosition();
+				restoreManually(save);
         return -1;
       }
       return 1;

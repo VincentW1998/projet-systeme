@@ -84,12 +84,12 @@ int execCommand(char ** command) {
       }
       break;
     default :
-    if(strcmp(command[0], "cat") == 0)
-    signal(SIGINT, SIG_IGN);
-      wait(&w);
+			if(strcmp(command[0], "cat") == 0)
+				signal(SIGINT, SIG_IGN);
+			wait(&w);
       signal(SIGINT, SIG_DFL);
   }
-  return 0;
+  return 1;
 }
 
 // si la ligne de commande contient un pipe
@@ -388,4 +388,11 @@ int commandNoTar_option(char * cmd, char *opt, char * path){
   char * command [4] = {[0]=cmd,[1]=opt,[2]=path};
   execCommand(command);
   return 1;
+}
+
+int displayError(char * cmd, char * msg){
+	write(2, msg, strlen(msg));
+	write(2,"\n",1);
+
+	return -1;
 }
