@@ -84,16 +84,14 @@ static int rechercher3 (int fichier, int option, char *nom){
   return recherche3(fichier, option, nom);
 }
 
-static int modif(char *racine,
-		  char * suffixe, char *chemin, char *nouveau){
+static int modif(char *racine,char * suffixe,
+		 char *chemin, char *nouveau){
   memset(nouveau,'\0',100);
-  int i=0;
-  int j=0;
+  int i=0;int j=0;
   for(; i<strlen(suffixe)&&suffixe[i]!='\0'; i++){
     nouveau[i] = suffixe[i];
   }
-  nouveau[i]='/';
-  i++;
+  nouveau[i]='/';i++;
   while(racine[j]==chemin[j]){
     j++;
   }
@@ -101,9 +99,21 @@ static int modif(char *racine,
     nouveau[i]=chemin[j];
     j++;
   }
-  if(nouveau[i-1]=='/')
-    nouveau[i-1]='\0';
-  
+  if(nouveau[i-1]=='/') nouveau[i-1]='\0';
+  return 1;
+}
+
+static int modif2(char *racine, char *chemin, char *nouveau){
+  memset(nouveau,'\0',100);
+  int i=0;int j=0;
+  while(racine[j]==chemin[j]){
+    j++;
+  }
+  for(;j<strlen(chemin);i++){
+    nouveau[i]=chemin[j];
+    j++;
+  }
+  if(nouveau[i-1]=='/') nouveau[i-1]='\0';
   return 1;
 }
 
@@ -123,8 +133,6 @@ static int estPresent(char *fic1, char *supprimer){
   int fichier1 = open(fic1,O_RDONLY);
   return (rechercher3(fichier1,1,supprimer)>=0);
 }
-
-
 
 static void init(char *a, char *b, char *p1, char *p2, char *p3){
   memset(a,'\0',100);memset(b,'\0',100);
@@ -147,6 +155,16 @@ static void init(char *a, char *b, char *p1, char *p2, char *p3){
   }
 }
 
+
+static int copie(char *a, char *b){
+  int i = 0;
+  for(; i < strlen(a);i++){
+    b[i]=a[i];
+  }
+  b[i]='/';
+  return 1;
+}
+
 static int valide(char *fic1,char *path){
   int fichier1 = open(fic1,O_RDONLY);
   struct posix_header entete;
@@ -162,7 +180,7 @@ static int cp2(char *tarSource1, char *tarTarget1,
 	       char *pathWithFile1, char *pathFileTarget1){
   int n;  
   cpOn = 1;
-
+  printf("toujours là");
   if(estPresent(tarTarget1, pathFileTarget1)<=0){
     if((n = checkEntete(tarTarget1, pathFileTarget1)) == 1) {
       cpOn = 0;
@@ -197,9 +215,8 @@ int cpRepo(char * path, char * target) {
   // path du fichier wsrc
   
   restorePosition();
-  if(whichCd(pathCdTarget) == -1) {
-    return -1;
-  }
+  if(whichCd(pathCdTarget) == -1) return -1;
+ 
   
   memset(pathCd, '\0', 1);
   tarTarget = substringTar();
@@ -208,9 +225,7 @@ int cpRepo(char * path, char * target) {
   char dossier[100];
   
   init(pathCpTarget2,dossier,pathCpTarget,pathFileTarget,pathCp);
-  if(valide(tarSource,pathWithFile)<=0){
-    return -1;
-  }
+  if(valide(tarSource,pathWithFile)<=0) return -1;
   
   char * pft = createPathFile(pathCpTarget2);
   int fic2 = open(tarTarget,O_RDWR);
@@ -224,61 +239,48 @@ int cpRepo(char * path, char * target) {
   return cp2(tarSource,tarTarget,pathWithFile,pathFileTarget);
 }
 
-static int copie(char *a, char *b){
-  int i = 0;
-  for(; i < strlen(a);i++){
-    b[i]=a[i];
-  }
-  b[i]='/';
-  return 1;
-}
+
 
 int cprtar(char * path, char * target){
   char *ctaille;
-  int taille;
-  int nb;
-  if((strlen(path))==0 || strlen(target) == 0){
-    //commande incomplète
-    return -1;
-  }
+  int taille,nb;
+  if((strlen(path))==0||strlen(target)==0) return -1;
   char * pathCp = getLastToken(path);
   char * pathCpTarget = getLastToken(target);
   char * pathCd = pathWithoutLastToken(path, pathCp);
   char * pathCdTarget = pathWithoutLastToken(target, pathCpTarget);
-  if(whichCd(pathCd) == -1)
-    return -1;
+  if(whichCd(pathCd) == -1) return -1;
   memset(pathCd, '\0',1);
   char * tarSource = substringTar();
   char * pathWithFile = createPathFile(pathCp);
   // path du fichier wsrc
   restorePosition();
-  if(whichCd(pathCdTarget) == -1) {
-    return -1;
-  }
+  if(whichCd(pathCdTarget) == -1) return -1;
   memset(pathCd, '\0', 1);
   tarTarget = substringTar();
   pathFileTarget = createPathFile(pathCpTarget);
-  char tab[100];
+  char tab[100];char tab2[100];
   int fichier1 = open(tarSource,O_RDONLY);
-  if(fichier1<=0){
-    return -1;
-  }
+  if(fichier1<=0) return -1;
   char t1 [strlen(pathWithFile)];
   copie(pathWithFile,t1);
-  
   struct posix_header entete;
   int chm=strlen(pathWithFile);
   char *cmd[2];
+  char *cmd2[3];
+  cmd2[0]="cp";
   cmd[0]="mkdir";
   while(read(fichier1,&entete,512)>0){
     ctaille = entete.size;
     sscanf(ctaille,"%o",&taille);
     nb = ((taille+512-1)/512);
     modif(pathCd,target,entete.name,tab);
+    modif2(pathCd,entete.name,tab2);
     cmd[1]=tab;
+    cmd2[2]=tab;
     if(strncmp(entete.name,t1,chm)==0){
       if(entete.typeflag=='5') mkdirTar(2,cmd);
-      else cpRepo(path,tab);
+      else cpTar(3,cmd2);
     }
     lseek(fichier1,nb*512,SEEK_CUR);
   }
@@ -292,13 +294,21 @@ int cpTar(int noOption, char ** command) {
   int bool = 0;
   if(noOption <3){
     puts("commande INVALIDE\n");
-    return 1;
+    return -1;
   }
   if(strcmp(command[1],"-r")==0){
     i=2;
     bool = 1;
+    if (noOption < 4 ) {
+      puts("Invalide.\n");
+      return -1;
+    }
   }
 
+  if(bool==0){
+    printf("\nc0 : %s\nc1 : %s\n",command[2],command[3]);
+  }
+  
   for(;i<(noOption-1);i++){
     if(bool == 1){
       cprtar(command[i],command[noOption-1]);
