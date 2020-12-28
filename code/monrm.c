@@ -105,6 +105,8 @@ int contient(char *dossier,char *nom){
 
 
 int rmfichier_tar(char * path){
+
+  printf("path : %s\n",path);
   int fd, n;
   storePosition(); //store sa position
 
@@ -114,15 +116,15 @@ int rmfichier_tar(char * path){
   if(whichCd(pathCd) == -1)
     return -1;
 
-  if(TARPATH[0] == '\0') { // si t'es pas dans un tar alors tu appelles exec
+  if(TARPATH[0] == '\0') {
+    // si t'es pas dans un tar alors tu appelles exec
     commandNoTar("rm", pathRm); // appel fonctions avec exec
     restorePosition(); // restorePosition
     return 1;
   }
 
-  
-
-  char * tarName = substringTar(); // recupere le nom du tar file
+  char * tarName = substringTar();
+  // recupere le nom du tar file
   char * pathWithFile = createPathFile(pathRm);
   
   fd = open(tarName, O_RDWR);
@@ -140,7 +142,8 @@ int rmfichier_tar(char * path){
 // getcwd + tarpath + fichier a supprimer
    
   rmOn = 1;
-  if((n = checkEntete(tarName, pathWithFile)) == -1) { //check si le fichier existe
+  if((n = checkEntete(tarName, pathWithFile)) == -1) {
+    //check si le fichier existe
     rmOn = 0;
     restorePosition();
     return -1;

@@ -93,9 +93,21 @@ static int fin_fic3(int fichier){
   return 0;
 }
 
-static int cp2(char *tarSource1, char *tarTarget1,char *pathWithFile1, char *pathFileTarget1){
-  //printf("\n| %s | %s | %s | %s |\n", tarSource1,tarTarget1,pathWithFile1,pathFileTarget1);
+static void presence(char *fic1, char *supprimer){
+  printf("supprimer : %s\n",supprimer);
+  int fichier1 = open(fic1,O_RDWR);
+  if(rechercher3(fichier1,1,supprimer)>=0){
+    printf("Je suis présent.\n\n\n");
+    rmfichier_tar(supprimer);
+  }
+  close (fichier1);
+}
+
+static int cp2(char *tarSource1, char *tarTarget1,
+	       char *pathWithFile1, char *pathFileTarget1){
   int n;
+  //presence(tarTarget1,pathFileTarget1);
+  //Présente un bug critique, ne pas utiliser pour le moment.
   cpOn = 1;
   
   if((n = checkEntete(tarTarget1, pathFileTarget1)) == 1) {
@@ -107,14 +119,6 @@ static int cp2(char *tarSource1, char *tarTarget1,char *pathWithFile1, char *pat
     return -1;
   }
   cpOn = 0;
-  return 1;
-}
-
-int cpTar(int noOption, char ** command) {
-  storePosition();
-    if(cpRepo(command[1], command[2]) == -1)
-      write(2, "erreur : cp\n", strlen("erreur : mkdir\n"));
-  restorePosition();
   return 1;
 }
 
@@ -139,6 +143,14 @@ static void init(char *a, char *b, char *p1, char *p2, char *p3){
   }
 }
 
+static int minicopie (char *c, char *b){
+  for(int i = 0 ; i<strlen(b)&&i<100; i++){
+    c[i]=b[i];
+  }
+  c[strlen(b)-1]='\0';
+  return 1;
+}
+
 static int valide(char *fic1,char *path){
   int fichier1 = open(fic1,O_RDONLY);
   struct posix_header entete;
@@ -150,14 +162,13 @@ static int valide(char *fic1,char *path){
   else return 1;
 }
 
-static void presence(char *fic1, char *supprimer){
-  int fichier1 = open(fic1,O_RDWR);
-  if(rechercher3(fichier1,1,supprimer)>=0)
-    rmfichier_tar(supprimer);
-  close (fichier1);
-}
+
 
 int cpRepo(char * path, char * target) {
+  if((strlen(path))==0 || strlen(target) == 0){
+    //commande incomplète
+    return -1;
+  }
   char * pathCp = getLastToken(path);
   char * pathCpTarget = getLastToken(target);
   char * pathCd = pathWithoutLastToken(path, pathCp);
@@ -165,10 +176,10 @@ int cpRepo(char * path, char * target) {
   if(whichCd(pathCd) == -1)
     return -1;
   
-  
   memset(pathCd, '\0',1);
   char * tarSource = substringTar();
-  char * pathWithFile = createPathFile(pathCp); // path du fichier src
+  char * pathWithFile = createPathFile(pathCp);
+  // path du fichier wsrc
   
   restorePosition();
   if(whichCd(pathCdTarget) == -1) {
@@ -187,17 +198,25 @@ int cpRepo(char * path, char * target) {
   }
   
   char * pft = createPathFile(pathCpTarget2);
- 
-  presence(tarTarget,pft);
   int fic2 = open(tarTarget,O_RDWR);
 
   if(rechercher3(fic2,1,dossier)>0){
     close(fic2);
-    pathFileTarget=pft;
+    pathFileTarget=pft;;
     return cp2(tarSource,tarTarget,pathWithFile,pft);
   }
   close(fic2);
-  
   return cp2(tarSource,tarTarget,pathWithFile,pathFileTarget);
 }
 
+int cpTar(int noOption, char ** command) {
+  storePosition();
+  if(noOption <3){
+    puts("commande INVALIDE\n");
+    return 1;
+  }
+  if(cpRepo(command[1], command[2]) == -1)
+      write(2, "erreur : cp\n", strlen("erreur : mkdir\n"));
+  restorePosition();
+  return 1;
+}
