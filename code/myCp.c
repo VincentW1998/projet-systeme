@@ -215,17 +215,91 @@ int cpRepo(char * path, char * target) {
   close(fic2);
   return cp2(tarSource,tarTarget,pathWithFile,pathFileTarget);
 }
+static int modif(char *racine,
+		  char * suffixe, char *chemin, char *nouveau){
+  memset(nouveau,'\0',100);
+  int i,j;
+  for(; i<strlen(suffixe)&&suffixe[i]='\0'; i++){
+    nouveau[i] = suffixe[i];
+  }
+  nouveau[i]='/';i++;
+  while(racine[j]==chemin[j]){
+    j++;
+  }
+  for(;j<strlen(chemin);i++){
+    nouveau[i]=chemin[j];
+    j++;
+  }
+  return 1;
+}
 
-int cprtar(int * path, char * target);
+int cprtar(int * path, char * target){
+  if((strlen(path))==0 || strlen(target) == 0){
+    //commande incomplète
+    return -1;
+  }
+  char * pathCp = getLastToken(path);
+  char * pathCpTarget = getLastToken(target);
+  char * pathCd = pathWithoutLastToken(path, pathCp);
+  char * pathCdTarget = pathWithoutLastToken(target, pathCpTarget);
+  if(whichCd(pathCd) == -1)
+    return -1;
+  
+  memset(pathCd, '\0',1);
+  char * tarSource = substringTar();
+  char * pathWithFile = createPathFile(pathCp);
+  // path du fichier wsrc
+  
+  restorePosition();
+  if(whichCd(pathCdTarget) == -1) {
+    return -1;
+  }
+  
+  memset(pathCd, '\0', 1);
+  tarTarget = substringTar();
+  pathFileTarget = createPathFile(pathCpTarget);
+  char tab[100];
+  int fichier1 = open(pathCp,O_RDONLY);
+  int fichier2 = open(tarTarget,O_RDONLY);
+  struct posix_header entete;
+  
+  int chm=strlen(pathWithFile);
+  while(read(fichier1,&entete,512)>0){
+    modif(pathCd,target,entete.name,tab);
+    if(strncmp(entete.name,pathWithFile,chm)==0){
+      if(entete.typeflag=='5') createRepo(tab);
+      else cpRepo(path,tab);
+    }
+    lseek();
+  }
+  return 0;
+}
 
 int cpTar(int noOption, char ** command) {
   storePosition();
+  int i = 0;
+  int bool = 0;
   if(noOption <3){
     puts("commande INVALIDE\n");
     return 1;
   }
-  if(cpRepo(command[1], command[2]) == -1)
+  
+  if(strcmp(command[1],"-r")==0){
+    i=2;
+    bool = 1;
+  }
+
+  for(;i<(nbOption-1);i++){
+    if(bool == 1){
+      cprtar(command[i],command[noOption-1]);
+    }
+    else if(cpRepo(command[i], command[noOption]) == -1){
       write(2, "erreur : cp\n", strlen("erreur : mkdir\n"));
+    }
+  }
+  
   restorePosition();
   return 1;
+
+  
 }
