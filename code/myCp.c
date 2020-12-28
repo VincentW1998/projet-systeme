@@ -5,6 +5,7 @@
 #include "myCd.h"
 #include "storeRestore.h"
 #include "monrm.h"
+#include "myMkdir.h"
 
 static int debut3(int fichier){
   return lseek(fichier,0,SEEK_SET);
@@ -82,7 +83,7 @@ static int rechercher3 (int fichier, int option, char *nom){
   debut3(fichier);
   return recherche3(fichier, option, nom);
 }
-
+/**
 static int fin_fic3(int fichier){
   debut3(fichier);
   while(1){
@@ -92,7 +93,26 @@ static int fin_fic3(int fichier){
   }
   return 0;
 }
+**/
 
+static int modif(char *racine,
+		  char * suffixe, char *chemin, char *nouveau){
+  memset(nouveau,'\0',100);
+  int i,j;
+  for(; i<strlen(suffixe)&&suffixe[i]=='\0'; i++){
+    nouveau[i] = suffixe[i];
+  }
+  nouveau[i]='/';i++;
+  while(racine[j]==chemin[j]){
+    j++;
+  }
+  for(;j<strlen(chemin);i++){
+    nouveau[i]=chemin[j];
+    j++;
+  }
+  return 1;
+}
+/**
 static void presence(char *fic1, char *supprimer){
   printf("supprimer : %s\n",supprimer);
   int fichier1 = open(fic1,O_RDWR);
@@ -102,6 +122,7 @@ static void presence(char *fic1, char *supprimer){
   }
   close (fichier1);
 }
+**/
 
 static int estPresent(char *fic1, char *supprimer){
   int fichier1 = open(fic1,O_RDONLY);
@@ -129,14 +150,6 @@ static void init(char *a, char *b, char *p1, char *p2, char *p3){
     a[i+j] = p3[j];
     j++;
   }
-}
-
-static int minicopie (char *c, char *b){
-  for(int i = 0 ; i<strlen(b)&&i<100; i++){
-    c[i]=b[i];
-  }
-  c[strlen(b)-1]='\0';
-  return 1;
 }
 
 static int valide(char *fic1,char *path){
@@ -215,25 +228,11 @@ int cpRepo(char * path, char * target) {
   close(fic2);
   return cp2(tarSource,tarTarget,pathWithFile,pathFileTarget);
 }
-static int modif(char *racine,
-		  char * suffixe, char *chemin, char *nouveau){
-  memset(nouveau,'\0',100);
-  int i,j;
-  for(; i<strlen(suffixe)&&suffixe[i]='\0'; i++){
-    nouveau[i] = suffixe[i];
-  }
-  nouveau[i]='/';i++;
-  while(racine[j]==chemin[j]){
-    j++;
-  }
-  for(;j<strlen(chemin);i++){
-    nouveau[i]=chemin[j];
-    j++;
-  }
-  return 1;
-}
 
-int cprtar(int * path, char * target){
+int cprtar(char * path, char * target){
+  char *ctaille;
+  int taille;
+  int nb;
   if((strlen(path))==0 || strlen(target) == 0){
     //commande incomplète
     return -1;
@@ -246,7 +245,7 @@ int cprtar(int * path, char * target){
     return -1;
   
   memset(pathCd, '\0',1);
-  char * tarSource = substringTar();
+  /**char * tarSource =**/ substringTar();
   char * pathWithFile = createPathFile(pathCp);
   // path du fichier wsrc
   
@@ -260,18 +259,21 @@ int cprtar(int * path, char * target){
   pathFileTarget = createPathFile(pathCpTarget);
   char tab[100];
   int fichier1 = open(pathCp,O_RDONLY);
-  int fichier2 = open(tarTarget,O_RDONLY);
+
   struct posix_header entete;
-  
   int chm=strlen(pathWithFile);
   while(read(fichier1,&entete,512)>0){
+    ctaille = entete.size;
+    sscanf(ctaille,"%o",&taille);
+    nb = ((taille+512-1)/512);
     modif(pathCd,target,entete.name,tab);
     if(strncmp(entete.name,pathWithFile,chm)==0){
       if(entete.typeflag=='5') createRepo(tab);
       else cpRepo(path,tab);
     }
-    lseek();
+    lseek(fichier1,nb*512,SEEK_CUR);
   }
+  close(fichier1);
   return 0;
 }
 
@@ -289,17 +291,15 @@ int cpTar(int noOption, char ** command) {
     bool = 1;
   }
 
-  for(;i<(nbOption-1);i++){
+  for(;i<(noOption-1);i++){
     if(bool == 1){
       cprtar(command[i],command[noOption-1]);
     }
-    else if(cpRepo(command[i], command[noOption]) == -1){
+    else if(cpRepo(command[i], command[noOption-1]) == -1){
       write(2, "erreur : cp\n", strlen("erreur : mkdir\n"));
     }
   }
   
   restorePosition();
   return 1;
-
-  
 }

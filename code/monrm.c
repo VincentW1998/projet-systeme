@@ -82,7 +82,7 @@ static int rechercher3 (int fichier, int option, char *nom){
   debut3(fichier);
   return recherche3(fichier, option, nom);
 }
-
+/**
 static int fin_fic3(int fichier){
   debut3(fichier);
   while(1){
@@ -91,7 +91,7 @@ static int fin_fic3(int fichier){
     else if(x==-1) return -1;
   }
   return 0;
-}
+  }**/
 
 int contient(char *dossier,char *nom){
   DIR *d = opendir(dossier);
