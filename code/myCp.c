@@ -240,7 +240,6 @@ int cpRepo(char * path, char * target) {
 }
 
 
-
 int cprtar(char * path, char * target){
   char *ctaille;
   int taille,nb;
@@ -256,39 +255,52 @@ int cprtar(char * path, char * target){
   // path du fichier wsrc
   restorePosition();
   if(whichCd(pathCdTarget) == -1) return -1;
+  
   memset(pathCd, '\0', 1);
   tarTarget = substringTar();
   pathFileTarget = createPathFile(pathCpTarget);
   char tab[100];char tab2[100];
+  
   int fichier1 = open(tarSource,O_RDONLY);
+  int fichier2 = open(tarTarget,O_RDONLY);
+  
+  int opt;
+  if(rechercher3(fichier2,0,pathFileTarget)==1) opt = 0;
+  else opt = 1;
+  
   if(fichier1<=0) return -1;
   char t1 [strlen(pathWithFile)];
   copie(pathWithFile,t1);
   struct posix_header entete;
   int chm=strlen(pathWithFile);
-  char *cmd[2];
-  char *cmd2[3];
+  char * cmd[2];
+  char * cmd2[3];
   cmd2[0]="cp";
   cmd[0]="mkdir";
   while(read(fichier1,&entete,512)>0){
     ctaille = entete.size;
     sscanf(ctaille,"%o",&taille);
     nb = ((taille+512-1)/512);
-    modif(pathCd,target,entete.name,tab);
+    modif(pathCd,pathCpTarget,entete.name,tab);
     modif2(pathCd,entete.name,tab2);
     cmd[1]=tab;
+    cmd2[1]=tab2;
     cmd2[2]=tab;
+    printf("tab  : %s\n", tab);
+    printf("tab2 : %s\n", tab2);
     if(strncmp(entete.name,t1,chm)==0){
       if(entete.typeflag=='5') mkdirTar(2,cmd);
       else cpTar(3,cmd2);
     }
-    lseek(fichier1,nb*512,SEEK_CUR);
+    lseek(fichier1,-512,SEEK_CUR);
+    if(suivant3(fichier1)==2) break;
   }
   close(fichier1);
   return 0;
 }
 
 int cpTar(int noOption, char ** command) {
+  
   storePosition();
   int i = 0;
   int bool = 0;
@@ -306,13 +318,11 @@ int cpTar(int noOption, char ** command) {
   }
 
   if(bool==0){
-    printf("\nc0 : %s\nc1 : %s\n",command[2],command[3]);
+    printf("\nc0 : %s\nc1 : %s\n",command[1],command[2]);
   }
   
   for(;i<(noOption-1);i++){
-    if(bool == 1){
-      cprtar(command[i],command[noOption-1]);
-    }
+    if(bool == 1) cprtar(command[i],command[noOption-1]);
     else if(cpRepo(command[i], command[noOption-1]) == -1){
       write(2, "erreur : cp\n", strlen("erreur : mkdir\n"));
     }
@@ -320,4 +330,5 @@ int cpTar(int noOption, char ** command) {
   
   restorePosition();
   return 1;
+  
 }
