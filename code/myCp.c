@@ -301,7 +301,13 @@ int cprtar(char * path, char * target){
 
   int n;
   //PARTIE CP_R
-  int fichier1 = open(tarSource,O_RDWR);
+  int fichier1 = open(tarSource,O_RDONLY);  
+  if(fichier1<0){
+    perror("Echec de l'ouverture du fichier");
+    return -1;
+  }
+
+  
   char t2[100];
   fusion2(pathCdTarget,"",t2);
   printf("test %s \n",t2);
@@ -310,7 +316,9 @@ int cprtar(char * path, char * target){
   }
   struct posix_header entete;
   //Le Dossier (contenant) est toujours avant dans l'arborescence.
-  read(fichier1,&entete,512);
+  if(read(fichier1,&entete,512)<0){
+    perror("Echec lecture du fichier");
+  }
   
   lseek(fichier1,-512,SEEK_CUR);
   char ntarget[100];
@@ -322,7 +330,9 @@ int cprtar(char * path, char * target){
   restorePosition();
   if(suivant3(fichier1)!=0) return 1;
   while(1){
-    read(fichier1,&entete,512);
+    if(read(fichier1,&entete,512)<0){
+     perror("Echec lecture du fichier");
+    }
     if(entete.typeflag=='5'){
       if(strncmp(entete.name,t2,strlen(t2))==0){
 	cprtar(path,entete.name);
@@ -331,7 +341,9 @@ int cprtar(char * path, char * target){
     //Si c'est un dossier on applique la récursion.
     else cpRepo(path,entete.name);
     //Sinon, on copie les fichiers.
-    lseek(fichier1,-512,SEEK_CUR);
+    if(lseek(fichier1,-512,SEEK_CUR)<0){
+      perror("Echec de modification du décalage de fichier");
+    }
     if(suivant3(fichier1)!=0) break;
   }
   return 1;
