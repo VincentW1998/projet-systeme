@@ -39,29 +39,36 @@ int afficheMessageErreur(char ** command) {
 
 /**************************** LECTURE LIGNE ****************************/
 //fonction qui se comporte comme readLine
-void *lectureLigne(char * str, char * buff){
-  char * token = strtok(str,"\n");
-  if(token!=NULL){
+/*void *lectureLigne(char * str, char * buff){
+  char * token = malloc(strlen(str));
+  memset(token, '\0', strlen(str));
+  token = strtok_r(str, "\n", &str);
+  if(token != NULL) {
     buff = malloc(strlen(token) + 1);
-    strcpy(buff,token);
-//    strcat(buff,"\n");
+    strcpy(buff, token);
   }
   memset(str, '\0', strlen(str));
   return buff;
-}
+}*/
 
 // separe la ligne en tableau de char
 int separateurCommand(char * buff, char ** command){
   char * token = NULL;
-  int i = 0;
+  int nbOption = 0;
+  int l = strlen(buff);
 
   while((token = strtok_r(buff, " \n", &buff)) != NULL) {
-    command[i] = malloc(strlen(token) + 1);
-    strcpy(command[i], token);
-    i ++;
+    command[nbOption] = malloc(strlen(token) + 1);
+    strcpy(command[nbOption], token);
+    nbOption ++;
   }
-  command[i] = NULL;
-  int nbOption = i;
+  if (nbOption == 0) {
+    command[nbOption] = malloc(1);
+    strcpy(command[nbOption], "");
+    nbOption ++;
+  }
+  memset(buff, '\0', l);
+  command[nbOption] = NULL;
   nbOption = nbOptionRedirect(nbOption, command); //redirect
   return nbOption;
 }
@@ -170,7 +177,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
 
     case 8 : return rmTar(nbOption, command);
 
-    case 9 : return 0;
+    case 9 : return 1;
 
   }
   return 1;

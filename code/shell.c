@@ -5,26 +5,27 @@ int main(int argc, char const *argv[]) {
   char str [BUFSIZE];
   // initialisation du buffer
   memset(str, '\0', BUFSIZE);
-  char * buff;
   int n;
   char * command[100];
   memset(command, '\0', 100 * sizeof(command[0]));
   char * commandPipe[100];
   memset(commandPipe, '\0', 100 * sizeof(commandPipe[0]));
-  int nbOption = 0;
+  int nbOption;
   TARPATH = malloc(1);
-//  strcpy(TARPATH,"\0");
   memset(TARPATH, '\0', 1);
   
   while(1) { // boucle infinie
     affichagePrompt();
     nbOption = 0;
     if((n = read(0,str,BUFSIZE) > 0)) { // check si l'usr ecrit dans l'entrée
-      buff = lectureLigne(str, buff); // readline
+//      buff = lectureLigne(str, buff); // readline
       
       // separe buff en command, option, path dans une variable command[]
-      nbOption = separateurCommand(buff, command);
-      memset(buff, '\0', strlen(buff) + 1);
+ //     nbOption = separateurCommand(buff, command);
+      nbOption = separateurCommand(str, command);
+      memset(str, '\0', BUFSIZE);
+
+//      memset(buff, '\0', strlen(buff) + 1);
       
       findPipeAndExec(nbOption, command, commandPipe);
       

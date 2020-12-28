@@ -6,8 +6,9 @@
 #include <stdlib.h>
 
 
-int execCommandPipe(char ** command, char ** commandPipe);
+int nbPipes(int nbOption, char ** command);
 
+int execCommandPipe(char ** command, char ** commandPipe);
 
 #endif
 
