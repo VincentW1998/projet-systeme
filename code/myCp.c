@@ -98,11 +98,13 @@ static int fin_fic3(int fichier){
 static int modif(char *racine,
 		  char * suffixe, char *chemin, char *nouveau){
   memset(nouveau,'\0',100);
-  int i,j;
-  for(; i<strlen(suffixe)&&suffixe[i]=='\0'; i++){
+  int i=0;
+  int j=0;
+  for(; i<strlen(suffixe)&&suffixe[i]!='\0'; i++){
     nouveau[i] = suffixe[i];
   }
-  nouveau[i]='/';i++;
+  nouveau[i]='/';
+  i++;
   while(racine[j]==chemin[j]){
     j++;
   }
@@ -222,11 +224,20 @@ int cpRepo(char * path, char * target) {
 
   if(rechercher3(fic2,1,dossier)>0){
     close(fic2);
-    pathFileTarget=pft;;
+    pathFileTarget=pft;
     return cp2(tarSource,tarTarget,pathWithFile,pft);
   }
   close(fic2);
   return cp2(tarSource,tarTarget,pathWithFile,pathFileTarget);
+}
+
+static int copie(char *a, char *b){
+  int i = 0;
+  for(; i < strlen(a);i++){
+    b[i]=a[i];
+  }
+  b[i]='/';
+  return 1;
 }
 
 int cprtar(char * path, char * target){
@@ -245,7 +256,7 @@ int cprtar(char * path, char * target){
     return -1;
   
   memset(pathCd, '\0',1);
-  /**char * tarSource =**/ substringTar();
+  char * tarSource = substringTar();
   char * pathWithFile = createPathFile(pathCp);
   // path du fichier wsrc
   
@@ -256,19 +267,30 @@ int cprtar(char * path, char * target){
   
   memset(pathCd, '\0', 1);
   tarTarget = substringTar();
+  
   pathFileTarget = createPathFile(pathCpTarget);
   char tab[100];
-  int fichier1 = open(pathCp,O_RDONLY);
+  int fichier1 = open(tarSource,O_RDONLY);
 
+  if(fichier1<=0){
+    printf("erreur...\n");
+    return -1;
+  }
+  char t1 [strlen(pathWithFile)];
+  copie(pathWithFile,t1);
+  
   struct posix_header entete;
   int chm=strlen(pathWithFile);
+  char *cmd[2];
+  cmd[0]="mkdir";
   while(read(fichier1,&entete,512)>0){
     ctaille = entete.size;
     sscanf(ctaille,"%o",&taille);
     nb = ((taille+512-1)/512);
     modif(pathCd,target,entete.name,tab);
-    if(strncmp(entete.name,pathWithFile,chm)==0){
-      if(entete.typeflag=='5') createRepo(tab);
+    cmd[1]=tab;
+    if(strncmp(entete.name,t1,chm)==0){
+      if(entete.typeflag=='5') mkdirTar(2,cmd);
       else cpRepo(path,tab);
     }
     lseek(fichier1,nb*512,SEEK_CUR);
@@ -285,7 +307,6 @@ int cpTar(int noOption, char ** command) {
     puts("commande INVALIDE\n");
     return 1;
   }
-  
   if(strcmp(command[1],"-r")==0){
     i=2;
     bool = 1;
