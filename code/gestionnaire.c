@@ -390,9 +390,8 @@ int commandNoTar_option(char * cmd, char *opt, char * path){
   return 1;
 }
 
-int displayError(char * cmd, char * msg){
+int displayError(char * msg){
 	write(2, msg, strlen(msg));
 	write(2,"\n",1);
-
 	return -1;
 }
