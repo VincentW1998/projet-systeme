@@ -295,6 +295,7 @@ char * getPathBeforeTar(char * path){ // return the path before TARPATH
   char * fromTar = pathFromTar(path);
 	if(strcmp(path,fromTar) == 0) return "";
   char * beforeTar = malloc(strlen(path) - strlen(fromTar));
+	memset(beforeTar, '\0', strlen(path) - strlen(fromTar));
   strncpy(beforeTar,path,strlen(path) - strlen(fromTar)-1);
   return beforeTar;
 }
@@ -303,7 +304,7 @@ char * getPathBeforeTar(char * path){ // return the path before TARPATH
 char * pathWithoutLastToken(char * path, char * lastToken){
   // copy path - size of the last token
   char * deplacement = malloc(strlen(path) - strlen(lastToken) + 1);
-  memset(deplacement, '\0', strlen(path));
+  memset(deplacement, '\0', strlen(path) - strlen(lastToken) + 1);
   strncpy(deplacement, path, strlen(path) - strlen(lastToken));
   return deplacement;
 }
