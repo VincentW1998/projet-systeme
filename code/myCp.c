@@ -103,24 +103,12 @@ static void presence(char *fic1, char *supprimer){
   close (fichier1);
 }
 
-static int cp2(char *tarSource1, char *tarTarget1,
-	       char *pathWithFile1, char *pathFileTarget1){
-  int n;
-  //presence(tarTarget1,pathFileTarget1);
-  //Présente un bug critique, ne pas utiliser pour le moment.
-  cpOn = 1;
-  
-  if((n = checkEntete(tarTarget1, pathFileTarget1)) == 1) {
-    cpOn = 0;
-    return -1;
-  }
-  if((n = checkEntete(tarSource1, pathWithFile1)) == -1) {
-    cpOn = 0;
-    return -1;
-  }
-  cpOn = 0;
-  return 1;
+static int estPresent(char *fic1, char *supprimer){
+  int fichier1 = open(fic1,O_RDONLY);
+  return (rechercher3(fichier1,1,supprimer)>=0);
 }
+
+
 
 static void init(char *a, char *b, char *p1, char *p2, char *p3){
   memset(a,'\0',100);memset(b,'\0',100);
@@ -162,7 +150,26 @@ static int valide(char *fic1,char *path){
   else return 1;
 }
 
+static int cp2(char *tarSource1, char *tarTarget1,
+	       char *pathWithFile1, char *pathFileTarget1){
+  int n;  
+  cpOn = 1;
 
+  if(estPresent(tarTarget1, pathFileTarget1)<=0){
+    if((n = checkEntete(tarTarget1, pathFileTarget1)) == 1) {
+      cpOn = 0;
+      return -1;
+    }
+    if((n = checkEntete(tarSource1, pathWithFile1)) == -1) {
+      cpOn = 0;
+      return -1;
+    }
+    cpOn = 0;
+    return 1;
+  }
+  printf("Cas à résoudre : Écraser un fichier déjà présent.\n");
+  return -1;
+}
 
 int cpRepo(char * path, char * target) {
   if((strlen(path))==0 || strlen(target) == 0){
@@ -208,6 +215,8 @@ int cpRepo(char * path, char * target) {
   close(fic2);
   return cp2(tarSource,tarTarget,pathWithFile,pathFileTarget);
 }
+
+int cprtar(int * path, char * target);
 
 int cpTar(int noOption, char ** command) {
   storePosition();
