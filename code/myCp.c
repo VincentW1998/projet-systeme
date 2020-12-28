@@ -83,17 +83,6 @@ static int rechercher3 (int fichier, int option, char *nom){
   debut3(fichier);
   return recherche3(fichier, option, nom);
 }
-/**
-static int fin_fic3(int fichier){
-  debut3(fichier);
-  while(1){
-    int x = suivant3(fichier);
-    if(x==2) break;
-    else if(x==-1) return -1;
-  }
-  return 0;
-}
-**/
 
 static int modif(char *racine,
 		  char * suffixe, char *chemin, char *nouveau){
@@ -112,8 +101,12 @@ static int modif(char *racine,
     nouveau[i]=chemin[j];
     j++;
   }
+  if(nouveau[i-1]=='/')
+    nouveau[i-1]='\0';
+  
   return 1;
 }
+
 /**
 static void presence(char *fic1, char *supprimer){
   printf("supprimer : %s\n",supprimer);
@@ -254,26 +247,20 @@ int cprtar(char * path, char * target){
   char * pathCdTarget = pathWithoutLastToken(target, pathCpTarget);
   if(whichCd(pathCd) == -1)
     return -1;
-  
   memset(pathCd, '\0',1);
   char * tarSource = substringTar();
   char * pathWithFile = createPathFile(pathCp);
   // path du fichier wsrc
-  
   restorePosition();
   if(whichCd(pathCdTarget) == -1) {
     return -1;
   }
-  
   memset(pathCd, '\0', 1);
   tarTarget = substringTar();
-  
   pathFileTarget = createPathFile(pathCpTarget);
   char tab[100];
   int fichier1 = open(tarSource,O_RDONLY);
-
   if(fichier1<=0){
-    printf("erreur...\n");
     return -1;
   }
   char t1 [strlen(pathWithFile)];
