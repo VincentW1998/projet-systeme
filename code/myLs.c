@@ -74,10 +74,8 @@ void printOccurences(){
 
 // check si target est visible depuis path 1
 int validPath(char * path, char * target){
-//	char * tmp = malloc(strlen(path)+2);
   char * tmp = malloc(strlen(path) + 1);
 	strcpy(tmp,path);
-//	if(strlen(path) != 0) strcat(tmp, "/"); // le path ne se trouve pas a la racine du tarball on rajoute / pour etre sur le que le fichier correspond bien
 	char * targ, * token;
 	if(strncmp(tmp,target, strlen(tmp)) == 0){
 		targ = malloc(strlen(target) - strlen(tmp) + 1);
@@ -140,7 +138,6 @@ void nbrlink(struct posix_header * p, int file){
 		strcat(tmp,"/");
 		strcat(tmp,p->name);
 	}
-//	if(tmp[strlen(tmp) - 1] == '/') tmp[strlen(tmp) - 1] = '\0';
 	int c = countLinks(tmp , file);
 	lseek(file, current, SEEK_SET);
 	tmp = malloc(10);

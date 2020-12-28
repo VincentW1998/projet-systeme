@@ -84,12 +84,12 @@ int execCommand(char ** command) {
       }
       break;
     default :
-    if(strcmp(command[0], "cat") == 0)
-    signal(SIGINT, SIG_IGN);
-      wait(&w);
+			if(strcmp(command[0], "cat") == 0)
+				signal(SIGINT, SIG_IGN);
+			wait(&w);
       signal(SIGINT, SIG_DFL);
   }
-  return 0;
+  return 1;
 }
 
 // si la ligne de commande contient un pipe
@@ -278,7 +278,7 @@ char * findTar(char * path){ // return the .tar filename
 }
 
 char * pathFromTar(char * path){ // return the path from the .tar
-  if(hasTar(path) == -1) return NULL;
+  if(hasTar(path) == -1) return "";
   char * tmp = malloc(strlen(path) + 1), *token;
   strcpy(tmp,path);
   size_t l = 0;
@@ -287,12 +287,13 @@ char * pathFromTar(char * path){ // return the path from the .tar
     if(estTar(token) == 1) return path+l;
     l += 1 + strlen(token);
   }
-  return NULL;
+	return NULL; // should never reach here
 }
 
 char * getPathBeforeTar(char * path){ // return the path before TARPATH
-  if(hasTar(path) == -1) return NULL;
+  if(hasTar(path) == -1) return path;
   char * fromTar = pathFromTar(path);
+	if(strcmp(path,fromTar) == 0) return "";
   char * beforeTar = malloc(strlen(path) - strlen(fromTar));
   strncpy(beforeTar,path,strlen(path) - strlen(fromTar)-1);
   return beforeTar;
@@ -387,4 +388,10 @@ int commandNoTar_option(char * cmd, char *opt, char * path){
   char * command [4] = {[0]=cmd,[1]=opt,[2]=path};
   execCommand(command);
   return 1;
+}
+
+int displayError(char * msg){
+	write(2, msg, strlen(msg));
+	write(2,"\n",1);
+	return -1;
 }

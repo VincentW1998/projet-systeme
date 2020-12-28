@@ -10,4 +10,8 @@ char * pos, * posTar;
 void storePosition();
 
 void restorePosition();
+
+void restoreManually(char * position);
+
+char * storeManually(void);
 #endif
