@@ -257,9 +257,21 @@ static void fusion(char *a, char *b, char *c){
   i++;
 
   for(;j<strlen(b);j++){
-    c[i+j]=b[i]
+    c[i+j]=b[j];
   }
 }
+
+static void fusion2(char *a, char *b, char *c){
+  int i=0; int j=0;
+  for(;i<strlen(a);i++){
+    c[i]=a[i];
+  }
+
+  for(;j<strlen(b);j++){
+    c[i+j]=b[j];
+  }
+}
+
 
 static void transformer();
 
@@ -290,22 +302,32 @@ int cprtar(char * path, char * target){
   int n;
   //PARTIE CP_R
   int fichier1 = open(tarSource,O_RDWR);
-
-  if(rechercher3(fichier1,1,pathWithFile)!=1){
+  char t2[100];
+  fusion2(pathCdTarget,"",t2);
+  printf("test %s \n",t2);
+  if(rechercher3(fichier1,1,t2)!=1){
     return -1;//Dossier source non présent.
   }
   struct posix_header entete;
   //Le Dossier (contenant) est toujours avant dans l'arborescence.
   read(fichier1,&entete,512);
-  //Création du dossier à copier
-  char *ntarget[100];
+  
+  lseek(fichier1,-512,SEEK_CUR);
+  char ntarget[100];
   fusion(target,pathCp,ntarget);
-  createRepo(ntarget);
-
+  storePosition();
+  navigate(pathCdTarget);
+  createRepo(pathCpTarget);
+  //Création du dossier
+  restorePosition();
+  if(suivant3(fichier1)!=0) return 1;
   while(1){
     read(fichier1,&entete,512);
-    if(entete.typeflag=="5")
-      cprtar(path,entete.name);
+    if(entete.typeflag=='5'){
+      if(strncmp(entete.name,t2,strlen(t2))==0){
+	cprtar(path,entete.name);
+      }
+    }
     //Si c'est un dossier on applique la récursion.
     else cpRepo(path,entete.name);
     //Sinon, on copie les fichiers.
@@ -317,8 +339,12 @@ int cprtar(char * path, char * target){
 
 int cpTar(int noOption, char ** command) {
   storePosition();
-    if(cpRepo(command[1], command[2]) == -1)
-      write(2, "erreur : cp\n", strlen("erreur : mkdir\n"));
+  if(noOption > 3);
+  if(strcmp(command[1],"-r")==0 && noOption >= 4){
+    cprtar(command[2],command[3]);
+  }
+  else if(cpRepo(command[1], command[2]) == -1)
+    write(2, "erreur : cp\n", strlen("erreur : mkdir\n"));
   restorePosition();
   return 1;
 }
