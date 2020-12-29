@@ -10,4 +10,10 @@ char * pos, * posTar;
 void storePosition();
 
 void restorePosition();
+
+char * getPos();
+
+char * getTARPATH();
+
+void storePosition2(char * tp, char * ps);
 #endif
