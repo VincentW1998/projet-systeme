@@ -30,7 +30,7 @@ int execCommand(char ** command);
 
 int separateurCommand(char * buff, char ** command);
 
-void findPipeAndExec(int nbOption, char ** command, char ** commandPipe);
+void findPipeAndExec(int nbOption, char ** command);
 
 int commandPersonnalisee(int nbOption, char ** command);
 

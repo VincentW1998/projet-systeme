@@ -123,8 +123,6 @@ int read_header(int fd, char *path) {
       }
     }
     if(cpOn) {
-//      lseek(fd, -512, SEEK_CUR);
- //     read(fd, &newHd, BLOCKSIZE);
       hasCpOn(fd, filesize);
     }
 

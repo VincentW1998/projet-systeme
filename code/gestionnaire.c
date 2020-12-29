@@ -73,7 +73,15 @@ int separateurCommand(char * buff, char ** command){
   return nbOption;
 }
 
+
 /*********************** APPEL DES COMMANDES ***********************/
+
+void whichCommand(int nbOption, char ** command) {
+  if(TARPATH[0] != '\0')
+   commandTar(nbOption, command);
+  else if(commandPersonnalisee(nbOption, command) == 0)
+   execCommand(command);
+}
 
 //Utilisation de execvp pour les commandes externes du shell
 int execCommand(char ** command) {
@@ -99,41 +107,34 @@ int execCommand(char ** command) {
   return 0;
 }
 
-// si la ligne de commande contient un pipe
-// on remplit command[] avec  tout les char avant le pipe |
-// on remplit commandPipe[] avec tout les char apres le pipe |
-// et on execute execCommandPipe
-// si la ligne ne contient pas de pipe alors on execute tout simplement
-// execcommand
-void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
-  int pipe = 0;
-  int i, j = 0;
-
-  for(i = 0; i < nbOption; i ++) {
-    if(!strcmp(command[i], "|")){
-      pipe = 1;
-      break;
-    }
+/* si la ligne de commande contient au moins un pipe
+ * on appelle la fonction pipeCommand du fichier pipe.c
+ * sinon on execute normalement nos commandes avec au choix
+ * commandTar : les commandes du tar
+ * commandPersonalisee : commande du shell
+ * execCommand : utilise la fonction exec
+*/
+void findPipeAndExec(int nbOption, char ** command) {
+  int nPipe = nbPipes(nbOption, command); // return number pipe
+  if(nPipe != 0) {
+    char * cmdPipe[nPipe + 1];
+    memset(cmdPipe, '\0', (nPipe + 1) * sizeof(cmdPipe[0]));
+    separateurPipe(nbOption, command, cmdPipe);
+    pipeCommand(cmdPipe, nPipe + 1);
+    return;
   }
-  if (pipe) {
-    for(i = i + 1; i < nbOption; i ++) {
-      commandPipe[j] = malloc(strlen(command[i]) + 1);
-      strcpy(commandPipe[j], command[i]);
-      j++;
-      command[i - 1] = NULL;
-    }
-    command[i - 1] =NULL;
-    execCommandPipe(command, commandPipe); // command avec pipe
-
-  }
-  else {
+  /*else {
     if(*TARPATH != '\0')
       commandTar(nbOption, command);
-    else if(commandPersonnalisee(nbOption, command) == 0) //command perso sans pipe
-       execCommand(command); // command sans le pipe
-  }
+
+    //command perso sans pipe
+    else if(commandPersonnalisee(nbOption, command) == 0) 
+      execCommand(command); // command sans le pipe
+  } */
+    else
+      whichCommand(nbOption, command);
   stopRedirection(); // redirect
-  return; // 0 if has no pipe, and 1 if has pipe
+  return;
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {

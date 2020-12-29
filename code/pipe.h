@@ -8,7 +8,13 @@
 
 int nbPipes(int nbOption, char ** command);
 
-int execCommandPipe(char ** command, char ** commandPipe);
+char ** separateurPipe(int nbOption, char ** command, char ** cmdPipe);
+
+
+void pipeCommand(char ** cmdPipe, int nbPipes);
+
+
+//int execCommandPipe(char ** command, char ** commandPipe);
 
 #endif
 
