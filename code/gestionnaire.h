@@ -26,11 +26,11 @@ int afficheMessageErreur(char ** command);
 
 int execCommand(char ** command);
 
-void *lectureLigne(char * str, char * buff);
+//void *lectureLigne(char * str, char * buff);
 
 int separateurCommand(char * buff, char ** command);
 
-void findPipeAndExec(int nbOption, char ** command, char ** commandPipe);
+void findPipeAndExec(int nbOption, char ** command);
 
 int commandPersonnalisee(int nbOption, char ** command);
 

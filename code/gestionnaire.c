@@ -39,34 +39,49 @@ int afficheMessageErreur(char ** command) {
 
 /**************************** LECTURE LIGNE ****************************/
 //fonction qui se comporte comme readLine
-void *lectureLigne(char * str, char * buff){
-  char * token = strtok(str,"\n");
-  if(token!=NULL){
+/*void *lectureLigne(char * str, char * buff){
+  char * token = malloc(strlen(str));
+  memset(token, '\0', strlen(str));
+  token = strtok_r(str, "\n", &str);
+  if(token != NULL) {
     buff = malloc(strlen(token) + 1);
-    strcpy(buff,token);
-//    strcat(buff,"\n");
+    strcpy(buff, token);
   }
   memset(str, '\0', strlen(str));
   return buff;
-}
+}*/
 
 // separe la ligne en tableau de char
 int separateurCommand(char * buff, char ** command){
   char * token = NULL;
-  int i = 0;
+  int nbOption = 0;
+  int l = strlen(buff);
 
   while((token = strtok_r(buff, " \n", &buff)) != NULL) {
-    command[i] = malloc(strlen(token) + 1);
-    strcpy(command[i], token);
-    i ++;
+    command[nbOption] = malloc(strlen(token) + 1);
+    strcpy(command[nbOption], token);
+    nbOption ++;
   }
-  command[i] = NULL;
-  int nbOption = i;
-//  nbOption = nbOptionRedirect(nbOption, command); //redirect
+  if (nbOption == 0) {
+    command[nbOption] = malloc(1);
+    strcpy(command[nbOption], "");
+    nbOption ++;
+  }
+  memset(buff, '\0', l);
+  command[nbOption] = NULL;
+  nbOption = nbOptionRedirect(nbOption, command); //redirect
   return nbOption;
 }
 
+
 /*********************** APPEL DES COMMANDES ***********************/
+
+void whichCommand(int nbOption, char ** command) {
+  if(TARPATH[0] != '\0')
+   commandTar(nbOption, command);
+  else if(commandPersonnalisee(nbOption, command) == 0)
+   execCommand(command);
+}
 
 //Utilisation de execvp pour les commandes externes du shell
 int execCommand(char ** command) {
@@ -92,43 +107,34 @@ int execCommand(char ** command) {
   return 1;
 }
 
-// si la ligne de commande contient un pipe
-// on remplit command[] avec  tout les char avant le pipe |
-// on remplit commandPipe[] avec tout les char apres le pipe |
-// et on execute execCommandPipe
-// si la ligne ne contient pas de pipe alors on execute tout simplement
-// execcommand
-void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
-  int pipe = 0;
-  int i, j = 0;
-
-  for(i = 0; i < nbOption; i ++) {
-    if(!strcmp(command[i], "|")){
-      pipe = 1;
-      break;
-    }
+/* si la ligne de commande contient au moins un pipe
+ * on appelle la fonction pipeCommand du fichier pipe.c
+ * sinon on execute normalement nos commandes avec au choix
+ * commandTar : les commandes du tar
+ * commandPersonalisee : commande du shell
+ * execCommand : utilise la fonction exec
+*/
+void findPipeAndExec(int nbOption, char ** command) {
+  int nPipe = nbPipes(nbOption, command); // return number pipe
+  if(nPipe != 0) {
+    char * cmdPipe[nPipe + 1];
+    memset(cmdPipe, '\0', (nPipe + 1) * sizeof(cmdPipe[0]));
+    separateurPipe(nbOption, command, cmdPipe);
+    pipeCommand(cmdPipe, nPipe + 1);
+    return;
   }
-	nbOption = nbOptionRedirect(nbOption, command); //redirect
-	command[nbOption] = NULL; // pour que le exec sache quand s'arreter
-	
-  if (pipe) {
-    for(i = i + 1; i < nbOption; i ++) {
-      commandPipe[j] = malloc(strlen(command[i]) + 1);
-      strcpy(commandPipe[j], command[i]);
-      j++;
-      command[i - 1] = NULL;
-    }
-    command[i - 1] =NULL;
-    execCommandPipe(command, commandPipe); // command avec pipe
-  }
-  else {
+  /*else {
     if(*TARPATH != '\0')
       commandTar(nbOption, command);
-    else if(commandPersonnalisee(nbOption, command) == 0) //command perso sans pipe
-       execCommand(command); // command sans le pipe
-  }
+
+    //command perso sans pipe
+    else if(commandPersonnalisee(nbOption, command) == 0) 
+      execCommand(command); // command sans le pipe
+  } */
+    else
+      whichCommand(nbOption, command);
   stopRedirection(); // redirect
-  return; // 0 if has no pipe, and 1 if has pipe
+  return;
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
@@ -172,7 +178,7 @@ int commandPersonnalisee(int nbOption , char ** command) {
 
     case 8 : return rmTar(nbOption, command);
 
-    case 9 : return 0;
+    case 9 : return 1;
 
   }
   return 1;
