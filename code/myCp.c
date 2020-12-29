@@ -276,10 +276,11 @@ static int f2(char *a, char *b, char *c){
   
 }
 
+static int brutalcp(char *detect, char * morceau1, char * morceau2, char *chemin, int fichier){
+  
+}
+
 int cprtar(char * path, char * target){
-
-
-
   
   char *tp= getTARPATH();
   char *ps= getPos();
