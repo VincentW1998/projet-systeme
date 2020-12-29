@@ -7,6 +7,142 @@
 #include "monrm.h"
 #include "myMkdir.h"
 
+int chchecksum(int fichier){
+  // Modifie le checksum de l'entête courante.
+  // Est utilisé à chaque fois qu'on modifie l'entête.
+  struct posix_header entete;
+  ssize_t lect = read(fichier,&entete,512);
+  if(lect==0)
+    return -1;
+  
+  if(lect<0){
+    perror("Echec de la lecture");
+    return -1;
+  }
+  
+  lseek(fichier, -512, SEEK_CUR);
+  set_checksum (&entete);
+  write(fichier,&entete,512);
+  lseek(fichier, -512, SEEK_CUR);
+  return check_checksum(&entete);
+}
+
+int renommer (int fichier, char *s){
+  /*change le nom à la position courante
+   *d'un fichier ou dossier dans un tar
+   */
+  struct posix_header entete;
+  ssize_t lect = read(fichier,&entete,512);
+  
+  if(lect==0) return -1;
+  
+  if(lect<0){
+    perror("Echec de la lecture dans renommer");
+    return -1;
+  }
+  lseek(fichier, -512, SEEK_CUR);
+  strncpy(entete.name,s,100);
+  write(fichier,&entete,512);
+  lseek(fichier, -512, SEEK_CUR);
+  return chchecksum(fichier);
+}
+
+int chdroit(int fichier, char *s){
+  //change les droits d'un fichier ou dossier tar
+  struct posix_header entete;
+  ssize_t lect = read(fichier,&entete,512);
+  
+  if(lect==0)
+    return -1;
+  
+  if(lect<0){
+    perror("Echec de la lecture");
+    return -1;
+  }
+  
+  lseek(fichier, -512, SEEK_CUR);
+  strncpy(entete.mode,s,8);
+  write(fichier,&entete,512);
+  lseek(fichier, -512, SEEK_CUR);
+  return chchecksum(fichier);
+}
+
+int chprop(int fichier, char *s){
+  struct posix_header entete;
+  ssize_t lect = read(fichier,&entete,512);
+  
+  if(lect==0)
+    return -1;
+  
+  if(lect<0){
+    perror("Echec de la lecture");
+    return -1;
+  }
+  
+  lseek(fichier, -512, SEEK_CUR);
+  strncpy(entete.uname,s,32);
+  write(fichier,&entete,512);
+  lseek(fichier, -512, SEEK_CUR);
+  return chchecksum(fichier);
+}
+
+int chgroup(int fichier, char *s){
+  struct posix_header entete;
+  ssize_t lect = read(fichier,&entete,512);
+  
+  if(lect==0)
+    return -1;
+  
+  if(lect<0){
+    perror("Echec de la lecture");
+    return -1;
+  }
+  
+  lseek(fichier, -512, SEEK_CUR);
+  strncpy(entete.gname,s,32);
+  write(fichier,&entete,512);
+  lseek(fichier, -512, SEEK_CUR);
+  return chchecksum(fichier);
+}
+
+int chgid(int fichier, char *s){
+  struct posix_header entete;
+  ssize_t lect = read(fichier,&entete,512);
+  
+  if(lect==0)
+    return -1;
+  
+  if(lect<0){
+    perror("Echec de la lecture");
+    return -1;
+  }
+  
+  lseek(fichier, -512, SEEK_CUR);
+  strncpy(entete.gid,s,8);
+  write(fichier,&entete,512);
+  lseek(fichier, -512, SEEK_CUR);
+  return chchecksum(fichier);
+}
+
+int chuid(int fichier, char *s){
+  struct posix_header entete;
+  ssize_t lect = read(fichier,&entete,512);
+  
+  if(lect==0)
+    return -1;
+  
+  if(lect<0){
+    perror("Echec de la lecture");
+    return -1;
+  }
+  
+  lseek(fichier, -512, SEEK_CUR);
+  strncpy(entete.uid,s,8);
+  write(fichier,&entete,512);
+  lseek(fichier, -512, SEEK_CUR);
+  return chchecksum(fichier);
+}
+
 static int debut3(int fichier){
   return lseek(fichier,0,SEEK_SET);
 }
@@ -82,6 +218,17 @@ static int recherche3(int fichier, int option, char *nom){
 static int rechercher3 (int fichier, int option, char *nom){
   debut3(fichier);
   return recherche3(fichier, option, nom);
+}
+
+
+int fin3(int fichier){
+  debut3(fichier);
+  while(1){
+    int x = suivant3(fichier);
+    if(x==2) break;
+    else if(x==-1) return -1;
+  }
+  return 0;
 }
 
 static int modif(char *racine,char * suffixe,
@@ -270,46 +417,59 @@ static int fs(char *a, char *b, char *c){
   for(int j = 0 ; j < strlen(a) ; j ++){
     c[j] = a[i+j];
   }
-  return c;
-}
-static int f2(char *a, char *b, char *c){
-  
+  return 1;
 }
 
-static int brutalcp(char *detect, char * morceau1, char * morceau2, char *chemin, int fichier, int fichier2){
-  char *ctaille = entete.size;
-  int taille;
-  //sscanf(ctaille,"%o",&taille);
-  int nb = ((taille+512-1)/512);
-  debut(fichier);
-  fin(fichier2)
+static int brutalcp(char *detect, char * morceau2, char *chemin, int fichier1, int fichier2){
+  char *m = getLastToken(morceau2);
+  char *m2 = pathWithoutLastToken(morceau2,m);
   struct posix_header et;
-  char * tampon[512];
-  strcat(chemin,morceau1);
-  strcat(chemin,morceau2);
+  char *ctaille = et.size;
+  int taille; int nb;
+  fin3(fichier1);
+  int max = lseek(fichier1,0,SEEK_CUR);
+  //printf("Nom : (%s)\n", morceau2);
+  debut3(fichier1);
+  fin3(fichier2);
+  char tampon[512];
+  char name[100];
+  //On ajoute la base.
+  //Ensuite, on ajoute le nom du repertoire dans lequel on souhaite écrire
   while(1){
-    read(fichier,&et,512);
-    ctaille = entete.size;
+    read(fichier1,&et,512);
+    if(et.name[0]=='\0' || lseek(fichier1,0,SEEK_CUR) > max) break;
+    ctaille = et.size;
     sscanf(ctaille,"%o",&taille);
     nb =((taille+512-1)/512);
-    write(fichier2,et,512);
-    if(strncmp(entete.name, detect, strlen(detect))==0
+    memset(name,'\0',100);
+    strcat(name,m2);
+    strcat(name,et.name);
+    
+   
+    if(strncmp(et.name, detect, strlen(detect))==0
        && et.typeflag != '5'){
-	read(fichier,tampon,512);
+       printf("name : (%s)\n", name);
+       write(fichier2,&et,512);
+       lseek(fichier2,-512,SEEK_CUR);
+       renommer(fichier2,name);
+       lseek(fichier2,512,SEEK_CUR);
+      for(int i = 0; i < nb; i++){
+	read(fichier1,tampon,512);
 	write(fichier2,tampon,512);
+      }
     }
     else {
-      lseek(fichier,nb*512,SEEK_CUR);
-      if(suivant3()!=0) break;
+      lseek(fichier1,-512,SEEK_CUR);
+      if(suivant3(fichier1)!=0) break;
     }
   }
   return 1;
 }
 
 int cprtar(char * path, char * target){
-  
   char *tp= getTARPATH();
   char *ps= getPos();
+
   
   char * pathCp = getLastToken(path);
   char * pathCpTarget = getLastToken(target);
@@ -341,16 +501,15 @@ int cprtar(char * path, char * target){
   
   int n;
   //PARTIE CP_R
-  int fichier1 = open(tarSource,O_RDONLY);  
-  if(fichier1<0){
+  int fichier1 = open(tarSource,O_RDONLY);
+  int fichier2 = open(tarSource,O_RDWR);  
+  if(fichier1<0 || fichier2<0){
     perror("Echec de l'ouverture du fichier");
     return -1;
   }
   
   char t2[100];
-  
   fusion2(pathCdTarget,"",t2);
-  printf("test %s \n",t2);
   
   if(rechercher3(fichier1,1,t2)!=1){
     return -1;//Dossier source non présent.
@@ -364,49 +523,35 @@ int cprtar(char * path, char * target){
   if(entete.typeflag != '5') return -1;
   
   lseek(fichier1,-512,SEEK_CUR);
-  suivant();
+  suivant3(fichier1);
   char ntarget[100];
   fusion(target,pathCp,ntarget);
   navigate(pathCdTarget);
-  
-  //createRepo(pathCpTarget);
-  //printf("TP : %s ; PS : %s \n",tp,ps);
-  //Création du dossier
-  
-  //restorePosition();
-  //navigate(pathCpTarget);
   char c[100];
-  debut(fichier1);
+  debut3(fichier1);
   while(1){
     read(fichier1,&entete,512);
-    if((strncmp(entete.name,pathWithFile,strlen(pathWithFile)))==0){
-      
-      if(entete.typeflag=='5') {
+    if(entete.name[0]=='\0') break;
+    if((strncmp(entete.name,pathWithFile,strlen(pathWithFile)))==0
+       && entete.typeflag=='5'){
 	printf("Dossier : ");
 	printf("entete.name (%s)\n",entete.name);
-	//char *z = getTARPATH(); 
-	//char *x = getPos();
-	//storePosition2(tp,ps);
-	//restorePosition();
-	//navigate(pathCpTarget);
-	//printf("PathCpTarget (%s)\n",pathCpTarget);
 	fs(entete.name,pathCdTarget,c);
-	//printf("c : %s\n",c);
 	storePosition();
 	entete.name[(strlen(entete.name))-1]='\0';
-	printf("createRepo (%s)\n", entete.name);
 	createRepo(entete.name);//pour tester
 	restorePosition();
-      }
-      else {
-	brutalcp();
-      }
     }
-    lseek(fichier1,-512,SEEK_CUR);
-    if(suivant(fichier1)!=0) break;
-  }
+    else {
+      lseek(fichier1,-512,SEEK_CUR);
+      if(suivant3(fichier1)!=0) break;
+    }
+  }  
+  brutalcp(pathWithFile,target,path, fichier1, fichier2);
   return 1;
 }
+
+
 
 int cpTar(int noOption, char ** command) {
   storePosition();
