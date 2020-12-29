@@ -238,6 +238,7 @@ int cpRepo(char * path, char * target) {
 }
 
 static void fusion(char *a, char *b, char *c){
+  memset(c,'\0',100);
   int i=0; int j=0;
   for(;i<strlen(a);i++){
     c[i]=a[i];
@@ -251,6 +252,7 @@ static void fusion(char *a, char *b, char *c){
 }
 
 static void fusion2(char *a, char *b, char *c){
+  memset(c,'\0',100);
   int i=0; int j=0;
   for(;i<strlen(a);i++){
     c[i]=a[i];
@@ -261,6 +263,10 @@ static void fusion2(char *a, char *b, char *c){
   }
 }
 
+static int supp(char *a, char *b, char *c){
+
+
+}
 
 int cprtar(char * path, char * target){
   char * pathCp = getLastToken(path);
@@ -295,8 +301,10 @@ int cprtar(char * path, char * target){
   }
   
   char t2[100];
+  
   fusion2(pathCdTarget,"",t2);
   printf("test %s \n",t2);
+  
   if(rechercher3(fichier1,1,t2)!=1){
     return -1;//Dossier source non présent.
   }
@@ -312,44 +320,25 @@ int cprtar(char * path, char * target){
   char ntarget[100];
   fusion(target,pathCp,ntarget);
 
-  char * tp[100];
-  copie(getTARPATH(),tp);
-  char * ps [100];
-  copie(getPos(),ps);
-  
+  char *tp= getTARPATH();
+  char *ps= getPos();
   navigate(pathCdTarget);
   createRepo(pathCpTarget);
+  printf("TP : %s ; PS : %s \n",tp,ps);
   //Création du dossier
   storePosition2(tp,ps);
-  restorePosition();
-  
-  if(suivant3(fichier1)!=0) return 1;
+
   while(1){
-    copie(getTARPATH(),tp);
-    copie(getPos(),ps);
-    if(read(fichier1,&entete,512)<0){
-     perror("Echec lecture du fichier");
-    }
-    if(entete.typeflag=='5'){
-      if(strncmp(entete.name,t2,strlen(t2))==0){
-	
-	cprtar(path,entete.name);
-	
-      }
-    }
-    //Si c'est un dossier on applique la récursion.
-    else {
-      cpRepo(path,entete.name);
-    }
-    //Sinon, on copie les fichiers.
-    if(lseek(fichier1,-512,SEEK_CUR)<0){
-      perror("Echec de modification du décalage de fichier");
-    }
-    storePosition2(tp,ps);
+    read(fichier,&entete,512);
+    if(strncmp(entete.name,pathWithFile,strlen(pathWithFile)==0))
+      cprtar(entete.name,target);
+    else cpRepo(entete.name,target);
     restorePosition();
-    if(suivant3(fichier1)!=0) break;
+    if(suivant(fichier1)!=0) break;
   }
+
   return 1;
+  
 }
 
 int cpTar(int noOption, char ** command) {
