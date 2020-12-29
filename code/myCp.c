@@ -263,17 +263,35 @@ static void fusion2(char *a, char *b, char *c){
   }
 }
 
-static int supp(char *a, char *b, char *c){
-
-
+static int fs(char *a, char *b, char *c){
+  int i =0;
+  memset(c,'\0',100);
+  for(; i < strlen(b) && a[i] == b[i] ; i ++){}
+  for(int j = 0 ; j < strlen(a) ; j ++){
+    c[j] = a[i+j];
+  }
+  return c;
+}
+static int f2(char *a, char *b, char *c){
+  
 }
 
 int cprtar(char * path, char * target){
+
+
+
+  
+  char *tp= getTARPATH();
+  char *ps= getPos();
+  
   char * pathCp = getLastToken(path);
   char * pathCpTarget = getLastToken(target);
   char * pathCd = pathWithoutLastToken(path, pathCp);
   char * pathCdTarget = pathWithoutLastToken(target, pathCpTarget);
 
+
+  char *mp= getTARPATH();
+  char *ts= getPos();
   if(whichCd(pathCd) == -1) {
     return -1;
   }
@@ -289,9 +307,11 @@ int cprtar(char * path, char * target){
   memset(pathCd, '\0', 1);
 
   tarTarget = substringTar();
-
   pathFileTarget = createPathFile(pathCpTarget);
 
+  storePosition2(tp,ps);
+  restorePosition();
+  
   int n;
   //PARTIE CP_R
   int fichier1 = open(tarSource,O_RDONLY);  
@@ -317,28 +337,53 @@ int cprtar(char * path, char * target){
   if(entete.typeflag != '5') return -1;
   
   lseek(fichier1,-512,SEEK_CUR);
+  suivant();
   char ntarget[100];
   fusion(target,pathCp,ntarget);
-
-  char *tp= getTARPATH();
-  char *ps= getPos();
   navigate(pathCdTarget);
-  createRepo(pathCpTarget);
-  printf("TP : %s ; PS : %s \n",tp,ps);
+  
+  //createRepo(pathCpTarget);
+  //printf("TP : %s ; PS : %s \n",tp,ps);
   //Création du dossier
-  storePosition2(tp,ps);
-
+  
+  //restorePosition();
+  //navigate(pathCpTarget);
+  char c[100];
+  debut(fichier1);
   while(1){
-    read(fichier,&entete,512);
-    if(strncmp(entete.name,pathWithFile,strlen(pathWithFile)==0))
-      cprtar(entete.name,target);
-    else cpRepo(entete.name,target);
-    restorePosition();
+    read(fichier1,&entete,512);
+    if((strncmp(entete.name,pathWithFile,strlen(pathWithFile)))==0){
+      
+      if(entete.typeflag=='5') {
+	printf("Dossier : ");
+	printf("entete.name (%s)\n",entete.name);
+	//char *z = getTARPATH(); 
+	//char *x = getPos();
+	//storePosition2(tp,ps);
+	//restorePosition();
+	//navigate(pathCpTarget);
+	//printf("PathCpTarget (%s)\n",pathCpTarget);
+	fs(entete.name,pathCdTarget,c);
+	//printf("c : %s\n",c);
+	storePosition();
+	entete.name[(strlen(entete.name))-1]='\0';
+	printf("createRepo (%s)\n", entete.name);
+	createRepo(entete.name);//pour tester
+	restorePosition();
+      }
+      /**  else {
+	storePosition2(mp,ts);
+	restore();
+	fs(entete.name,pathCpTarget,c);
+	cpRepo(entete.name,target);
+	}**/
+      //storePosition2(tp,ps);
+      //restorePosition();
+    }
+    lseek(fichier1,-512,SEEK_CUR);
     if(suivant(fichier1)!=0) break;
   }
-
   return 1;
-  
 }
 
 int cpTar(int noOption, char ** command) {
