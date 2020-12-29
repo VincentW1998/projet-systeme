@@ -65,10 +65,14 @@ int separateurCommand(char * buff, char ** command){
 /*********************** APPEL DES COMMANDES ***********************/
 
 void whichCommand(int nbOption, char ** command) {
+  nbOption = nbOptionRedirect(nbOption, command);
+  command[nbOption] = NULL;
+
   if(TARPATH[0] != '\0')
    commandTar(nbOption, command);
   else if(commandPersonnalisee(nbOption, command) == 0)
    execCommand(command);
+  stopRedirection();
 }
 
 //Utilisation de execvp pour les commandes externes du shell
@@ -111,17 +115,8 @@ void findPipeAndExec(int nbOption, char ** command) {
     pipeCommand(cmdPipe, nPipe + 1);
     return;
   }
-  /*else {
-    if(*TARPATH != '\0')
-      commandTar(nbOption, command);
-
-    //command perso sans pipe
-    else if(commandPersonnalisee(nbOption, command) == 0) 
-      execCommand(command); // command sans le pipe
-  } */
     else
       whichCommand(nbOption, command);
-  stopRedirection(); // redirect
   return;
 }
 
@@ -145,28 +140,40 @@ int commandPersonnalisee(int nbOption , char ** command) {
       numeroCommand = i;
   }
   switch (numeroCommand) {
-    case -1 : return 0; //renvoie 0 si la commande ne figure pas dans le tableau
-      
-    case 0 : exit(0);
-      
-    case 1 : if(nbOption == 1) return cdNoOptions();
-           return cdPerso(command[1]);
-      
-    case 2 : return cat(nbOption, command);
-      
-    case 3 : return ls(nbOption, command);
 
-    case 4 : return mkdirTar(nbOption, command);
+  //renvoie 0 si la commande ne figure pas dans le tableau
+    case -1 : return 0;
+
+    case 0 :
+      exit(0);
+      
+    case 1 :
+      if(nbOption == 1) return cdNoOptions();
+      return cdPerso(command[1]);
+      
+    case 2 :
+      return cat(nbOption, command);
+      
+    case 3 :
+      return ls(nbOption, command);
+
+    case 4 :
+      return mkdirTar(nbOption, command);
     
-    case 5 : return rmdirTar(nbOption, command);
+    case 5 :
+      return rmdirTar(nbOption, command);
       
-    case 6 : return Test();
+    case 6 :
+      return Test();
 
-    case 7 : return cpTar(nbOption, command);
+    case 7 :
+      return cpTar(nbOption, command);
 
-    case 8 : return rmTar(nbOption, command);
+    case 8 :
+      return rmTar(nbOption, command);
 
-    case 9 : return 1;
+    case 9 :
+      return 1;
 
   }
   return 1;
