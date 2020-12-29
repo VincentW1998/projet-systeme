@@ -5,7 +5,6 @@
 int fpipe [2];
 int saveDup;
 
-
 int isDirectory(char * lastToken);
 
 void flush(void);
