@@ -99,12 +99,12 @@ int execCommand(char ** command) {
       }
       break;
     default :
-    if(strcmp(command[0], "cat") == 0)
-    signal(SIGINT, SIG_IGN);
-      wait(&w);
+			if(strcmp(command[0], "cat") == 0)
+				signal(SIGINT, SIG_IGN);
+			wait(&w);
       signal(SIGINT, SIG_DFL);
   }
-  return 0;
+  return 1;
 }
 
 /* si la ligne de commande contient au moins un pipe
@@ -286,7 +286,7 @@ char * findTar(char * path){ // return the .tar filename
 }
 
 char * pathFromTar(char * path){ // return the path from the .tar
-  if(hasTar(path) == -1) return NULL;
+  if(hasTar(path) == -1) return "";
   char * tmp = malloc(strlen(path) + 1), *token;
   strcpy(tmp,path);
   size_t l = 0;
@@ -295,13 +295,15 @@ char * pathFromTar(char * path){ // return the path from the .tar
     if(estTar(token) == 1) return path+l;
     l += 1 + strlen(token);
   }
-  return NULL;
+	return NULL; // should never reach here
 }
 
 char * getPathBeforeTar(char * path){ // return the path before TARPATH
-  if(hasTar(path) == -1) return NULL;
+  if(hasTar(path) == -1) return path;
   char * fromTar = pathFromTar(path);
+	if(strcmp(path,fromTar) == 0) return "";
   char * beforeTar = malloc(strlen(path) - strlen(fromTar));
+	memset(beforeTar, '\0', strlen(path) - strlen(fromTar));
   strncpy(beforeTar,path,strlen(path) - strlen(fromTar)-1);
   return beforeTar;
 }
@@ -310,7 +312,7 @@ char * getPathBeforeTar(char * path){ // return the path before TARPATH
 char * pathWithoutLastToken(char * path, char * lastToken){
   // copy path - size of the last token
   char * deplacement = malloc(strlen(path) - strlen(lastToken) + 1);
-  memset(deplacement, '\0', strlen(path));
+  memset(deplacement, '\0', strlen(path) - strlen(lastToken) + 1);
   strncpy(deplacement, path, strlen(path) - strlen(lastToken));
   return deplacement;
 }
@@ -395,4 +397,19 @@ int commandNoTar_option(char * cmd, char *opt, char * path){
   char * command [4] = {[0]=cmd,[1]=opt,[2]=path};
   execCommand(command);
   return 1;
+}
+
+void setTarpath(char * tarp){
+	TARPATH = malloc(strlen(tarp) + 1);
+	memset(TARPATH, '\0', strlen(tarp) + 1);
+	if(tarp[strlen(tarp)-1] == '/')
+		strncpy(TARPATH,tarp, strlen(tarp) -1);
+	else
+		strcpy(TARPATH,tarp);
+}
+
+int displayError(char * msg){
+	write(2, msg, strlen(msg));
+	write(2,"\n",1);
+	return -1;
 }

@@ -3,8 +3,6 @@
 #define myLs_h
 #include "tar.h"
 
-int withL;
-
 int manageOption(int nbOptions, char ** path);
 
 void writeName(void);
@@ -39,8 +37,6 @@ void usrAndGrp(struct posix_header * p);
 void psize(struct posix_header * p);
 
 void mtime(struct posix_header * p);
-
-long octalConverter (char * octal);
 
 int countLinks(char * name ,int file);
 #endif /* myLs_h */

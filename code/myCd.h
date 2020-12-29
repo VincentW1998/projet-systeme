@@ -9,12 +9,9 @@ int cdPerso(char * path);
 
 int cd (char * path);
 
-int checkPath(char * path, char * token);
+char * tabToString(int l, char ** fp);
 
-int checkfp(char *tar, char *fullpath[50], int i);
-
-void setTarpath(char * tarp);
-
+int checkfp (char * tar, char * fp);
 
 int cdAbs(char * path);
 
