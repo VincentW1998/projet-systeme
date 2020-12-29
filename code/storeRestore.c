@@ -14,11 +14,7 @@ void restorePosition() {
 }
 
 char * getTARPATH(){
-  char * c = [100];
-  for(int i = 0 ; i < strlen(TARPATH); i++){
-    c[i] = TARPATH[i];
-  }
-  return c;
+  return TARPATH;
 }
 
 char * getPos(){
