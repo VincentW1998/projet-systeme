@@ -21,13 +21,24 @@ Aller dans le dossier /home/projet et exécutez le Makefile
 
 * `make`
 
-Cela va créer 4 exécutables indépendants : **shell**, **mon_cp**, **mon_mv**, **mon_rm**
+Cela va créer 1 exécutable indépendant : **shell**
 
 L'exécution de **shell** vous permet :
 
-* D'avoir un shell, avec toutes les commandes UNIX sauf les redirections, prends en compte les commandes avec UN pipe
-* De rentrer, sortir, naviguer dans un tar avec la commande cd
-* D'afficher sa position courante avec la commande pwd
+* D'avoir un shell classique, avec toutes les commandes UNIX
+* De traiter les tarballs comme s'ils s'agissait de repertoires.
 
-L'exécution de **mon_cp**, **mon_mv**, **mon_rm** vous permet :
-* De tester les commandes associées indépendamment de notre shell tsh
+Les commandes suivantes sont implementees pour un tarball :
+
+* cd : permet de naviger dans un tarball
+* exit : quitte le shell
+* pwd : affiche le chemin du repertoire courant
+* mkdir : creer un nouveau repertoire (ou plusieurs a la fois)
+* rmdir : supprime un ou des repertoires
+* mv : ?
+* cp : copie un fichier
+* rm : supprime un fichier ou un dossier avec l'option -r
+* ls : affiche le contenu du ou des repertoires, l'option -l
+* cat : affiche le contenu d'un fichier ou dossier
+* redirection
+* pipe : permet de faire des combinaisons de commandes
