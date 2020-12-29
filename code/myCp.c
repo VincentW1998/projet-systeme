@@ -276,8 +276,34 @@ static int f2(char *a, char *b, char *c){
   
 }
 
-static int brutalcp(char *detect, char * morceau1, char * morceau2, char *chemin, int fichier){
-  
+static int brutalcp(char *detect, char * morceau1, char * morceau2, char *chemin, int fichier, int fichier2){
+  char *ctaille = entete.size;
+  int taille;
+  //sscanf(ctaille,"%o",&taille);
+  int nb = ((taille+512-1)/512);
+  debut(fichier);
+  fin(fichier2)
+  struct posix_header et;
+  char * tampon[512];
+  strcat(chemin,morceau1);
+  strcat(chemin,morceau2);
+  while(1){
+    read(fichier,&et,512);
+    ctaille = entete.size;
+    sscanf(ctaille,"%o",&taille);
+    nb =((taille+512-1)/512);
+    write(fichier2,et,512);
+    if(strncmp(entete.name, detect, strlen(detect))==0
+       && et.typeflag != '5'){
+	read(fichier,tampon,512);
+	write(fichier2,tampon,512);
+    }
+    else {
+      lseek(fichier,nb*512,SEEK_CUR);
+      if(suivant3()!=0) break;
+    }
+  }
+  return 1;
 }
 
 int cprtar(char * path, char * target){
@@ -372,14 +398,9 @@ int cprtar(char * path, char * target){
 	createRepo(entete.name);//pour tester
 	restorePosition();
       }
-      /**  else {
-	storePosition2(mp,ts);
-	restore();
-	fs(entete.name,pathCpTarget,c);
-	cpRepo(entete.name,target);
-	}**/
-      //storePosition2(tp,ps);
-      //restorePosition();
+      else {
+	brutalcp();
+      }
     }
     lseek(fichier1,-512,SEEK_CUR);
     if(suivant(fichier1)!=0) break;
