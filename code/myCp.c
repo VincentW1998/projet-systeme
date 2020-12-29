@@ -158,10 +158,11 @@ static void init(char *a, char *b, char *p1, char *p2, char *p3){
 
 static int copie(char *a, char *b){
   int i = 0;
+  memset(b,'\0',100);
   for(; i < strlen(a);i++){
     b[i]=a[i];
   }
-  b[i]='/';
+  // b[i]='/';
   return 1;
 }
 
@@ -196,18 +197,6 @@ static int cp2(char *tarSource1, char *tarTarget1,
   printf("Cas à résoudre : Écraser un fichier déjà présent.\n");
   return -1;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 int cpRepo(char * path, char * target) {
   char * pathCp = getLastToken(path);
@@ -273,8 +262,6 @@ static void fusion2(char *a, char *b, char *c){
 }
 
 
-static void transformer();
-
 int cprtar(char * path, char * target){
   char * pathCp = getLastToken(path);
   char * pathCpTarget = getLastToken(target);
@@ -306,7 +293,6 @@ int cprtar(char * path, char * target){
     perror("Echec de l'ouverture du fichier");
     return -1;
   }
-
   
   char t2[100];
   fusion2(pathCdTarget,"",t2);
@@ -319,31 +305,48 @@ int cprtar(char * path, char * target){
   if(read(fichier1,&entete,512)<0){
     perror("Echec lecture du fichier");
   }
+
+  if(entete.typeflag != '5') return -1;
   
   lseek(fichier1,-512,SEEK_CUR);
   char ntarget[100];
   fusion(target,pathCp,ntarget);
-  storePosition();
+
+  char * tp[100];
+  copie(getTARPATH(),tp);
+  char * ps [100];
+  copie(getPos(),ps);
+  
   navigate(pathCdTarget);
   createRepo(pathCpTarget);
   //Création du dossier
+  storePosition2(tp,ps);
   restorePosition();
+  
   if(suivant3(fichier1)!=0) return 1;
   while(1){
+    copie(getTARPATH(),tp);
+    copie(getPos(),ps);
     if(read(fichier1,&entete,512)<0){
      perror("Echec lecture du fichier");
     }
     if(entete.typeflag=='5'){
       if(strncmp(entete.name,t2,strlen(t2))==0){
+	
 	cprtar(path,entete.name);
+	
       }
     }
     //Si c'est un dossier on applique la récursion.
-    else cpRepo(path,entete.name);
+    else {
+      cpRepo(path,entete.name);
+    }
     //Sinon, on copie les fichiers.
     if(lseek(fichier1,-512,SEEK_CUR)<0){
       perror("Echec de modification du décalage de fichier");
     }
+    storePosition2(tp,ps);
+    restorePosition();
     if(suivant3(fichier1)!=0) break;
   }
   return 1;
