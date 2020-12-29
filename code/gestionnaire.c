@@ -62,7 +62,7 @@ int separateurCommand(char * buff, char ** command){
   }
   command[i] = NULL;
   int nbOption = i;
-  nbOption = nbOptionRedirect(nbOption, command); //redirect
+//  nbOption = nbOptionRedirect(nbOption, command); //redirect
   return nbOption;
 }
 
@@ -108,6 +108,9 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
       break;
     }
   }
+	nbOption = nbOptionRedirect(nbOption, command); //redirect
+	command[nbOption] = NULL; // pour que le exec sache quand s'arreter
+	
   if (pipe) {
     for(i = i + 1; i < nbOption; i ++) {
       commandPipe[j] = malloc(strlen(command[i]) + 1);
@@ -117,7 +120,6 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
     }
     command[i - 1] =NULL;
     execCommandPipe(command, commandPipe); // command avec pipe
-
   }
   else {
     if(*TARPATH != '\0')

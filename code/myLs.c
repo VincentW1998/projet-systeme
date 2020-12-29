@@ -4,6 +4,8 @@
 #include "check.h"
 #include "storeRestore.h"
 
+int withL;
+
 // ls sans path en arguments
 int LsWithoutPath(){
 	if(*TARPATH == '\0')

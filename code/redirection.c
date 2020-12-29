@@ -117,11 +117,8 @@ int redirection(char * path){
 	fpipe[0] = 1;
 	saveDup = dup(fpipe[0]);
 	char * lastToken = getLastToken(path);
-	if(*TARPATH == '\0') // move to path before last token
-		cdPerso(pathWithoutLastToken(path,lastToken)); //suposed to exit if directory does not exist
-	else navigate(pathWithoutLastToken(path,lastToken));
-	//a decommenter
-	//	if(whichCd(pathWithoutLastToken(path,lastToken)) == -1) return -1;
+//a decommenter
+	if(whichCd(pathWithoutLastToken(path,lastToken)) == -1) return -1;
 	if(isDirectory(lastToken) == 1) {//check if lastToken is a directory
 		restorePosition();
 		return -1;
