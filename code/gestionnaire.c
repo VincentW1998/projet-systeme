@@ -393,6 +393,15 @@ int commandNoTar_option(char * cmd, char *opt, char * path){
   return 1;
 }
 
+void setTarpath(char * tarp){
+	TARPATH = malloc(strlen(tarp) + 1);
+	memset(TARPATH, '\0', strlen(tarp) + 1);
+	if(tarp[strlen(tarp)-1] == '/')
+		strncpy(TARPATH,tarp, strlen(tarp) -1);
+	else
+		strcpy(TARPATH,tarp);
+}
+
 int displayError(char * msg){
 	write(2, msg, strlen(msg));
 	write(2,"\n",1);

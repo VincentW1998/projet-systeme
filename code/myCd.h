@@ -13,8 +13,6 @@ char * tabToString(int l, char ** fp);
 
 int checkfp (char * tar, char * fp);
 
-void setTarpath(char * tarp);
-
 int cdAbs(char * path);
 
 int whichCd(char * pathCd);

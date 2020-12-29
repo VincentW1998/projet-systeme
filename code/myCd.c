@@ -134,15 +134,6 @@ int checkfp(char * tar, char * fp){
 	return 1;
 }
 
-void setTarpath(char * tarp){
-  TARPATH = malloc(strlen(tarp) + 1);
-	memset(TARPATH, '\0', strlen(tarp) + 1);
-	if(tarp[strlen(tarp)-1] == '/')
-		strncpy(TARPATH,tarp, strlen(tarp) -1);
-	else
-		strcpy(TARPATH,tarp);
-}
-
 int whichCd(char * pathCd) {
 //	if(pathCd[0] == '\0') return 1;
   //if tarpath vide -> cdPerso because we are not in tar file
