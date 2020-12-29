@@ -36,6 +36,7 @@ void stopRedirection(){
 		flush();
 }
 
+//the function to be called in Gestionnaire
 //returns the position where the first > is encountered
 int nbOptionRedirect(int nbOption, char ** cmd){
 	for(int i=0;i<nbOption;i++){
@@ -109,8 +110,6 @@ int redirect(char * lastToken){
 	return 1;
 }
 
-
-//Main function : the function to be called in Gestionnaire
 int redirection(char * path){
 	flush();
 	storePosition();
