@@ -5,6 +5,13 @@
 #include "myCd.h"
 #define absPath "/home/projet/Test"
 
+void validityCd(char * pos, char * posTar){
+	if(strcmp(getcwd(NULL, 0),pos) == 0 && strcmp(TARPATH, posTar) == 0)
+		printf(GREEN "Passed" RESET "\n");
+	else
+		printf(RED "Failed" RESET "\n");
+}
+
 void TCd1(){ //goes to Lvl1-B
 	storePosition();
 	printf(KBLU"TCd1 -> goes to Test/lvl1-B"RESET "\n");
@@ -36,14 +43,6 @@ void TCd4(){
 	validityCd(absPath,"lvl1-A.tar/lvl2-A");
 	restorePosition();
 }
-
-void validityCd(char * pos, char * posTar){
-	if(strcmp(getcwd(NULL, 0),pos) == 0 && strcmp(TARPATH, posTar) == 0)
-		printf(GREEN "Passed" RESET "\n");
-	else
-		printf(RED "Failed" RESET "\n");
-}
-
 
 
 int Test(){

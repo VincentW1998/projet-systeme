@@ -1,49 +1,108 @@
 #include "pipe.h"
 #include "gestionnaire.h"
-// pour les commandes externes du shell avec un pipe
-int execCommandPipe(char ** command, char ** commandPipe) {
-  int fd[2];
-  if(pipe(fd) < -1){
-    perror("pipe");
+
+
+// return number of pipe in the command line
+int nbPipes(int nbOption, char ** command) {
+  int number = 0;
+  for (int i = 0; i < nbOption; i++) {
+    if(strcmp(command[i], "|") == 0) {
+      number ++;
+    }
   }
-  int n, w;
-  pid_t pid1, pid2;
-
-  pid1 = fork();
-
-  switch (pid1) {
-    case -1 :
-      perror("fork");
-      break;
-
-    case 0 : // fils, commandPipe[0], lecteur, fd[0]
-      close(fd[1]);
-      dup2(fd[0], 0);
-      close(fd[0]);
-      if((n = execvp(commandPipe[0], commandPipe)) == -1)
-        exit(1);
-        // perror("execvp");
-        // afficheMessageErreur(commandPipe);
-      break;
-    default :
-      pid2 = fork();
-
-      switch (pid2) {
-        case -1 :
-          perror("fork");
-          break;
-
-        case 0 : // fils, command, ecrivain, fd[1]
-          close(fd[0]);
-          dup2(fd[1], 1);
-          close(fd[1]);
-          if((n = execvp(command[0], command)) == -1)
-            exit(1);
-            // perror("execvp");
-            // afficheMessageErreur(command);
-          break;
-      }
-      wait(&w); //attend le processus fils
-  }
-  return 0;
+  return number;
 }
+
+
+/* example : 
+ command {"ls", "|", "grep .o", "|", "wc}
+ this function return 
+ cmdPipe = {"ls", "grep .o", "wc"} 
+ */
+char ** separateurPipe(int nbOption, char ** command, char ** cmdPipe) {
+  int length = 0; // lenght for malloc
+  int j = 0; // index of cmdPipe
+  char * tmp = malloc(sizeof(char));
+  memset(tmp, '\0', 1);
+  int espace = 0; // help to know if we should add space " " or not
+
+  for(int i = 0; i< nbOption; i++) {
+
+    if(strcmp(command[i], "|") != 0) { // if element != "|"
+      if(espace) { // need space
+        length += strlen(command[i]);
+        tmp = realloc(tmp, length + 2);
+        strcat(tmp, " ");
+        strcat(tmp, command[i]);
+      }
+      else { // don't need space
+        length += strlen(command[i]);
+        tmp = realloc(tmp, length + 1);
+        strcat(tmp, command[i]);
+        espace = 1;
+      }
+          }
+    else{ // element == "|"
+      length = 0;
+      espace = 0;
+      cmdPipe[j] = malloc(strlen(tmp) + 1);
+      strcpy(cmdPipe[j], tmp);
+      j ++;
+      memset(tmp, '\0', strlen(tmp));
+    }
+  }
+  // add the last tmp 
+  cmdPipe[j] = malloc(strlen(tmp) + 1);
+  strcpy(cmdPipe[j], tmp);
+  memset(tmp, '\0', strlen(tmp));
+  return cmdPipe;
+}
+/* exec pipe fonction */
+void pipeCommand(char ** cmdPipe, int nbPipes) {
+  int fd[2];
+  int lastFd = 0;
+  int nOption;
+  pid_t pid;
+  char * cmd[100];
+  memset(cmd, '\0', 100 * sizeof(cmd[0]));
+
+  // boucle sur chaque commande 
+  for(int i = 0; i < nbPipes; i++) {
+
+    nOption = separateurCommand(cmdPipe[i], cmd);
+
+    if(pipe(fd) < -1) {
+      return;
+    }
+
+    pid = fork();
+    switch(pid) {
+      case -1 : exit(1);
+
+      case  0 : //fils, lecteur, fd[0]
+        dup2(lastFd, 0); // lecture dans STDIN
+        if((i + 1) < nbPipes) // si il existe une commande suivante
+          dup2(fd[1], 1); // ecrit le resultat dans STDOUT
+        close(fd[0]);
+
+        // exec la commande
+        if(TARPATH[0] != '\0') {
+          if (commandTar(nOption, cmd) == -1)
+            execCommand(cmd);
+        }
+        else if(commandShell(nOption, cmd) == 0)
+          execCommand(cmd);
+        exit(1);
+
+      default : // attend le fils
+        wait(NULL);
+        close(fd[1]);
+        lastFd = fd[0];
+    }
+  }
+}
+
+
+
+
+

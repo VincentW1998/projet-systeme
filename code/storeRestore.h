@@ -7,13 +7,11 @@
 
 char * pos, * posTar;
 
-void storePosition();
+void storePosition(void);
 
-void restorePosition();
+void restorePosition(void);
 
-char * getPos();
+void restoreManually(char * position);
 
-char * getTARPATH();
-
-void storePosition2(char * tp, char * ps);
+char * storeManually(void);
 #endif

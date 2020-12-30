@@ -39,35 +39,42 @@ int afficheMessageErreur(char ** command) {
 
 
 /**************************** LECTURE LIGNE ****************************/
-//fonction qui se comporte comme readLine
-void *lectureLigne(char * str, char * buff){
-  char * token = strtok(str,"\n");
-  if(token!=NULL){
-    buff = malloc(strlen(token) + 1);
-    strcpy(buff,token);
-//    strcat(buff,"\n");
-  }
-  memset(str, '\0', strlen(str));
-  return buff;
-}
 
 // separe la ligne en tableau de char
 int separateurCommand(char * buff, char ** command){
   char * token = NULL;
-  int i = 0;
+  int nbOption = 0;
+  int l = strlen(buff);
 
   while((token = strtok_r(buff, " \n", &buff)) != NULL) {
-    command[i] = malloc(strlen(token) + 1);
-    strcpy(command[i], token);
-    i ++;
+    command[nbOption] = malloc(strlen(token) + 1);
+    strcpy(command[nbOption], token);
+    nbOption ++;
   }
-  command[i] = NULL;
-  int nbOption = i;
+  if (nbOption == 0) {
+    command[nbOption] = malloc(1);
+    strcpy(command[nbOption], "");
+    nbOption ++;
+  }
+  memset(buff, '\0', l);
+  command[nbOption] = NULL;
   nbOption = nbOptionRedirect(nbOption, command); //redirect
   return nbOption;
 }
 
+
 /*********************** APPEL DES COMMANDES ***********************/
+
+void whichCommand(int nbOption, char ** command) {
+  nbOption = nbOptionRedirect(nbOption, command);
+  command[nbOption] = NULL;
+
+  if(TARPATH[0] != '\0')
+   commandTar(nbOption, command);
+  else if(commandShell(nbOption, command) == 0)
+   execCommand(command);
+  stopRedirection();
+}
 
 //Utilisation de execvp pour les commandes externes du shell
 int execCommand(char ** command) {
@@ -85,53 +92,37 @@ int execCommand(char ** command) {
       }
       break;
     default :
-    if(strcmp(command[0], "cat") == 0)
-    signal(SIGINT, SIG_IGN);
-      wait(&w);
+			if(strcmp(command[0], "cat") == 0)
+				signal(SIGINT, SIG_IGN);
+			wait(&w);
       signal(SIGINT, SIG_DFL);
   }
-  return 0;
+  return 1;
 }
 
-// si la ligne de commande contient un pipe
-// on remplit command[] avec  tout les char avant le pipe |
-// on remplit commandPipe[] avec tout les char apres le pipe |
-// et on execute execCommandPipe
-// si la ligne ne contient pas de pipe alors on execute tout simplement
-// execcommand
-void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
-  int pipe = 0;
-  int i, j = 0;
-
-  for(i = 0; i < nbOption; i ++) {
-    if(!strcmp(command[i], "|")){
-      pipe = 1;
-      break;
-    }
+/* si la ligne de commande contient au moins un pipe
+ * on appelle la fonction pipeCommand du fichier pipe.c
+ * sinon on execute normalement nos commandes avec au choix
+ * commandTar : les commandes du tar
+ * commandPersonalisee : commande du shell
+ * execCommand : utilise la fonction exec
+*/
+void findPipeAndExec(int nbOption, char ** command) {
+  int nPipe = nbPipes(nbOption, command); // return number pipe
+  if(nPipe != 0) {
+    char * cmdPipe[nPipe + 1];
+    memset(cmdPipe, '\0', (nPipe + 1) * sizeof(cmdPipe[0]));
+    separateurPipe(nbOption, command, cmdPipe);
+    pipeCommand(cmdPipe, nPipe + 1);
+    return;
   }
-  if (pipe) {
-    for(i = i + 1; i < nbOption; i ++) {
-      commandPipe[j] = malloc(strlen(command[i]) + 1);
-      strcpy(commandPipe[j], command[i]);
-      j++;
-      command[i - 1] = NULL;
-    }
-    command[i - 1] =NULL;
-    execCommandPipe(command, commandPipe); // command avec pipe
-
-  }
-  else {
-    if(*TARPATH != '\0')
-      commandTar(nbOption, command);
-    else if(commandPersonnalisee(nbOption, command) == 0) //command perso sans pipe
-       execCommand(command); // command sans le pipe
-  }
-  stopRedirection(); // redirect
-  return; // 0 if has no pipe, and 1 if has pipe
+    else
+      whichCommand(nbOption, command);
+  return;
 }
 
-int commandPersonnalisee(int nbOption , char ** command) {
-  int nbCommand = 11;
+int commandShell(int nbOption , char ** command) {
+  int nbCommand = 10;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
   commandPerso[0] = "exit";
@@ -151,30 +142,40 @@ int commandPersonnalisee(int nbOption , char ** command) {
       numeroCommand = i;
   }
   switch (numeroCommand) {
-  case -1 : return 0; //renvoie 0 si la commande ne figure pas dans le tableau
-      
-  case 0 : exit(0);
-      
-  case 1 : if(nbOption == 1) return cdNoOptions();
-    return cdPerso(command[1]);
-      
-  case 2 : return cat(nbOption, command);
-      
-  case 3 : return ls(nbOption, command);
 
-  case 4 : return mkdirTar(nbOption, command);
+  //renvoie 0 si la commande ne figure pas dans le tableau
+    case -1 : return 0;
+
+    case 0 :
+      exit(0);
+      
+    case 1 :
+      if(nbOption == 1) return cdNoOptions();
+      return cdPerso(command[1]);
+      
+    case 2 :
+      return cat(nbOption, command);
+      
+    case 3 :
+      return ls(nbOption, command);
+
+    case 4 :
+      return mkdirTar(nbOption, command);
     
-  case 5 : return rmdirTar(nbOption, command);
+    case 5 :
+      return rmdirTar(nbOption, command);
       
-  case 6 : return Test();
+    case 6 :
+      return Test();
 
-  case 7 : return cpTar(nbOption, command);
+    case 7 :
+      return cpTar(nbOption, command);
 
-  case 8 : return rmTar(nbOption, command);
+    case 8 :
+      return rmTar(nbOption, command);
 
-  case 9 : return monMv(nbOption, command,1);
-
-  case 10 : return 0;
+    case 9 :
+      return 1;
 
   }
   return 1;
@@ -233,6 +234,7 @@ int commandTar(int nbOption, char ** command) {
 
 }
 
+/* verifie si le .tar existe */
 int existTar(char * token){
   char * tar = malloc(strlen(token) + 1);
   strcpy(tar, token);
@@ -251,19 +253,19 @@ int existTar(char * token){
   return -1;
 }
 
-int estTar(char * token) { // verifie si un token est un .tar
+/* verifie si le premier token du path est un .tar
+   ex : dossier.tar/toto.tar/hello  ->  1          */
+int estTar(char * token) {
 	char * tmp = malloc(strlen(token) +1 );
 	strcpy(tmp, token);
 	char * tok = strtok_r(tmp,"/",&tok);
-	//	free(tmp);
 	if(hasTar(tok) == 1) return 1;
 	return -1;
 }
 
 
-
-// prends un path et verifie si il y a un tar dans le path
-// fonction qui appelle hasTar = cdPerso
+/* verifie que il y a bien un .tar
+   ex : dossier/toto.tar/hello  ->  1 */
 int hasTar(char * path){
   char * token;
   if( (token = strstr(path,".tar/")) !=NULL) return 1;
@@ -271,7 +273,9 @@ int hasTar(char * path){
   return -1;
 }
 
-char * findTar(char * path){ // return the .tar filename
+/* retourne le .tar dans un path
+   ex : hello/tarball.tar/hello  ->  tarball.tar */
+char * findTar(char * path){
   if(hasTar(path) == -1) return NULL;
   char * tarp = pathFromTar(path);
   char * tmp = malloc(strlen(tarp) + 1);
@@ -281,8 +285,10 @@ char * findTar(char * path){ // return the .tar filename
   return tar;
 }
 
-char * pathFromTar(char * path){ // return the path from the .tar
-  if(hasTar(path) == -1) return NULL;
+/* retourne le path a partir du tarball
+   ex : tarball.tar/hello                */
+char * pathFromTar(char * path){
+  if(hasTar(path) == -1) return "";
   char * tmp = malloc(strlen(path) + 1), *token;
   strcpy(tmp,path);
   size_t l = 0;
@@ -291,22 +297,27 @@ char * pathFromTar(char * path){ // return the path from the .tar
     if(estTar(token) == 1) return path+l;
     l += 1 + strlen(token);
   }
-  return NULL;
+	return NULL; // should never reach here
 }
 
-char * getPathBeforeTar(char * path){ // return the path before TARPATH
-  if(hasTar(path) == -1) return NULL;
+/* retourne le path avant le tarball
+  ex : fichier/dossier/tarball.tar/hello
+        -> fichier/dossier              */
+char * getPathBeforeTar(char * path){
+  if(hasTar(path) == -1) return path;
   char * fromTar = pathFromTar(path);
+	if(strcmp(path,fromTar) == 0) return "";
   char * beforeTar = malloc(strlen(path) - strlen(fromTar));
+	memset(beforeTar, '\0', strlen(path) - strlen(fromTar));
   strncpy(beforeTar,path,strlen(path) - strlen(fromTar)-1);
   return beforeTar;
 }
 
-//return the path without the last Token
+//retourne le path sans le dernier token
 char * pathWithoutLastToken(char * path, char * lastToken){
   // copy path - size of the last token
   char * deplacement = malloc(strlen(path) - strlen(lastToken) + 1);
-  memset(deplacement, '\0', strlen(path));
+  memset(deplacement, '\0', strlen(path) - strlen(lastToken) + 1);
   strncpy(deplacement, path, strlen(path) - strlen(lastToken));
   return deplacement;
 }
@@ -330,7 +341,8 @@ char * subWithoutTar() {
   return tmp;
 }
 
-// return lastToken in path
+/* retourne le dernier token
+   ex : tarball.tar/hello  ->  token  */
 char * getLastToken(char * path) {
   char *tmp = malloc(strlen(path) + 1), * token;
   memset(tmp, '\0', strlen(path));
@@ -392,14 +404,17 @@ int commandNoTar_option(char * cmd, char *opt, char * path){
   return 1;
 }
 
-int commandNoTar4opt(char * cmd, char * opt, char * path, char * path2){
-  char * command [5] = {[0]=cmd,[1]=opt,[2]=path,[3]=path2};
-  execCommand(command);
-  return 1;
+void setTarpath(char * tarp){
+	TARPATH = malloc(strlen(tarp) + 1);
+	memset(TARPATH, '\0', strlen(tarp) + 1);
+	if(tarp[strlen(tarp)-1] == '/')
+		strncpy(TARPATH,tarp, strlen(tarp) -1);
+	else
+		strcpy(TARPATH,tarp);
 }
 
-int commandNoTar4(char * cmd, char * path, char * path2){
-  char * command [4] = {[0]=cmd,[1]=path,[2]=path2};
-  execCommand(command);
-  return 1;
+int displayError(char * msg){
+	write(2, msg, strlen(msg));
+	write(2,"\n",1);
+	return -1;
 }

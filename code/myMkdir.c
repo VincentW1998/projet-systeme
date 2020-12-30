@@ -5,6 +5,7 @@
 #include "myCd.h"
 #include "storeRestore.h"
 
+/* create new posix_header of Empty directory */
 struct posix_header newHeader(const char * path) {
   struct posix_header hd;
   uid_t uid = getuid();
@@ -39,17 +40,24 @@ struct posix_header newHeader(const char * path) {
   return hd;
 }
 
+/* loop for each command[i] (path) */
 int mkdirTar(int nbOption,char ** command) {
   storePosition();
 
   for (int i = 1; i < nbOption; i++) {
     if(createRepo(command[i]) == -1) {
-      write(2,"erreur : mkdir\n",strlen("erreur : mkdir\n"));
+      char * msg = "mkdir: cannot create directory : File exists";
+      displayError(msg);
+
     }
     restorePosition();
   }
  return 1;}
 
+
+/* check which command we should use, cmd shell or cmd tar 
+ * and check the tarfile, if the directory doesn't existe, 
+ * it will be create */
 int createRepo(char * path){
   char * pathMkdir = getLastToken(path);
   char * pathCd = pathWithoutLastToken(path, pathMkdir);

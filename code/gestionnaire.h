@@ -22,17 +22,15 @@ char * TARPATH;
 
 int affichagePrompt(void);
 
-int afficheMessageErreur(char ** command);
+//int afficheMessageErreur(char ** command);
 
 int execCommand(char ** command);
 
-void *lectureLigne(char * str, char * buff);
-
 int separateurCommand(char * buff, char ** command);
 
-void findPipeAndExec(int nbOption, char ** command, char ** commandPipe);
+void findPipeAndExec(int nbOption, char ** command);
 
-int commandPersonnalisee(int nbOption, char ** command);
+int commandShell(int nbOption, char ** command);
 
 int commandTar(int nbOption, char ** command);
 
@@ -63,7 +61,8 @@ char * createPathFile(const char * path);
 int commandNoTar(char * cmd, char * path);
 
 int commandNoTar_option(char * cmd, char *opt, char * path);
-int commandNoTar4(char * cmd, char * path, char * path2);
-int commandNoTar4opt(char * cmd, char * opt, char * path, char * path2);
 
+void setTarpath(char * tarp);
+
+int displayError(char * msg);
 #endif

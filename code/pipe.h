@@ -6,8 +6,15 @@
 #include <stdlib.h>
 
 
-int execCommandPipe(char ** command, char ** commandPipe);
+int nbPipes(int nbOption, char ** command);
 
+char ** separateurPipe(int nbOption, char ** command, char ** cmdPipe);
+
+
+void pipeCommand(char ** cmdPipe, int nbPipes);
+
+
+//int execCommandPipe(char ** command, char ** commandPipe);
 
 #endif
 
