@@ -215,7 +215,7 @@ int manageOption(int nbOptions, char ** path){
 	if(nbOptions < 2) return 0;
 	if(path[1][0] == '-'){
 		if(strcmp(path[1],"-l") == 0) withL = 1;
-		else return displayError("option non reconnue");
+		else return displayError("invalid option");
 	}
 	return 1 + withL;
 }
