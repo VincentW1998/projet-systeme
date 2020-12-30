@@ -1,5 +1,0 @@
-make
-mkdir a b c
-mkdir a/j/k/l/m
-touch b/fichier.txt b/fichier2.txt
-./shell
