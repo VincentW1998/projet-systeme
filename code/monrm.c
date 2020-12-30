@@ -160,7 +160,6 @@ int rm_r_tar (char * path){
   char * pathCd = pathWithoutLastToken(path, pathRm);
   if(whichCd(pathCd) == -1)
     return -1;
-
   int x = (strlen(pathRm)+5);
   char pathRm2[x];
   memset(pathRm2,'\0',x);

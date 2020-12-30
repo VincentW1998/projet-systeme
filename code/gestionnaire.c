@@ -8,6 +8,7 @@
 #include "UnitTest.h"
 #include "redirection.h"
 #include "myCp.h"
+#include "monmv.h"
 #include "pipe.h"
 
 /**************************** AFFICHAGE ****************************/
@@ -130,7 +131,7 @@ void findPipeAndExec(int nbOption, char ** command, char ** commandPipe) {
 }
 
 int commandPersonnalisee(int nbOption , char ** command) {
-  int nbCommand = 10;
+  int nbCommand = 11;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
   commandPerso[0] = "exit";
@@ -142,35 +143,38 @@ int commandPersonnalisee(int nbOption , char ** command) {
   commandPerso[6] = "test";
   commandPerso[7] = "cp";
   commandPerso[8] = "rm";
-  commandPerso[9] = "";
+  commandPerso[9] = "mv";
+  commandPerso[10] = "";
   
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
       numeroCommand = i;
   }
   switch (numeroCommand) {
-    case -1 : return 0; //renvoie 0 si la commande ne figure pas dans le tableau
+  case -1 : return 0; //renvoie 0 si la commande ne figure pas dans le tableau
       
-    case 0 : exit(0);
+  case 0 : exit(0);
       
-    case 1 : if(nbOption == 1) return cdNoOptions();
-           return cdPerso(command[1]);
+  case 1 : if(nbOption == 1) return cdNoOptions();
+    return cdPerso(command[1]);
       
-    case 2 : return cat(nbOption, command);
+  case 2 : return cat(nbOption, command);
       
-    case 3 : return ls(nbOption, command);
+  case 3 : return ls(nbOption, command);
 
-    case 4 : return mkdirTar(nbOption, command);
+  case 4 : return mkdirTar(nbOption, command);
     
-    case 5 : return rmdirTar(nbOption, command);
+  case 5 : return rmdirTar(nbOption, command);
       
-    case 6 : return Test();
+  case 6 : return Test();
 
-    case 7 : return cpTar(nbOption, command);
+  case 7 : return cpTar(nbOption, command);
 
-    case 8 : return rmTar(nbOption, command);
+  case 8 : return rmTar(nbOption, command);
 
-    case 9 : return 0;
+  case 9 : return monMv(nbOption, command,1);
+
+  case 10 : return 0;
 
   }
   return 1;
@@ -213,7 +217,7 @@ int commandTar(int nbOption, char ** command) {
 
   case 4 : return rmdirTar(nbOption, command);
       
-//  case 5 : return mvJulien
+  case 5 : return monMv(nbOption,command,1);
 
   case 6:  return cat(nbOption,command);
 
@@ -381,7 +385,6 @@ int commandNoTar(char * cmd, char * path) {
   execCommand(command);
   return 1;
 }
-
 
 int commandNoTar_option(char * cmd, char *opt, char * path){
   char * command [4] = {[0]=cmd,[1]=opt,[2]=path};

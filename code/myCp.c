@@ -7,7 +7,7 @@
 #include "monrm.h"
 #include "myMkdir.h"
 
-int chchecksum(int fichier){
+static int chchecksum(int fichier){
   // Modifie le checksum de l'entête courante.
   // Est utilisé à chaque fois qu'on modifie l'entête.
   struct posix_header entete;
@@ -27,7 +27,7 @@ int chchecksum(int fichier){
   return check_checksum(&entete);
 }
 
-int renommer (int fichier, char *s){
+static int renommer (int fichier, char *s){
   /*change le nom à la position courante
    *d'un fichier ou dossier dans un tar
    */
@@ -42,102 +42,6 @@ int renommer (int fichier, char *s){
   }
   lseek(fichier, -512, SEEK_CUR);
   strncpy(entete.name,s,100);
-  write(fichier,&entete,512);
-  lseek(fichier, -512, SEEK_CUR);
-  return chchecksum(fichier);
-}
-
-int chdroit(int fichier, char *s){
-  //change les droits d'un fichier ou dossier tar
-  struct posix_header entete;
-  ssize_t lect = read(fichier,&entete,512);
-  
-  if(lect==0)
-    return -1;
-  
-  if(lect<0){
-    perror("Echec de la lecture");
-    return -1;
-  }
-  
-  lseek(fichier, -512, SEEK_CUR);
-  strncpy(entete.mode,s,8);
-  write(fichier,&entete,512);
-  lseek(fichier, -512, SEEK_CUR);
-  return chchecksum(fichier);
-}
-
-int chprop(int fichier, char *s){
-  struct posix_header entete;
-  ssize_t lect = read(fichier,&entete,512);
-  
-  if(lect==0)
-    return -1;
-  
-  if(lect<0){
-    perror("Echec de la lecture");
-    return -1;
-  }
-  
-  lseek(fichier, -512, SEEK_CUR);
-  strncpy(entete.uname,s,32);
-  write(fichier,&entete,512);
-  lseek(fichier, -512, SEEK_CUR);
-  return chchecksum(fichier);
-}
-
-int chgroup(int fichier, char *s){
-  struct posix_header entete;
-  ssize_t lect = read(fichier,&entete,512);
-  
-  if(lect==0)
-    return -1;
-  
-  if(lect<0){
-    perror("Echec de la lecture");
-    return -1;
-  }
-  
-  lseek(fichier, -512, SEEK_CUR);
-  strncpy(entete.gname,s,32);
-  write(fichier,&entete,512);
-  lseek(fichier, -512, SEEK_CUR);
-  return chchecksum(fichier);
-}
-
-int chgid(int fichier, char *s){
-  struct posix_header entete;
-  ssize_t lect = read(fichier,&entete,512);
-  
-  if(lect==0)
-    return -1;
-  
-  if(lect<0){
-    perror("Echec de la lecture");
-    return -1;
-  }
-  
-  lseek(fichier, -512, SEEK_CUR);
-  strncpy(entete.gid,s,8);
-  write(fichier,&entete,512);
-  lseek(fichier, -512, SEEK_CUR);
-  return chchecksum(fichier);
-}
-
-int chuid(int fichier, char *s){
-  struct posix_header entete;
-  ssize_t lect = read(fichier,&entete,512);
-  
-  if(lect==0)
-    return -1;
-  
-  if(lect<0){
-    perror("Echec de la lecture");
-    return -1;
-  }
-  
-  lseek(fichier, -512, SEEK_CUR);
-  strncpy(entete.uid,s,8);
   write(fichier,&entete,512);
   lseek(fichier, -512, SEEK_CUR);
   return chchecksum(fichier);
@@ -159,7 +63,7 @@ static int suivant3(int fichier){
   }
 
   if(entete.name[0]=='\0'){
-    //printf("cas ?\n");
+    
     lseek(fichier,-512,SEEK_CUR);
     return 2;
   }
@@ -174,7 +78,6 @@ static int suivant3(int fichier){
 }
 
 static int recherche3(int fichier, int option, char *nom){
-  //printf("Looping\n");
   struct posix_header entete;
   ssize_t lect = read(fichier,&entete,512);
   
@@ -186,15 +89,8 @@ static int recherche3(int fichier, int option, char *nom){
   }
 
   if(entete.name[0]=='\0'){
-    //printf("Je suis à la fin !!!");
     return -1;
   }
-  
-  /**if(check_checksum(&entete)==0){
-    //printf("entete.name : %s\n",entete.name); 
-    perror("Mauvaise entête. Je suis bloqué dans recherche !\n");
-    return -1;
-    }**/
 
   if(strcmp(entete.name,nom)==0){
     if(option == 1) lseek(fichier,-512,SEEK_CUR);
@@ -206,7 +102,6 @@ static int recherche3(int fichier, int option, char *nom){
 
   switch(suivant3(fichier)){
   case 2:
-    printf("over\n");
     return -1;
   case 0:
       return recherche3(fichier,option,nom);
@@ -325,7 +220,6 @@ int cprtar(char * path, char * target){
   char * pathCpTarget = getLastToken(target);
   char * pathCd = pathWithoutLastToken(path, pathCp);
   char * pathCdTarget = pathWithoutLastToken(target, pathCpTarget);
-  printf("PCP 1 (%s)\n",pathCp);
   if(whichCd(pathCd) == -1) {
     return -1;
   }
@@ -333,7 +227,6 @@ int cprtar(char * path, char * target){
   memset(pathCd, '\0',1);
   
   char * tarSource = substringTar();
-  //char * pathWithFile = createPathFile(pathCp); // path du fichier src
   char * pathWithFile = createPath(pathCp);
   
   restorePosition();
@@ -350,9 +243,6 @@ int cprtar(char * path, char * target){
   int t = open(tarSource,O_RDONLY);
   
   close(t);
-  //storePosition2(tp,ps);
-  //restorePosition();
-  //PARTIE CP_R
   int fichier1 = open(tarSource,O_RDONLY);
   int fichier2 = open(tarSource,O_RDWR);  
   if(fichier1<0 || fichier2<0){
@@ -366,19 +256,13 @@ int cprtar(char * path, char * target){
     return -1;//Dossier source non présent.
   }
   struct posix_header entete;
-  //Le Dossier (contenant) est toujours avant dans l'arborescence.
-  if(read(fichier1,&entete,512)<0){
-    perror("Echec lecture du fichier");
-  }
+  if(read(fichier1,&entete,512)<0) perror("Echec lecture du fichier");
   if(entete.typeflag != '5') return -1;
   
   lseek(fichier1,-512,SEEK_CUR);
   suivant3(fichier1);
   char ntarget[100];
-  fusion(target,pathCp,ntarget);
-  
-  //navigate(pathCdTarget);
-  
+  fusion(target,pathCp,ntarget);  
   char c[100];
   
   fin3(fichier1);
@@ -433,8 +317,6 @@ int cprtar(char * path, char * target){
    
   return 1;
 }
-
-
 
 int cpTar(int noOption, char ** command) {
   storePosition();
