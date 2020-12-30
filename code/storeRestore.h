@@ -7,9 +7,9 @@
 
 char * pos, * posTar;
 
-void storePosition();
+void storePosition(void);
 
-void restorePosition();
+void restorePosition(void);
 
 void restoreManually(char * position);
 

@@ -9,6 +9,7 @@
 #define GREEN "\x1B[32m"
 #include <stdio.h>
 
-void validityCd(char * pos, char * posTar);
+//void validityCd(char * pos, char * posTar);
+
 int Test(void);
 #endif /* UnitTest_h */
