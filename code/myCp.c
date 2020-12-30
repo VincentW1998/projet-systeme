@@ -419,7 +419,6 @@ static int fs(char *a, char *b, char *c){
   }
   return 1;
 }
-
 static int brutalcp(char *detect, char * morceau2, char *chemin, int fichier1, int fichier2){
   char *m = getLastToken(morceau2);
   char *m2 = pathWithoutLastToken(morceau2,m);
@@ -444,8 +443,6 @@ static int brutalcp(char *detect, char * morceau2, char *chemin, int fichier1, i
     memset(name,'\0',100);
     strcat(name,m2);
     strcat(name,et.name);
-    
-   
     if(strncmp(et.name, detect, strlen(detect))==0
        && et.typeflag != '5'){
        printf("name : (%s)\n", name);
@@ -470,12 +467,11 @@ int cprtar(char * path, char * target){
   char *tp= getTARPATH();
   char *ps= getPos();
 
-  
+  if(path == target) return -1;
   char * pathCp = getLastToken(path);
   char * pathCpTarget = getLastToken(target);
   char * pathCd = pathWithoutLastToken(path, pathCp);
   char * pathCdTarget = pathWithoutLastToken(target, pathCpTarget);
-
 
   char *mp= getTARPATH();
   char *ts= getPos();
