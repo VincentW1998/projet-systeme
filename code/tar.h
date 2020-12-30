@@ -4,6 +4,10 @@
 #include <string.h>
 #define BLOCKSIZE 512
 #define BLOCKBITS 9
+
+/* CODE REPRIS DU TP1 DE SYSTEME */
+
+
 /* tar Header Block, from POSIX 1003.1-1990.  */
 /* POSIX header.  */
 
@@ -20,8 +24,8 @@ struct posix_header
   char chksum[8];               /* 148 */
   char typeflag;                /* 156 */
   char linkname[100];           /* 157 */
-  char magic[6];                /* 257 */
-  char version[2];              /* 263 */
+  char magic[8];                /* 257 */
+//  char version[2];              /* 263 */
   char uname[32];               /* 265 */
   char gname[32];               /* 297 */
   char devmajor[8];             /* 329 */
@@ -47,24 +51,6 @@ struct posix_header
    Then hd->chksum is set to contain the octal encoding of this
    sum (on 6 bytes), followed by '\0' and ' '.
 */
-/*void set_checksum(struct posix_header *hd) {
-  memset(hd->chksum,' ',8);
-  unsigned int sum = 0;
-  char *p = (char *)hd;
-  for (int i=0; i < BLOCKSIZE; i++) { sum += p[i]; }
-  sprintf(hd->chksum,"%06o",sum);
-}
-
-
-int check_checksum(struct posix_header *hd) {
-  unsigned int checksum;
-  sscanf(hd->chksum,"%o ", &checksum);
-  unsigned int sum = 0;
-  char *p = (char *)hd;
-  for (int i=0; i < BLOCKSIZE; i++) { sum += p[i]; }
-  for (int i=0;i<8;i++) { sum += ' ' - hd->chksum[i]; }
-  return (checksum == sum);
-}*/
 void set_checksum(struct posix_header *hd);
 int check_checksum(struct posix_header *hd);
 #endif

@@ -66,6 +66,7 @@ void pipeCommand(char ** cmdPipe, int nbPipes) {
   char * cmd[100];
   memset(cmd, '\0', 100 * sizeof(cmd[0]));
 
+  // boucle sur chaque commande 
   for(int i = 0; i < nbPipes; i++) {
 
     nOption = separateurCommand(cmdPipe[i], cmd);
@@ -79,17 +80,17 @@ void pipeCommand(char ** cmdPipe, int nbPipes) {
       case -1 : exit(1);
 
       case  0 : //fils, lecteur, fd[0]
-        dup2(lastFd, 0);
-        if((i + 1) < nbPipes) // existe une commande suivante
-          dup2(fd[1], 1);
+        dup2(lastFd, 0); // lecture dans STDIN
+        if((i + 1) < nbPipes) // si il existe une commande suivante
+          dup2(fd[1], 1); // ecrit le resultat dans STDOUT
         close(fd[0]);
 
-        // exec the command
+        // exec la commande
         if(TARPATH[0] != '\0') {
           if (commandTar(nOption, cmd) == -1)
             execCommand(cmd);
         }
-        else if(commandPersonnalisee(nOption, cmd) == 0)
+        else if(commandShell(nOption, cmd) == 0)
           execCommand(cmd);
         exit(1);
 
@@ -103,54 +104,5 @@ void pipeCommand(char ** cmdPipe, int nbPipes) {
 
 
 
-
-/*// pour les commandes externes du shell avec un pipe
-int execCommandPipe(char ** command, char ** commandPipe) {
-  int fd[2];
-  if(pipe(fd) < -1){
-    perror("pipe");
-  }
-  int n, w;
-  pid_t pid1;
-
-  pid1 = fork();
-
-  switch (pid1) {
-    case -1 :
-      perror("fork");
-      break;
-
-    case 0 : // fils, commandPipe[0], lecteur, fd[0]
-      close(fd[1]);
-      dup2(fd[0], 0);
-      close(fd[0]);
-      if((n = execvp(commandPipe[0], commandPipe)) == -1)
-        exit(1);
-      exit(1);
-      break;
-    default :
-      pid1 = fork();
-
-      switch (pid1) {
-        case -1 :
-          perror("fork");
-          break;
-
-        case 0 : // fils, command, ecrivain, fd[1]
-          close(fd[0]);
-          dup2(fd[1], 1);
-          close(fd[1]);
-          if((n = execvp(command[0], command)) == -1)
-            exit(1);
-          exit(1);
-          break;
-      }
-      close(fd[0]);
-      close(fd[1]);
-      wait(&w); //attend le processus fils
-//      waitpid(pid1, &w, 0);
-  }
-  return 0;
-} */
 
 

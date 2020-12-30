@@ -24,10 +24,11 @@ int rmOn; // si tu utilises rm -> 1 sinon 0
 char * pathFileTarget; // name of target file
 char * tarTarget; //name of tar of target file
 int endFile; // premier block vide du fichier target
-int cpOn;
+int cpOn; // si tu utilises cp -> 1 sinon 0
 int rmdirOn; // if we are using rmdir command -> 1 else 0
-int found;
+int found; // si le fichier est trouve -> 1 sinon 0
 char buf[512];
+int rmdirEmpty; // si dossier non vide -> 1 sinon 0
 
 void next_header(int fd, unsigned int filesize);
 

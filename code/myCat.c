@@ -32,16 +32,17 @@ int readFile(char * path, char * tar){
 
 //effectue cat sur le path donné
 int CatFile (char * path){
-	char * lastToken = getLastToken(path);
-	char * deplacement = pathWithoutLastToken(path, lastToken);
-	if(whichCd(deplacement) == -1){
-		free(deplacement);
-		return -1;
-	}
-	free(deplacement);
-	if(TARPATH[0] == '\0') return commandNoTar("cat", lastToken); //si hors du tarball exec
-	char * tar = findTar(TARPATH);
-	return readFile(lastToken, tar); //readfile sur le path apres le TAR
+  char * lastToken = getLastToken(path);
+  char * deplacement = pathWithoutLastToken(path, lastToken);
+  if(whichCd(deplacement) == -1){
+    free(deplacement);
+    return -1;
+  }
+  free(deplacement);
+  char * pathCat = createPathFile(lastToken);
+  if(TARPATH[0] == '\0') return commandNoTar("cat", lastToken); //si hors du tarball exec
+  char * tar = findTar(TARPATH);
+  return readFile(pathCat, tar); //readfile sur le path apres le TAR
 }
 
 /* fonction principale cat effectue une boucle pour appeler cat sur tout les path donné

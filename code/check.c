@@ -3,6 +3,7 @@
 #include "myLs.h"
 #include "parcours.h"
 
+
 // saut vers le prochain header
 void next_header(int fd, unsigned int filesize) {
   unsigned int nblocks = (filesize + BLOCKSIZE - 1) >> BLOCKBITS;
@@ -121,6 +122,8 @@ int read_header(int fd, char *path) {
         lseek(fd, pos, SEEK_SET);
         hasRmdirOn(fd, filesize);
       }
+      else
+        rmdirEmpty = 1;
     }
     if(cpOn) {
       hasCpOn(fd, filesize);
@@ -233,6 +236,7 @@ int hasPosixHeader(int fd){
   return -1;
 }
 
+/* delete the directory */
 int hasRmdirOn(int fd, int filesize) {
   char tampon[BLOCKSIZE];
   int n = lseek(fd, 0, SEEK_CUR);
@@ -248,6 +252,7 @@ int hasRmdirOn(int fd, int filesize) {
   return 0;
 }
 
+/* copy the file */
 int hasCpOn(int fd, int filesize) {
   char tampon[BLOCKSIZE]; // tampon pour recuper le contenu
   char blockEnd[BLOCKSIZE]; // block vide
@@ -255,6 +260,8 @@ int hasCpOn(int fd, int filesize) {
   read(fd, &newHd, BLOCKSIZE); // read file source
   memset(newHd.name, '\0', 100);
   strncpy(newHd.name, pathFileTarget, 100);
+  set_checksum(&newHd);
+  check_checksum(&newHd);
   int nb = (filesize + 512 -1) / 512;
   int fd2 = open(tarTarget, O_RDWR);
   pwrite(fd2, &newHd, BLOCKSIZE, endFile);
@@ -264,6 +271,7 @@ int hasCpOn(int fd, int filesize) {
     pwrite(fd2, &tampon, BLOCKSIZE, endFile + accu);
     accu += 512;
   }
+
   memset(blockEnd, '\0', BLOCKSIZE);
   pwrite(fd2, blockEnd, BLOCKSIZE, endFile + accu);
   memset(&newHd, '\0', BLOCKSIZE); // vide le posix_header 
