@@ -11,5 +11,4 @@ RUN apt-get install -y emacs
 RUN mkdir /home/projet
 COPY code/*.h /home/projet/
 COPY code/*.c /home/projet/
-COPY code/essai.tar /home/projet/essai.tar
 COPY code/Makefile /home/projet/Makefile

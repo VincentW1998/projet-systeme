@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 int cpTar(int nbOption, char ** command);
-
+int cprtar(char * path, char * target);
 int cpRepo(char * path, char * target);
 
 #endif

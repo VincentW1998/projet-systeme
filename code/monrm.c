@@ -8,32 +8,45 @@
 
 // fonction qui supprime un fichier 
 int rmfichier_tar(char * path){
+
+  printf("path : %s\n",path);
   int fd, n;
   storePosition(); //store sa position
+
   char *pathRm = getLastToken(path); // file a supprimer
   char * pathCd = pathWithoutLastToken(path, pathRm);
 
   if(whichCd(pathCd) == -1)
     return -1;
 
-
-  if(TARPATH[0] == '\0') { // si t'es pas dans un tar alors tu appelles exec
+  if(TARPATH[0] == '\0') {
+    // si t'es pas dans un tar alors tu appelles exec
     commandNoTar("rm", pathRm); // appel fonctions avec exec
     restorePosition(); // restorePosition
     return 1;
   }
 
-  char * tarName = substringTar(); // recupere le nom du tar file
+  char * tarName = substringTar();
+  // recupere le nom du tar file
+  char * pathWithFile = createPathFile(pathRm);
+  
   fd = open(tarName, O_RDWR);
+
   if(fd < 0) {
     perror("open fichier tar");
     return -1;
   }
 
+  if(rechercher3(fd,0,pathWithFile)<=0){
+    return -1;
+  }
+  close(fd);
+
 // getcwd + tarpath + fichier a supprimer
-  char * pathWithFile = createPathFile(pathRm); 
+   
   rmOn = 1;
-  if((n = checkEntete(tarName, pathWithFile)) == -1) { //check si le fichier existe
+  if((n = checkEntete(tarName, pathWithFile)) == -1) {
+    //check si le fichier existe
     rmOn = 0;
     restorePosition();
     return -1;
@@ -45,7 +58,7 @@ int rmfichier_tar(char * path){
 
 // fonction qui supprime recursivement un dossier
 int rm_r_tar (char * path){
-  int n;
+  int fd,n;
   storePosition(); //store sa position
   char *pathRm = getLastToken(path); // file a supprimer
   char * pathCd = pathWithoutLastToken(path, pathRm);
@@ -60,7 +73,6 @@ int rm_r_tar (char * path){
   }
   
   char * tarName = substringTar(); // recupere le nom du tar file
-
   // getcwd + tarpath + fichier a supprimer
   char * pathWithFile = createPath(pathRm);
   if((n = checkEntete_r(tarName, pathWithFile)) == -1) { //check si le fichier existe

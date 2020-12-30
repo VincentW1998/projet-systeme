@@ -8,6 +8,7 @@
 #include "UnitTest.h"
 #include "redirection.h"
 #include "myCp.h"
+#include "monmv.h"
 #include "pipe.h"
 
 /**************************** AFFICHAGE ****************************/
@@ -133,7 +134,8 @@ int commandShell(int nbOption , char ** command) {
   commandPerso[6] = "test";
   commandPerso[7] = "cp";
   commandPerso[8] = "rm";
-  commandPerso[9] = "";
+  commandPerso[9] = "mv";
+  commandPerso[10] = "";
   
   for (int i = 0; i < nbCommand; i++) {
     if(!strcmp(commandPerso[i], command[0]))
@@ -216,7 +218,7 @@ int commandTar(int nbOption, char ** command) {
 
   case 4 : return rmdirTar(nbOption, command);
       
-//  case 5 : return mvJulien
+  case 5 : return monMv(nbOption,command,1);
 
   case 6:  return cat(nbOption,command);
 
@@ -395,7 +397,6 @@ int commandNoTar(char * cmd, char * path) {
   execCommand(command);
   return 1;
 }
-
 
 int commandNoTar_option(char * cmd, char *opt, char * path){
   char * command [4] = {[0]=cmd,[1]=opt,[2]=path};
