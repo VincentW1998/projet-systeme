@@ -1,38 +1,32 @@
-#include "moncp.c"
+#include "myCp.h"
+#include "monrm.h"
 
-int mv2_intratar(int fichier,char *dosarc, char *arc, char *cible, char *dest){
-  int f = cp_r_intratar(fichier,dosarc,arc,cible,dest);
-  rm_r_tar(f,dosarc,arc,cible);
-}
-
-int mvintratar(int fichier, char *dosarc, char *arc, char *cible, char *dest){
-  int a = cpfichier_intratar(fichier,dosarc,arc,cible,dest);
-  if(a!=2){
-    rmfichier_tar(fichier,dosarc,arc,cible);
+char * monMv(int nbOption, char ** command, int dos){
+  if (nbOption<3) return -1;
+  char ** c [nbOption-1];
+  if (dos == 1 && nbOption >= 4){
+    c[1] = malloc(strlen("-r")+1);
+    for(int i = 2; i<nbOption-1;i++){
+      c[i] = malloc(strlen(command[i])+1);
+      memset(c[i],'\0',strlen(command[i])+1);
+      strcpy(c[i],command[i]);
+    }
+    
+    for(int i = 2 ; i < nbOption-1; i++){
+      cpTar(nbOption,c);
+      rmTar(nbOption,c);
+    }
   }
-}
-
-int mv_intertar
-(int fichier1, int fichier2,char *dosarc1, char *arc1, char *dosarc2, char *arc2, char *fic, char *c){
-  cpfichier_intertar(fichier1, fichier2, dosarc2, arc2, fic, c);
-  rmfichier_tar(fichier1, dosarc1, arc1,fic);
-}
-
-int mvdos(int fichier1, int fichier2,char *dosarc1, char *arc1, char *dosarc2, char *arc2, char *fic, char *c){
-  cp_r_intertar(fichier1,fichier2,dosarc2,arc2,fic,c);
-  rm_r_tar(fichier1,dosarc1,arc1,fic);
-}
-
-int main(){
-  int f = open("a.tar",O_RDWR);
-  int g = open("b.tar",O_RDONLY);
-  if(f<=0){
-    perror("( f )");
+  else {
+    for(int i = 1; i<nbOption -1 ;i++){
+      c[i] = malloc(strlen(command[i])+1);
+      memset(c[i],'\0',strlen(command[i])+1);
+      strcpy(c[i],command[i]);
+    }
+    for(int i = 1 ; i < nbOption-1;i++){
+      cpTar(nbOption,c);
+      rmTar(nbOption,c);
+    }
   }
-
-  if (g<=0){
-    perror("( g )");
-  }
-  mvdos(g,f,"./","./b.tar","./","./a.tar","b/","a/");
+  return 1;
 }
-
