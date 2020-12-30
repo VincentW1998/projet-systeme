@@ -133,12 +133,12 @@ int cpRepo(char * path, char * target) {
   char * pathCdTarget = pathWithoutLastToken(target, pathCpTarget);
 
   if(whichCd(pathCd) == -1) return -1;
-
+  /**
   if(TARPATH[0]== '\0'){
     commandNoTar4("cp",pathCp,pathCdTarget);
     restorePosition();
     return 1;
-  }
+    }**/
   
   memset(pathCd, '\0',1);
   char * tarSource = substringTar();
@@ -231,13 +231,13 @@ int cprtar(char * path, char * target){
   char * pathCdTarget = pathWithoutLastToken(target, pathCpTarget);
   
   if(whichCd(pathCd) == -1) return -1;
-
+  /**
   if(TARPATH[0]== '\0'){
     commandNoTar4opt("cp","-r",pathCp, pathCdTarget);
     restorePosition();
     return 1;
   }
-  
+  **/
   char * tarSource = substringTar();
   char * pathWithFile = createPath(pathCp);
   
