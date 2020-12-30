@@ -264,18 +264,6 @@ static int modif2(char *racine, char *chemin, char *nouveau){
   return 1;
 }
 
-/**
-static void presence(char *fic1, char *supprimer){
-  printf("supprimer : %s\n",supprimer);
-  int fichier1 = open(fic1,O_RDWR);
-  if(rechercher3(fichier1,1,supprimer)>=0){
-    printf("Je suis présent.\n\n\n");
-    rmfichier_tar(supprimer);
-  }
-  close (fichier1);
-}
-**/
-
 static int estPresent(char *fic1, char *supprimer){
   int fichier1 = open(fic1,O_RDONLY);
   return (rechercher3(fichier1,1,supprimer)>=0);
@@ -463,39 +451,54 @@ static int brutalcp(char *detect, char * morceau2, char *chemin, int fichier1, i
   return 1;
 }
 
+static void fusion3(char *a, char * b, char * retour){
+  int i = 0; int j= 0;
+  memset(retour,'\0',100);
+  for(;i<strlen(a);i++){
+    retour[i]=a[i];
+  }
+  for(;j<strlen(b);j++){
+    retour[i+j]=b[j];
+  }
+}
+
 int cprtar(char * path, char * target){
-  char *tp= getTARPATH();
-  char *ps= getPos();
 
   if(path == target) return -1;
+  
   char * pathCp = getLastToken(path);
   char * pathCpTarget = getLastToken(target);
   char * pathCd = pathWithoutLastToken(path, pathCp);
   char * pathCdTarget = pathWithoutLastToken(target, pathCpTarget);
-
-  char *mp= getTARPATH();
-  char *ts= getPos();
+  printf("PCP 1 (%s)\n",pathCp);
   if(whichCd(pathCd) == -1) {
     return -1;
   }
   
   memset(pathCd, '\0',1);
+  
   char * tarSource = substringTar();
-  char * pathWithFile = createPathFile(pathCp); // path du fichier src
+  //char * pathWithFile = createPathFile(pathCp); // path du fichier src
+  char * pathWithFile = createPath(pathCp);
+  char * ptest = createPathFile(pathCp);
+  char * ptest2 = strcat(ptest,"/");
+  
   restorePosition();
 
   if(whichCd(pathCdTarget) == -1) {
     return -1;
   }
+  
   memset(pathCd, '\0', 1);
 
   tarTarget = substringTar();
-  pathFileTarget = createPathFile(pathCpTarget);
+  pathFileTarget = createPath(pathCpTarget);
 
-  storePosition2(tp,ps);
-  restorePosition();
+  int t = open(tarSource,O_RDONLY);
   
-  int n;
+  close(t);
+  //storePosition2(tp,ps);
+  //restorePosition();
   //PARTIE CP_R
   int fichier1 = open(tarSource,O_RDONLY);
   int fichier2 = open(tarSource,O_RDWR);  
@@ -506,8 +509,7 @@ int cprtar(char * path, char * target){
   
   char t2[100];
   fusion2(pathCdTarget,"",t2);
-  
-  if(rechercher3(fichier1,1,t2)!=1){
+  if(rechercher3(fichier1,1,pathWithFile)!=1){
     return -1;//Dossier source non présent.
   }
   struct posix_header entete;
@@ -515,35 +517,45 @@ int cprtar(char * path, char * target){
   if(read(fichier1,&entete,512)<0){
     perror("Echec lecture du fichier");
   }
-
   if(entete.typeflag != '5') return -1;
   
   lseek(fichier1,-512,SEEK_CUR);
   suivant3(fichier1);
   char ntarget[100];
   fusion(target,pathCp,ntarget);
-  navigate(pathCdTarget);
+  
+  //navigate(pathCdTarget);
+  
   char c[100];
+  
+  fin3(fichier1);
+  int f = lseek(fichier1,0,SEEK_CUR);
   debut3(fichier1);
+  fin3(fichier2);
+  char tnom[100];
   while(1){
     read(fichier1,&entete,512);
-    if(entete.name[0]=='\0') break;
+    if(entete.name[0]=='\0' || lseek(fichier1,0,SEEK_CUR)>f) break;
     if((strncmp(entete.name,pathWithFile,strlen(pathWithFile)))==0
        && entete.typeflag=='5'){
-	printf("Dossier : ");
-	printf("entete.name (%s)\n",entete.name);
-	fs(entete.name,pathCdTarget,c);
-	storePosition();
-	entete.name[(strlen(entete.name))-1]='\0';
-	createRepo(entete.name);//pour tester
-	restorePosition();
+      if(strcmp(path,pathCp)==0) fs(entete.name,"",c);
+      else fs(entete.name,pathCp,c);
+      fusion3(pathFileTarget,c,tnom);
+      if(rechercher3(fichier2,0,tnom) != 1){
+	fin3(fichier2);
+	write(fichier2,&entete,512);
+	lseek(fichier2,-512,SEEK_CUR);
+	renommer(fichier2,tnom);
+	lseek(fichier2,512,SEEK_CUR);
+      }
     }
     else {
       lseek(fichier1,-512,SEEK_CUR);
       if(suivant3(fichier1)!=0) break;
     }
-  }  
-  brutalcp(pathWithFile,target,path, fichier1, fichier2);
+  }
+  
+  brutalcp(pathWithFile,target,path,fichier1,fichier2);
   return 1;
 }
 
