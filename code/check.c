@@ -15,80 +15,6 @@ void next_header(int fd, unsigned int filesize) {
   }
 }
 
-static int contient2(char *dossier,char *nom){
-  DIR *d = opendir(dossier);
-  struct dirent *ds = readdir(d);
-  while (1){
-    if(readdir(d)<=0) break;
-    if(strcmp(ds->d_name,nom)==0) return 1;
-  }
-  closedir(d);
-  return 0;
-}
-
-int rmftar(char * tarName, char * path){
-  int fd;
-  int bool;
-  fd = open(tarName, O_RDWR);
-  char *nom = path;
-  //Partie I : Généraœtion aléatoire de nom et ouverture.
-  
-  char tempfic[250];
-  int var[1];
-  int i = 8;
-  char * b = "./tampon";
-  for(int v = 0; v<strlen(b);v++){
-    tempfic[v]=b[v];
-  }
-  while(contient2("./",tempfic)&& i<250){
-    getrandom(var,1,0);
-    var[0]=(var[0]%10)+48;
-    tempfic[i]=var[0];
-    i++;
-  }
-  int ft = open(tempfic,O_CREAT|O_RDWR,S_IRWXU);
-  //Partie II : copie dans le fichier tampon
-  char tampon[BLOCKSIZE];
-
-  while(read(fd,&tampon,BLOCKSIZE)>0){
-    write(ft,&tampon,BLOCKSIZE);
-  }
-
-  ftruncate(fd,0);
-  char *ctaille;
-  int taille,nb,j;
-  //Partie III : Replacement
-  struct posix_header entete;
-  lseek(fd,0,SEEK_SET);
-  lseek(ft,0,SEEK_SET);
-  while(read(ft,&entete,BLOCKSIZE)>0){
-    j=0;
-    ctaille=entete.size;
-    sscanf(ctaille,"%o",&taille);
-    nb=((taille+512-1)/512);
-    if(strcmp(entete.name,nom)!=0){
-      write(fd,&entete,512);
-      while(j<nb){
-	read(ft,&tampon,BLOCKSIZE);
-	write(fd,&tampon,BLOCKSIZE);
-	j++;
-      }
-      bool=1;
-    }
-    else lseek(ft,nb*512,SEEK_CUR);
-  }
-  char tamp[1024];
-  memset(&tamp,'\0',1024);
-  write(fd,tamp,1024);
-  close(ft);
-  close(fd);
-  unlink(tempfic);
-  if (bool==1) return 1;
-  else return -1;
-}
-
-
-
 
 int read_header(int fd, char *path) {
   unsigned int filesize = 0;
@@ -136,23 +62,8 @@ int read_header(int fd, char *path) {
 int checkEntete_r(char * tarName, char * path) {
   int fd;
   fd = open(tarName, O_RDWR);
-  char *nom = path;
-  //Partie I : Généraœtion aléatoire de nom et ouverture.
-  int chm = strlen(nom);
-  char tempfic[250];
-  int var[1];
-  int i = 8;
-  char * b = "./tampon";
-  for(int v = 0; v<strlen(b);v++){
-    tempfic[v]=b[v];
-  }
-  while(contient2("./",tempfic)&& i<250){
-    getrandom(var,1,0);
-    var[0]=(var[0]%10)+48;
-    tempfic[i]=var[0];
-    i++;
-  }
-  int ft = open(tempfic,O_CREAT|O_RDWR,S_IRWXU);
+  char * b = "tamponForRm"; // name for file tampon
+    int ft = open(b,O_CREAT|O_RDWR,S_IRWXU);
   //Partie II : copie dans le fichier tampon
   char tampon[BLOCKSIZE];
 
@@ -161,18 +72,17 @@ int checkEntete_r(char * tarName, char * path) {
   }
 
   ftruncate(fd,0);
-  char *ctaille;
   int taille,nb,j;
   //Partie III : Replacement
   struct posix_header entete;
   lseek(fd,0,SEEK_SET);
   lseek(ft,0,SEEK_SET);
-  while(read(ft,&entete,BLOCKSIZE)>0){
+  int n;
+  while((n = read(ft,&entete,BLOCKSIZE))>0){
     j=0;
-    ctaille=entete.size;
-    sscanf(ctaille,"%o",&taille);
+    sscanf(entete.size,"%o",&taille);
     nb=((taille+512-1)/512);
-    if(strncmp(entete.name,nom,chm)!=0){
+    if(strcmp(entete.name, path)!=0){
       write(fd,&entete,512);
       while(j<nb){
 	read(ft,&tampon,BLOCKSIZE);
@@ -187,7 +97,7 @@ int checkEntete_r(char * tarName, char * path) {
   write(fd,tamp,1024);
   close(ft);
   close(fd);
-  unlink(tempfic);
+  unlink(b);
   return 1;
 }
 

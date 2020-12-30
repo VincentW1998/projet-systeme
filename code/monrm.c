@@ -68,29 +68,16 @@ int rm_r_tar (char * path){
     return 1;
   }
   
-  int x = (strlen(pathRm)+1);
-  char pathRm2[x];
-  memset(pathRm2,'\0',x);
-  for(int i = 0; i < strlen(pathRm);i++){
-    pathRm2[i]=pathRm[i];
-  }
-  pathRm2[strlen(pathRm)]='/';
-  
   char * tarName = substringTar(); // recupere le nom du tar file
 
   // getcwd + tarpath + fichier a supprimer
-  char * pathWithFile = createPathFile(pathRm); 
-  rmOn = 1;
+  char * pathWithFile = createPath(pathRm);
   if((n = checkEntete_r(tarName, pathWithFile)) == -1) { //check si le fichier existe
-    rmOn = 0;
     restorePosition();
     return -1;
   }
-  rmOn = 0;
   restorePosition();
   return 1;
-
-  /** **/
 }
 
 int rmTar(int nbOption, char ** command) {
@@ -108,15 +95,3 @@ int rmTar(int nbOption, char ** command) {
 }
 
 
-/**void main(){
-   int f = open("t.tar",O_RDWR);
-  
-   if(f<=0){
-   perror("Erreur ouverture");
-   return;
-   }
-
-   //rm_r_tar(f,"./","./t.tar","a/");
-   //rmfichier_tar(f,"./","./t.tar","a/c");
-   close(f);
-   }**/
