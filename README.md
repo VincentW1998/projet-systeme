@@ -31,8 +31,8 @@ Les commandes suivantes sont implementees pour un tarball :
 * `pwd` : affiche le chemin du repertoire courant
 * `mkdir` : creer un nouveau repertoire (ou plusieurs a la fois)
 * `rmdir` : supprime un ou des repertoires
-* `mv` : ?
-* `cp` : copie un fichier
+* `mv` : deplacer des dossiers
+* `cp` : copie un fichier ou un dossier avec l'option -r
 * `rm` : supprime un fichier ou un dossier avec l'option -r
 * `ls` : affiche le contenu du ou des repertoires, l'option -l
 * `cat` : affiche le contenu d'un fichier ou dossier
