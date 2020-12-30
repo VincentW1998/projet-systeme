@@ -10,7 +10,7 @@
 int rmfichier_tar(char * path){
 
   printf("path : %s\n",path);
-  int fd, n;
+  int n;
   storePosition(); //store sa position
 
   char *pathRm = getLastToken(path); // file a supprimer
