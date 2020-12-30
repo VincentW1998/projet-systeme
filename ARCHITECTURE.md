@@ -48,26 +48,30 @@ Verifie les entetes du fichier tar, et execute les commandes :
 
 ## myRmdir.c
 
-Suppression d'un ou plusieurs entete d'un dossier dans un tar,
+* Suppression d'un ou plusieurs entete d'un dossier dans un tar,
 et re positionne correctement les fichiers du tar.
 
 ## monrm.c
 
-Supprime un ou plusieurs entete (fichier ou dossier avec l'option -r)
+* Supprime un ou plusieurs entete (fichier ou dossier avec l'option -r)
+* utilise un fichier tampon pour deplacer et les rearranger afin d'eviter les "trous"
 
 
 ## myCp.c
 
-Copie un ou plusieurs entete (fichier ou dossier avec l'option -r)
+* Copie un ou plusieurs entete (fichier ou dossier avec l'option -r)
+* `cp -r` ne fonctionne que dans le tar, c'est a dire que la commande ne peut pas copier un fichier hors du tar vers le tar et inversement,
+
 
 ## monmv.c
 
-Deplace un ou plusieurs dossiers
+Utilise les fonctions cp + rm
 
 ## pipe.c
 
-Ce fichier gere les combinaisons de commandes (shell ou tar)
-
+* On commence par recuperer le nombre de pipe a effectue,
+* puis on creer un tableau de taille nombre de pipe qui contient toutes les commandes.
+* puis pour chaque commande on redirige le resultat de la commande vers stdout pour la commande d'apres qui fait une lecture dans le stdin etc...
 ## storeRestore.c
 
 Sauvegarde sa position, et reinitialise sa position avant l'execution
@@ -75,5 +79,6 @@ d'une commande.
 
 ## redirection.c
 
-Redirige le flux stdin vers un fichier, ne fonctionne que hors du tar.
+Redirige le flux stdin vers un fichier, ne redirige pas vers un fichier
+dans un tar.
 
