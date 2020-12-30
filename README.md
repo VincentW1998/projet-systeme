@@ -30,7 +30,7 @@ L'exécution de **shell** vous permet :
 
 Les commandes suivantes sont implementees pour un tarball :
 
-* cd : permet de naviger dans un tarball
+* cd : permet de naviguer dans un tarball
 * exit : quitte le shell
 * pwd : affiche le chemin du repertoire courant
 * mkdir : creer un nouveau repertoire (ou plusieurs a la fois)
@@ -42,3 +42,8 @@ Les commandes suivantes sont implementees pour un tarball :
 * cat : affiche le contenu d'un fichier ou dossier
 * redirection
 * pipe : permet de faire des combinaisons de commandes
+
+**Precision sur l'implementation du projet**
+
+Nous utilisons le vieux format GNU du tar le seul changement notable c'est qu'on a supprime le champs "version" et allouee une memoire de 8 bits au champs "magic" pour garder une taille de 512 bits par entete.
+Donc le projet doit etre tester avec le bon format Tar.
