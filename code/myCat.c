@@ -13,6 +13,7 @@ int showContent(int file, int filesize){
       write(1,buffer,BLOCKSIZE);
     }
   }
+  write(1, "\n", 1);
   close(file);
   return 1;
 }
