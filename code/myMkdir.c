@@ -40,6 +40,20 @@ struct posix_header newHeader(const char * path) {
   return hd;
 }
 
+int directoryShell(char * path) {
+  int fd;
+  fd = open(path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+  if (fd < 0) {
+    perror("Erruer ouverture fichier tar");
+    return -1;
+  }
+  char blockVide[20 * BLOCKSIZE];
+  memset(blockVide, '\0', 20 * BLOCKSIZE);
+  write(fd, blockVide, 20 * BLOCKSIZE);
+  close(fd);
+  return 1;
+}
+
 /* loop for each command[i] (path) */
 int mkdirTar(int nbOption,char ** command) {
   storePosition();
@@ -68,8 +82,8 @@ int createRepo(char * path){
 
   // after Cd function if we are not in tar file
   if (TARPATH[0] == '\0') {
-    commandNoTar("mkdir", pathMkdir);
-    return 1;
+    //commandNoTar("mkdir", pathMkdir);
+    return directoryShell(pathMkdir);
   }
 
   int n;
