@@ -22,7 +22,15 @@ int cpRepo(char * path, char * target) {
   if(whichCd(pathCd) == -1) {
     return -1;
   }
-  memset(pathCd, '\0',1);
+  char * pwd = getcwd(NULL, 0);
+
+  char *pathCp2 = malloc(strlen(pwd) + strlen(pathCp) + 2);
+  memset(pathCp2, '\0', strlen(pwd) + strlen(pathCp) + 2);
+  strcat(pathCp2, pwd);
+  strcat(pathCp2, "/");
+  strcat(pathCp2, pathCp);
+
+
   char * tarSource = substringTar();
 
   char * pathWithFile = createPathFile(pathCp); // path du fichier src
@@ -32,7 +40,21 @@ int cpRepo(char * path, char * target) {
   if(whichCd(pathCdTarget) == -1) {
     return -1;
   }
-  memset(pathCd, '\0', 1);
+  char * pwd2 = getcwd(NULL, 0);
+
+  char *pathCpTarget2 = malloc(strlen(pwd2) + strlen(pathCpTarget) + 2);
+  memset(pathCpTarget2, '\0', strlen(pwd2) + strlen(pathCpTarget) + 2);
+  strcat(pathCpTarget2, pwd2);
+  strcat(pathCpTarget2, "/");
+  strcat(pathCpTarget2, pathCpTarget);
+  
+  if(TARPATH[0] == '\0') {
+    commandNoTar_option("cp", pathCp2, pathCpTarget2);
+    return 1;
+  }
+
+  memset(pathCd, '\0',1);
+  memset(pathCdTarget, '\0', 1);
 
   tarTarget = substringTar();
 

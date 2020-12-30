@@ -40,8 +40,6 @@ int read_header_r(int fd, char *path);
 
 int checkEntete_r(char * tarName, char * path);
 
-int decalage(int fd, int pos);
-
 int fin(int fd, int pos);
 
 int hasPosixHeader(int fd);
@@ -52,5 +50,4 @@ int hasCpOn(int fd, int filesize);
 
 int hasRm_r(int fd, int filesize);
 
-int rmftar(char * tarName, char * path);
 #endif
