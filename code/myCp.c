@@ -369,7 +369,6 @@ int cprtar(char * path, char * target){
 
 int cpTar(int noOption, char ** command) {
   storePosition();
-  if(noOption > 3);
   if(strcmp(command[1],"-r")==0 && noOption >= 4){
     cprtar(command[2],command[3]);
   }
