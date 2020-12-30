@@ -22,8 +22,6 @@ char * TARPATH;
 
 int affichagePrompt(void);
 
-//int afficheMessageErreur(char ** command);
-
 int execCommand(char ** command);
 
 int separateurCommand(char * buff, char ** command);
