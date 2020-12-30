@@ -113,18 +113,4 @@ int nbOptionRedirect(int nbOption, char ** cmd){
 }
 
 
-//move the file containing the redirection content to the desired destination in tar
-/*
- void moveToTarDest(){
- storePosition();
- char * cmdRmTar [3] = {"rm", tarRedirectedDestination};
- char * cmdMv [4] = {"mv",fileToBeDeleted,tarRedirectedDestination};
- cdAbs(getPathBeforeTar(tarRedirectedDestination));
- char * tar = findTar(tarRedirectedDestination);
- char * path = pathFromTar(tarRedirectedDestination);
- if(checkEntete(tar,path + strlen(tar) + 1) == 1) rm(2,cmdRmTar);
- mv(3,cmdMv);
- restorePosition();
- }
- */
 
