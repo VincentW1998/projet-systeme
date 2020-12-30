@@ -3,6 +3,7 @@
 #include "myLs.h"
 #include "parcours.h"
 
+
 // saut vers le prochain header
 void next_header(int fd, unsigned int filesize) {
   unsigned int nblocks = (filesize + BLOCKSIZE - 1) >> BLOCKBITS;

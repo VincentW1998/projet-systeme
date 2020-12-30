@@ -2,7 +2,7 @@
 #define MYCAT_H
 #include "tar.h"
 
-int showContent(int file, struct posix_header * p);
+int showContent(int file, int filesize);
 
 int simpleCat(char * path);
 
