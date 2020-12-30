@@ -53,7 +53,7 @@ int rmfichier_tar(char * path){
 
 // fonction qui supprime recursivement un dossier
 int rm_r_tar (char * path){
-  int fd,n;
+  int n;
   storePosition(); //store sa position
   char *pathRm = getLastToken(path); // file a supprimer
   char * pathCd = pathWithoutLastToken(path, pathRm);
