@@ -232,6 +232,7 @@ int commandTar(int nbOption, char ** command) {
 
 }
 
+/* verifie si le .tar existe */
 int existTar(char * token){
   char * tar = malloc(strlen(token) + 1);
   strcpy(tar, token);
@@ -250,19 +251,19 @@ int existTar(char * token){
   return -1;
 }
 
-int estTar(char * token) { // verifie si un token est un .tar
+/* verifie si le premier token du path est un .tar
+   ex : dossier.tar/toto.tar/hello  ->  1          */
+int estTar(char * token) {
 	char * tmp = malloc(strlen(token) +1 );
 	strcpy(tmp, token);
 	char * tok = strtok_r(tmp,"/",&tok);
-	//	free(tmp);
 	if(hasTar(tok) == 1) return 1;
 	return -1;
 }
 
 
-
-// prends un path et verifie si il y a un tar dans le path
-// fonction qui appelle hasTar = cdPerso
+/* verifie que il y a bien un .tar
+   ex : dossier/toto.tar/hello  ->  1 */
 int hasTar(char * path){
   char * token;
   if( (token = strstr(path,".tar/")) !=NULL) return 1;
@@ -270,7 +271,9 @@ int hasTar(char * path){
   return -1;
 }
 
-char * findTar(char * path){ // return the .tar filename
+/* retourne le .tar dans un path
+   ex : hello/tarball.tar/hello  ->  tarball.tar */
+char * findTar(char * path){
   if(hasTar(path) == -1) return NULL;
   char * tarp = pathFromTar(path);
   char * tmp = malloc(strlen(tarp) + 1);
@@ -280,7 +283,9 @@ char * findTar(char * path){ // return the .tar filename
   return tar;
 }
 
-char * pathFromTar(char * path){ // return the path from the .tar
+/* retourne le path a partir du tarball
+   ex : tarball.tar/hello                */
+char * pathFromTar(char * path){
   if(hasTar(path) == -1) return "";
   char * tmp = malloc(strlen(path) + 1), *token;
   strcpy(tmp,path);
@@ -293,7 +298,10 @@ char * pathFromTar(char * path){ // return the path from the .tar
 	return NULL; // should never reach here
 }
 
-char * getPathBeforeTar(char * path){ // return the path before TARPATH
+/* retourne le path avant le tarball
+  ex : fichier/dossier/tarball.tar/hello
+        -> fichier/dossier              */
+char * getPathBeforeTar(char * path){
   if(hasTar(path) == -1) return path;
   char * fromTar = pathFromTar(path);
 	if(strcmp(path,fromTar) == 0) return "";
@@ -303,7 +311,7 @@ char * getPathBeforeTar(char * path){ // return the path before TARPATH
   return beforeTar;
 }
 
-//return the path without the last Token
+//retourne le path sans le dernier token
 char * pathWithoutLastToken(char * path, char * lastToken){
   // copy path - size of the last token
   char * deplacement = malloc(strlen(path) - strlen(lastToken) + 1);
@@ -331,7 +339,8 @@ char * subWithoutTar() {
   return tmp;
 }
 
-// return lastToken in path
+/* retourne le dernier token
+   ex : tarball.tar/hello  ->  token  */
 char * getLastToken(char * path) {
   char *tmp = malloc(strlen(path) + 1), * token;
   memset(tmp, '\0', strlen(path));
