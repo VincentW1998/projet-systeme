@@ -1,7 +1,6 @@
 #include "tar.h"
 #include "check.h"
 #include "myLs.h"
-#include "parcours.h"
 
 
 // saut vers le prochain header
