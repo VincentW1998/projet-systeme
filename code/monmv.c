@@ -25,11 +25,8 @@ int monMv(int nbOption, char ** command, int dos){
       memset(c2[i+1],'\0',strlen(command[i])+1);
       strcpy(c2[i+1],command[i]);
     }
-    
-    for(int i = 1 ; i < nbOption; i++){
-      cpTar(nbOption+1,c);
-      rmTar(nbOption,c2);
-    }
+    cpTar(nbOption+1,c);
+    rmTar(nbOption,c2);
   }
   else {
     for(int i = 1; i<nbOption -1 ;i++){
@@ -37,10 +34,8 @@ int monMv(int nbOption, char ** command, int dos){
       memset(c1[i],'\0',strlen(command[i])+1);
       strcpy(c1[i],command[i]);
     }
-    for(int i = 1 ; i < nbOption-1;i++){
-      cpTar(nbOption,command);
-      rmTar(nbOption-1,c1);
-    }
+    cpTar(nbOption,command);
+    rmTar(nbOption-1,c1);
   }
   return 1;
 }
