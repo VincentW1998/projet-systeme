@@ -89,7 +89,7 @@ void pipeCommand(char ** cmdPipe, int nbPipes) {
           if (commandTar(nOption, cmd) == -1)
             execCommand(cmd);
         }
-        else if(commandPersonnalisee(nOption, cmd) == 0)
+        else if(commandShell(nOption, cmd) == 0)
           execCommand(cmd);
         exit(1);
 

@@ -70,7 +70,7 @@ void whichCommand(int nbOption, char ** command) {
 
   if(TARPATH[0] != '\0')
    commandTar(nbOption, command);
-  else if(commandPersonnalisee(nbOption, command) == 0)
+  else if(commandShell(nbOption, command) == 0)
    execCommand(command);
   stopRedirection();
 }
@@ -120,7 +120,7 @@ void findPipeAndExec(int nbOption, char ** command) {
   return;
 }
 
-int commandPersonnalisee(int nbOption , char ** command) {
+int commandShell(int nbOption , char ** command) {
   int nbCommand = 10;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
