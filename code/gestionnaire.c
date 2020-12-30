@@ -122,7 +122,7 @@ void findPipeAndExec(int nbOption, char ** command) {
 }
 
 int commandShell(int nbOption , char ** command) {
-  int nbCommand = 10;
+  int nbCommand = 11;
   char * commandPerso[nbCommand];
   int numeroCommand = -1;
   commandPerso[0] = "exit";
@@ -175,6 +175,10 @@ int commandShell(int nbOption , char ** command) {
       return rmTar(nbOption, command);
 
     case 9 :
+      return monMv(nbOption, command, 1);
+
+
+    case 10 :
       return 1;
 
   }
@@ -418,3 +422,4 @@ int displayError(char * msg){
 	write(2,"\n",1);
 	return -1;
 }
+
