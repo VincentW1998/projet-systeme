@@ -46,7 +46,9 @@ int mkdirTar(int nbOption,char ** command) {
 
   for (int i = 1; i < nbOption; i++) {
     if(createRepo(command[i]) == -1) {
-      write(2,"erreur : mkdir\n",strlen("erreur : mkdir\n"));
+      char * msg = "mkdir: cannot create directory : File exists";
+      displayError(msg);
+
     }
     restorePosition();
   }

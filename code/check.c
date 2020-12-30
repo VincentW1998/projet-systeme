@@ -121,6 +121,8 @@ int read_header(int fd, char *path) {
         lseek(fd, pos, SEEK_SET);
         hasRmdirOn(fd, filesize);
       }
+      else
+        rmdirEmpty = 1;
     }
     if(cpOn) {
       hasCpOn(fd, filesize);

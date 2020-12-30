@@ -28,6 +28,7 @@ int cpOn;
 int rmdirOn; // if we are using rmdir command -> 1 else 0
 int found;
 char buf[512];
+int rmdirEmpty;
 
 void next_header(int fd, unsigned int filesize);
 
