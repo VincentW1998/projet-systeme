@@ -231,108 +231,6 @@ int fin3(int fichier){
   return 0;
 }
 
-static int modif(char *racine,char * suffixe,
-		 char *chemin, char *nouveau){
-  memset(nouveau,'\0',100);
-  int i=0;int j=0;
-  for(; i<strlen(suffixe)&&suffixe[i]!='\0'; i++){
-    nouveau[i] = suffixe[i];
-  }
-  nouveau[i]='/';i++;
-  while(racine[j]==chemin[j]){
-    j++;
-  }
-  for(;j<strlen(chemin);i++){
-    nouveau[i]=chemin[j];
-    j++;
-  }
-  if(nouveau[i-1]=='/') nouveau[i-1]='\0';
-  return 1;
-}
-
-static int modif2(char *racine, char *chemin, char *nouveau){
-  memset(nouveau,'\0',100);
-  int i=0;int j=0;
-  while(racine[j]==chemin[j]){
-    j++;
-  }
-  for(;j<strlen(chemin);i++){
-    nouveau[i]=chemin[j];
-    j++;
-  }
-  if(nouveau[i-1]=='/') nouveau[i-1]='\0';
-  return 1;
-}
-
-static int estPresent(char *fic1, char *supprimer){
-  int fichier1 = open(fic1,O_RDONLY);
-  return (rechercher3(fichier1,1,supprimer)>=0);
-}
-
-static void init(char *a, char *b, char *p1, char *p2, char *p3){
-  memset(a,'\0',100);memset(b,'\0',100);
-  int i = 0;
-  while(i<100 && p1[i]!='\0'){
-    a[i]=p1[i]; i++;
-  }
-  int i2 = 0;
-  while(i2<100 && p2[i2]!='\0'){
-    b[i2]=p2[i2]; i2++;
-  }
-  a[i]='/';
-  b[i2]='/';
-  i++;i2++;
-  int j=0;
-  while ((i+j) < 100 && j<strlen(p3)
-	 && p3[j]!='\0'){
-    a[i+j] = p3[j];
-    j++;
-  }
-}
-
-
-static int copie(char *a, char *b){
-  int i = 0;
-  memset(b,'\0',100);
-  for(; i < strlen(a);i++){
-    b[i]=a[i];
-  }
-  // b[i]='/';
-  return 1;
-}
-
-static int valide(char *fic1,char *path){
-  int fichier1 = open(fic1,O_RDONLY);
-  struct posix_header entete;
-  if(rechercher3 (fichier1,1,path) != 1)
-    return -1;//fichier source non présent
-  read(fichier1,&entete,512);
-  close(fichier1);
-  if (entete.typeflag=='5') return -1;
-  else return 1;
-}
-
-static int cp2(char *tarSource1, char *tarTarget1,
-	       char *pathWithFile1, char *pathFileTarget1){
-  int n;  
-  cpOn = 1;
-  printf("toujours là");
-  if(estPresent(tarTarget1, pathFileTarget1)<=0){
-    if((n = checkEntete(tarTarget1, pathFileTarget1)) == 1) {
-      cpOn = 0;
-      return -1;
-    }
-    if((n = checkEntete(tarSource1, pathWithFile1)) == -1) {
-      cpOn = 0;
-      return -1;
-    }
-    cpOn = 0;
-    return 1;
-  }
-  printf("Cas à résoudre : Écraser un fichier déjà présent.\n");
-  return -1;
-}
-
 int cpRepo(char * path, char * target) {
   char * pathCp = getLastToken(path);
   char * pathCpTarget = getLastToken(target);
@@ -407,49 +305,6 @@ static int fs(char *a, char *b, char *c){
   }
   return 1;
 }
-static int brutalcp(char *detect, char * morceau2, char *chemin, int fichier1, int fichier2){
-  char *m = getLastToken(morceau2);
-  char *m2 = pathWithoutLastToken(morceau2,m);
-  struct posix_header et;
-  char *ctaille = et.size;
-  int taille; int nb;
-  fin3(fichier1);
-  int max = lseek(fichier1,0,SEEK_CUR);
-  //printf("Nom : (%s)\n", morceau2);
-  debut3(fichier1);
-  fin3(fichier2);
-  char tampon[512];
-  char name[100];
-  //On ajoute la base.
-  //Ensuite, on ajoute le nom du repertoire dans lequel on souhaite écrire
-  while(1){
-    read(fichier1,&et,512);
-    if(et.name[0]=='\0' || lseek(fichier1,0,SEEK_CUR) > max) break;
-    ctaille = et.size;
-    sscanf(ctaille,"%o",&taille);
-    nb =((taille+512-1)/512);
-    memset(name,'\0',100);
-    strcat(name,m2);
-    strcat(name,et.name);
-    if(strncmp(et.name, detect, strlen(detect))==0
-       && et.typeflag != '5'){
-       printf("name : (%s)\n", name);
-       write(fichier2,&et,512);
-       lseek(fichier2,-512,SEEK_CUR);
-       renommer(fichier2,name);
-       lseek(fichier2,512,SEEK_CUR);
-      for(int i = 0; i < nb; i++){
-	read(fichier1,tampon,512);
-	write(fichier2,tampon,512);
-      }
-    }
-    else {
-      lseek(fichier1,-512,SEEK_CUR);
-      if(suivant3(fichier1)!=0) break;
-    }
-  }
-  return 1;
-}
 
 static void fusion3(char *a, char * b, char * retour){
   int i = 0; int j= 0;
@@ -480,8 +335,6 @@ int cprtar(char * path, char * target){
   char * tarSource = substringTar();
   //char * pathWithFile = createPathFile(pathCp); // path du fichier src
   char * pathWithFile = createPath(pathCp);
-  char * ptest = createPathFile(pathCp);
-  char * ptest2 = strcat(ptest,"/");
   
   restorePosition();
 
@@ -554,8 +407,30 @@ int cprtar(char * path, char * target){
       if(suivant3(fichier1)!=0) break;
     }
   }
-  
-  brutalcp(pathWithFile,target,path,fichier1,fichier2);
+  debut3(fichier1);
+  fin3(fichier2);
+  while(1){
+    read(fichier1,&entete,512);
+    if(entete.name[0]=='\0' || lseek(fichier1,0,SEEK_CUR)>f) break;
+    if((strncmp(entete.name,pathWithFile,strlen(pathWithFile)))==0
+       && entete.typeflag!='5'){
+      if(strcmp(path,pathCp)==0) fs(entete.name,"",c);
+      else fs(entete.name,pathCp,c);
+      fusion3(pathFileTarget,c,tnom);
+      if(rechercher3(fichier2,0,tnom) != 1){
+	fin3(fichier2);
+	write(fichier2,&entete,512);
+	lseek(fichier2,-512,SEEK_CUR);
+	renommer(fichier2,tnom);
+	lseek(fichier2,512,SEEK_CUR);
+      }
+    }
+    else {
+      lseek(fichier1,-512,SEEK_CUR);
+      if(suivant3(fichier1)!=0) break;
+    }
+  }
+   
   return 1;
 }
 
