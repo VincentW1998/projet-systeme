@@ -6,17 +6,7 @@
 #include "check.h"
 #include "myCd.h"
 
-
-int contient(char *dossier,char *nom){
-  DIR *d = opendir(dossier);
-  struct dirent *ds = readdir(d);
-  while (1){
-    if(readdir(d)<=0) break;
-    if(strcmp(ds->d_name,nom)==0) return 1;
-  }
-  return 0;
-}
-
+// fonction qui supprime un fichier 
 int rmfichier_tar(char * path){
   int fd, n;
   storePosition(); //store sa position
@@ -53,6 +43,7 @@ int rmfichier_tar(char * path){
   return 1;
 }
 
+// fonction qui supprime recursivement un dossier
 int rm_r_tar (char * path){
   int n;
   storePosition(); //store sa position
@@ -80,6 +71,7 @@ int rm_r_tar (char * path){
   return 1;
 }
 
+// supprime pour chaque element du tableau qui contient les fichier
 int rmTar(int nbOption, char ** command) {
   int i = 1;
   int bool = 0;

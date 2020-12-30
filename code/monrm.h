@@ -10,13 +10,10 @@
 #include <dirent.h>
 #include <sys/random.h>
 
-int contient(char *dossier,char *nom);
-
-//int rmfichier_tar(int fichier,char *chemindossier,char *cheminarchive,char *c    );
 
 int rmfichier_tar(char * path);
 
-//int rm_r_tar(int fichier,char *chemindossier,char *cheminarchive,char *c);
+int rm_r_tar(char * path);
 
 int rmTar(int nbOption, char ** command);
 
