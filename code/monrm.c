@@ -169,8 +169,10 @@ int rm_r_tar (char * path){
     i++;
   }
   pathRm2[i]='/';
-  if(TARPATH[0] == '\0') { // si t'es pas dans un tar alors tu appelles exec
-    commandNoTar_option("rm","-r", pathRm); // appel fonctions avec exec
+  if(TARPATH[0] == '\0') {
+    // si t'es pas dans un tar alors tu appelles exec
+    commandNoTar_option("rm","-r", pathRm);
+    // appel fonctions avec exec
     restorePosition(); // restorePosition
     return 1;
   }

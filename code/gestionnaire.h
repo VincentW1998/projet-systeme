@@ -63,4 +63,7 @@ char * createPathFile(const char * path);
 int commandNoTar(char * cmd, char * path);
 
 int commandNoTar_option(char * cmd, char *opt, char * path);
+int commandNoTar4(char * cmd, char * path, char * path2);
+int commandNoTar4opt(char * cmd, char * opt, char * path, char * path2);
+
 #endif

@@ -391,3 +391,15 @@ int commandNoTar_option(char * cmd, char *opt, char * path){
   execCommand(command);
   return 1;
 }
+
+int commandNoTar4opt(char * cmd, char * opt, char * path, char * path2){
+  char * command [5] = {[0]=cmd,[1]=opt,[2]=path,[3]=path2};
+  execCommand(command);
+  return 1;
+}
+
+int commandNoTar4(char * cmd, char * path, char * path2){
+  char * command [4] = {[0]=cmd,[1]=path,[2]=path2};
+  execCommand(command);
+  return 1;
+}

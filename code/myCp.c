@@ -132,17 +132,24 @@ int cpRepo(char * path, char * target) {
   char * pathCd = pathWithoutLastToken(path, pathCp);
   char * pathCdTarget = pathWithoutLastToken(target, pathCpTarget);
 
-  if(whichCd(pathCd) == -1) {
-    return -1;
+  if(whichCd(pathCd) == -1) return -1;
+
+  if(TARPATH[0]== '\0'){
+    commandNoTar4("cp",pathCp,pathCdTarget);
+    restorePosition();
+    return 1;
   }
+  
   memset(pathCd, '\0',1);
   char * tarSource = substringTar();
-  char * pathWithFile = createPathFile(pathCp); // path du fichier src
+  char * pathWithFile = createPathFile(pathCp);
+  // path du fichier src
   restorePosition();
 
-  if(whichCd(pathCdTarget) == -1) {
-    return -1;
-  }
+  if(whichCd(pathCdTarget) == -1) return -1;
+
+  
+  
   memset(pathCd, '\0', 1);
 
   tarTarget = substringTar();
@@ -194,7 +201,9 @@ static void fusion2(char *a, char *b, char *c){
 static int fs(char *a, char *b, char *c){
   int i =0;
   memset(c,'\0',100);
-  for(; i < strlen(b) && a[i] == b[i] ; i ++){}
+  while(a[i] == b[i] && i<strlen(a) && i < strlen(b)){
+    i++;
+  }
   for(int j = 0 ; j < strlen(a) ; j ++){
     c[j] = a[i+j];
   }
@@ -220,23 +229,23 @@ int cprtar(char * path, char * target){
   char * pathCpTarget = getLastToken(target);
   char * pathCd = pathWithoutLastToken(path, pathCp);
   char * pathCdTarget = pathWithoutLastToken(target, pathCpTarget);
-  if(whichCd(pathCd) == -1) {
-    return -1;
-  }
   
-  memset(pathCd, '\0',1);
+  if(whichCd(pathCd) == -1) return -1;
+
+  if(TARPATH[0]== '\0'){
+    commandNoTar4opt("cp","-r",pathCp, pathCdTarget);
+    restorePosition();
+    return 1;
+  }
   
   char * tarSource = substringTar();
   char * pathWithFile = createPath(pathCp);
   
   restorePosition();
 
-  if(whichCd(pathCdTarget) == -1) {
-    return -1;
-  }
+  if(whichCd(pathCdTarget) == -1) return -1;
   
-  memset(pathCd, '\0', 1);
-
+  
   tarTarget = substringTar();
   pathFileTarget = createPath(pathCpTarget);
 
@@ -244,7 +253,7 @@ int cprtar(char * path, char * target){
   
   close(t);
   int fichier1 = open(tarSource,O_RDONLY);
-  int fichier2 = open(tarSource,O_RDWR);  
+  int fichier2 = open(tarTarget,O_RDWR);  
   if(fichier1<0 || fichier2<0){
     perror("Echec de l'ouverture du fichier");
     return -1;
@@ -264,25 +273,37 @@ int cprtar(char * path, char * target){
   char ntarget[100];
   fusion(target,pathCp,ntarget);  
   char c[100];
+
+  if(recherche3(fichier2,0,pathFileTarget)!=1){
+    fin3(fichier2);
+    strcpy(entete.name,pathFileTarget);
+    write(fichier2,&entete,512);
+    lseek(fichier2,-512,SEEK_CUR);
+    chchecksum(fichier2);
+    lseek(fichier2,512,SEEK_CUR);
+    fin3(fichier2);
+  }
   
   fin3(fichier1);
   int f = lseek(fichier1,0,SEEK_CUR);
   debut3(fichier1);
   fin3(fichier2);
   char tnom[100];
-  
+  char pcd[100];
+  memset(pcd,'\0',100);
+  strcat(pcd, pathCd);
   char *ctaille = entete.size;
   int taille;
   sscanf(ctaille,"%o",&taille);
   int nb = ((taille+512-1)/512);
-  char *tampon[512];
+  char tampon[512];
   while(1){
     read(fichier1,&entete,512);
     if(entete.name[0]=='\0' || lseek(fichier1,0,SEEK_CUR)>f) break;
     if((strncmp(entete.name,pathWithFile,strlen(pathWithFile)))==0
        && entete.typeflag=='5'){
-      if(strcmp(path,pathCp)==0) fs(entete.name,"",c);
-      else fs(entete.name,pathCp,c);
+      if(strcmp(path,pathCp)==0) fs(entete.name,pcd,c);
+      else fs(entete.name,pcd,c);
       fusion3(pathFileTarget,c,tnom);
       if(rechercher3(fichier2,0,tnom) != 1){
 	fin3(fichier2);
@@ -304,7 +325,7 @@ int cprtar(char * path, char * target){
     if(entete.name[0]=='\0' || lseek(fichier1,0,SEEK_CUR)>f) break;
     if((strncmp(entete.name,pathWithFile,strlen(pathWithFile)))==0
        && entete.typeflag!='5'){
-      if(strcmp(path,pathCp)==0) fs(entete.name,"",c);
+      if(strcmp(path,pathCp)==0) fs(entete.name,pathCd,c);
       else fs(entete.name,pathCp,c);
       fusion3(pathFileTarget,c,tnom);
       if(rechercher3(fichier2,0,tnom) != 1){
@@ -327,7 +348,6 @@ int cprtar(char * path, char * target){
       if(suivant3(fichier1)!=0) break;
     }
   }
-   
   return 1;
 }
 
