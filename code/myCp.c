@@ -270,6 +270,12 @@ int cprtar(char * path, char * target){
   debut3(fichier1);
   fin3(fichier2);
   char tnom[100];
+  
+  char *ctaille = entete.size;
+  int taille;
+  sscanf(ctaille,"%o",&taille);
+  int nb = ((taille+512-1)/512);
+  char *tampon[512];
   while(1){
     read(fichier1,&entete,512);
     if(entete.name[0]=='\0' || lseek(fichier1,0,SEEK_CUR)>f) break;
@@ -307,6 +313,13 @@ int cprtar(char * path, char * target){
 	lseek(fichier2,-512,SEEK_CUR);
 	renommer(fichier2,tnom);
 	lseek(fichier2,512,SEEK_CUR);
+	ctaille=entete.size;
+	sscanf(ctaille,"%o",&taille);
+	nb = ((taille+512-1)/512);
+	for(int i = 0 ; i < nb ; i ++){
+	  read(fichier1,&tampon,512);
+	  write(fichier2,&tampon,512);
+	}
       }
     }
     else {
