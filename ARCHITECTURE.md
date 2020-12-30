@@ -21,15 +21,19 @@ Fichier qui regroupe toutes les fonctions qui permet de :
 La fonction navigate permet de se deplacer dans un tar
 La fonction cdPerso permet de se deplacer hors du tar
 la fonction cdAbs permet de se deplacer avec un path Absolu
+Cd est utilisee pour les commandes :
+
+* cat, mkdir, rmdir, ls, cp, rm, mv
+
 
 ## myLs.c
 
-la fonction ls permet de lister le contenu d'un dossier dans un tar,
+La fonction ls permet de lister le contenu d'un dossier dans un tar,
 prends en compte l'option -l.
 
 ## myCat.c
 
-la fonction cat permet d'afficher le contenu d'un fichier dans un tar.
+La fonction cat permet d'afficher le contenu d'un fichier dans un tar.
 
 ## myMkdir.c
 
@@ -54,15 +58,15 @@ Supprime un ou plusieurs entete (fichier ou dossier avec l'option -r)
 
 ## myCp.c
 
-copie un ou plusieurs entete (fichier ou dossier avec l'option -r)
+Copie un ou plusieurs entete (fichier ou dossier avec l'option -r)
 
 ## monmv.c
 
-deplace un ou plusieurs dossiers
+Deplace un ou plusieurs dossiers
 
 ## pipe.c
 
-ce fichier gere les combinaisons de commandes (shell ou tar)
+Ce fichier gere les combinaisons de commandes (shell ou tar)
 
 ## storeRestore.c
 
@@ -71,10 +75,5 @@ d'une commande.
 
 ## redirection.c
 
-redirige le flux stdin vers un fichier, ne fonctionne que hors du tar.
-
-
-
-
-
+Redirige le flux stdin vers un fichier, ne fonctionne que hors du tar.
 
