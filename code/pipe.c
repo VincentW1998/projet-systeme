@@ -66,6 +66,7 @@ void pipeCommand(char ** cmdPipe, int nbPipes) {
   char * cmd[100];
   memset(cmd, '\0', 100 * sizeof(cmd[0]));
 
+  // boucle sur chaque commande 
   for(int i = 0; i < nbPipes; i++) {
 
     nOption = separateurCommand(cmdPipe[i], cmd);
@@ -79,12 +80,12 @@ void pipeCommand(char ** cmdPipe, int nbPipes) {
       case -1 : exit(1);
 
       case  0 : //fils, lecteur, fd[0]
-        dup2(lastFd, 0);
-        if((i + 1) < nbPipes) // existe une commande suivante
-          dup2(fd[1], 1);
+        dup2(lastFd, 0); // lecture dans STDIN
+        if((i + 1) < nbPipes) // si il existe une commande suivante
+          dup2(fd[1], 1); // ecrit le resultat dans STDOUT
         close(fd[0]);
 
-        // exec the command
+        // exec la commande
         if(TARPATH[0] != '\0') {
           if (commandTar(nOption, cmd) == -1)
             execCommand(cmd);
